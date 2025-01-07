@@ -43,7 +43,10 @@ export async function GET(req: NextRequest) {
     }
 
     const data = await response.json();
-    const redirectTo = `/token-display?access_token=${data.access_token}`;
+    // ✅ 절대 URL 생성
+    const host = req.nextUrl.origin;
+    const redirectTo = `${host}/token-display?access_token=${data.access_token}`;
+
     return NextResponse.redirect(redirectTo);
     
   } catch (error) {
