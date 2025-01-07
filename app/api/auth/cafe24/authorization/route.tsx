@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
       headers: {
         'Authorization': authHeader,
         'Content-Type': 'application/x-www-form-urlencoded',
+        'Referer': 'https://cithmb.vercel.app',
       },
       body: params.toString(),
     });
