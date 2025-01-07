@@ -25,23 +25,28 @@ export async function GET(req: NextRequest) {
   const authHeader = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`;
   
   // 액세스 토큰 요청
-  const response = await fetch(tokenUrl, {
-    method: 'POST',
-    headers: {
-      'Authorization': authHeader,
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Referer': 'https://cithmb.vercel.app',
-    },
-    body: params.toString(),
-  });
+  try {
+    const response = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
 
-  if (!response.ok) {
-    return NextResponse.json({ error: 'Failed to fetch access token' }, { status: 500 });
+    // 상태 코드 확인
+    if (!response.ok) {
+      console.error(`Error fetching access token: ${response.status} ${response.statusText}`);
+      return NextResponse.json({ error: 'Failed to fetch access token' }, { status: 500 });
+    }
+
+    const data = await response.json();
+    const redirectTo = `/token-display?access_token=${data.access_token}`;
+    return NextResponse.redirect(redirectTo);
+    
+  } catch (error) {
+    console.error('Error fetching access token:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const data = await response.json();
-
-  // 액세스 토큰을 URL 파라미터로 리디렉션
-  const redirectTo = `/token-display?access_token=${data.access_token}`;
-  return NextResponse.redirect(redirectTo);
 }
