@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
             }
           );
         } catch (axiosError) {
-          const error = axiosError as any;
+          const error = axiosError as Error;
           console.error(`Failed to request new token for mall_id ${mall_id}. Error details:`, error.message, error.stack);
           return;
         }
