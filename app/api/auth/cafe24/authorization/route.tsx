@@ -46,32 +46,41 @@ export async function GET(req: NextRequest) {
     const { access_token, expires_at, refresh_token, refresh_token_expires_at, client_id, mall_id, user_id, scopes, issued_at } = data;
 
     // SQL 쿼리 작성
-    const insertQuery = `
-      INSERT INTO tokens (
-        access_token, 
-        expires_at, 
-        refresh_token, 
-        refresh_token_expires_at, 
-        client_id, 
-        mall_id, 
-        user_id, 
-        scopes, 
-        issued_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    `;
+    const insertOrUpdateQuery = `
+    INSERT INTO tokens (
+      access_token, 
+      expires_at, 
+      refresh_token, 
+      refresh_token_expires_at, 
+      client_id, 
+      mall_id, 
+      user_id, 
+      scopes, 
+      issued_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    ON CONFLICT (mall_id, user_id) 
+    DO UPDATE SET 
+      access_token = $1, 
+      expires_at = $2, 
+      refresh_token = $3, 
+      refresh_token_expires_at = $4, 
+      client_id = $5, 
+      scopes = $8, 
+      issued_at = $9;
+  `;
 
     // DB에 데이터 삽입
     try {
-      await db.query(insertQuery, [
+      await db.query(insertOrUpdateQuery, [
         access_token,
-        expires_at, // 이미 ISO 문자열로 제공되므로 그대로 사용
+        expires_at,
         refresh_token,
-        refresh_token_expires_at, // 이미 ISO 문자열로 제공되므로 그대로 사용
+        refresh_token_expires_at,
         client_id,
         mall_id,
         user_id,
-        JSON.stringify(scopes), // 배열을 JSON 문자열로 저장
-        issued_at, // 이미 ISO 문자열로 제공되므로 그대로 사용
+        JSON.stringify(scopes),
+        issued_at,
       ]);
 
       console.log('Token data saved successfully!');
@@ -82,7 +91,7 @@ export async function GET(req: NextRequest) {
 
     // 토큰 저장 후 리다이렉트
     const host = req.nextUrl.origin;
-    const redirectTo = `${host}/token-display?access_token=${access_token}`;
+    const redirectTo = `${host}/dashboard?mall_id=${mall_id}`;
     return NextResponse.redirect(redirectTo);
     
   } catch (error) {
