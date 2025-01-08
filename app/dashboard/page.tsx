@@ -1,3 +1,4 @@
+// ~/app/dashboard/page.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -20,7 +21,7 @@ const Dashboard = () => {
 
     setMallId(mallId);
 
-    fetch(`/api/auth/store-token?mall_id=${mallId}`)
+    fetch(`/api/auth/cafe24/store-token?mall_id=${mallId}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
