@@ -58,13 +58,14 @@ export async function GET(req: NextRequest) {
       scopes, 
       issued_at
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    ON CONFLICT (mall_id, user_id) 
+    ON CONFLICT (mall_id) 
     DO UPDATE SET 
       access_token = $1, 
       expires_at = $2, 
       refresh_token = $3, 
       refresh_token_expires_at = $4, 
       client_id = $5, 
+      user_id = $7,
       scopes = $8, 
       issued_at = $9;
   `;
