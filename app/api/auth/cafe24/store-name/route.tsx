@@ -11,23 +11,28 @@ export async function GET(req: NextRequest) {
 
   const url = `https://${mallId}.cafe24api.com/api/v2/admin/store?fields=shop_name&shop_no=1`;
 
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  const rawData = await response.text(); // 먼저 raw text로 받아봄
+  console.log('Fetched store data (raw):', rawData); // 콘솔에 raw 응답 출력
+  
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      return NextResponse.json({ error: 'Failed to fetch store name' }, { status: 500 });
+    const data = JSON.parse(rawData); // JSON 파싱 시도
+    console.log('Parsed store data:', data);
+  
+    if (!data.shop_name) {
+      return NextResponse.json({ error: 'Shop name not found in response' }, { status: 500 });
     }
-
-    const data = await response.json();
+  
     return NextResponse.json({ shop_name: data.shop_name });
   } catch (error) {
-    console.error('Error fetching store name:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error parsing store data:', error);
+    return NextResponse.json({ error: 'Failed to parse store data' }, { status: 500 });
   }
 }
