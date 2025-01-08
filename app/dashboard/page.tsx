@@ -43,21 +43,9 @@ const Dashboard = () => {
   const fetchStoreName = async (accessToken: string, mallId: string) => {
     try {
       const response = await fetch(`/api/auth/cafe24/store-name?mall_id=${mallId}&access_token=${accessToken}`);
-      const data = await response.json();
+      const shopName = await response.json();
   
-      if (data.error) {
-        setError(data.error);
-        setLoading(false);
-        return;
-      }
-  
-      // API 응답이 data.store.shop_name 형태임을 반영하여 수정
-      if (data.store && data.store.shop_name) {
-        setStoreName(data.store.shop_name);
-      } else {
-        setError('Shop name not found in response');
-      }
-  
+      setStoreName(shopName);
       setLoading(false);
     } catch (error) {
       setError('Failed to fetch store name');

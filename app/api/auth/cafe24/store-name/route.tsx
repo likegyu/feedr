@@ -25,9 +25,9 @@ export async function GET(req: NextRequest) {
     }
 
     const data = await response.json();
-    return NextResponse.json({ shop_name: data.store.shop_name });
+    return NextResponse.json(data.store.shop_name);
   } catch (error) {
     console.error('Error fetching store name:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json('Internal server error', { status: 500 });
   }
 }
