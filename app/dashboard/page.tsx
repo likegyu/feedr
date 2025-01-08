@@ -43,16 +43,31 @@ const Dashboard = () => {
   const fetchStoreName = async (accessToken: string, mallId: string) => {
     // store-name API를 호출하여 상점 이름을 가져옵니다.
     fetch(`/api/auth/cafe24/store-name?mall_id=${mallId}&access_token=${accessToken}`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Fetched store data:', data);
-        if (data.error) {
-          setError(data.error);
+      .then((response) => response.text())  // 응답을 텍스트로 받아옵니다.
+      .then((text) => {
+        console.log('Fetched store data (raw text):', text); // 텍스트 출력하여 확인
+        try {
+          const data = JSON.parse(text);  // 텍스트를 JSON으로 변환합니다.
+          console.log('Parsed store data:', data);
+  
+          if (data.error) {
+            setError(data.error);
+            setLoading(false);
+            return;
+          }
+  
+          if (data.shop_name) {
+            setStoreName(data.shop_name);
+          } else {
+            setError('Shop name is missing in the response');
+          }
+  
           setLoading(false);
-          return;
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+          setError('Failed to parse store data');
+          setLoading(false);
         }
-        setStoreName(data.shop_name);
-        setLoading(false);
       })
       .catch((error) => {
         setError('Failed to fetch store name');
