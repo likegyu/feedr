@@ -20,7 +20,9 @@ const pool = new Pool({
   },
 });
 
-// `db.query` 반환 값에 대해 구체적인 타입 지정
+// params를 unknown[]로 구체화
 export const db = {
-  query: async (text: string, params?: any[]): Promise<QueryResult<Token>> => pool.query(text, params),
+  query: async (text: string, params?: unknown[]): Promise<QueryResult<Token>> => {
+    return pool.query(text, params);
+  },
 };
