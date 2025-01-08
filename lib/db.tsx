@@ -1,3 +1,4 @@
+// ~/app/lib/db.tsx
 import { Pool, QueryResult } from 'pg';
 
 // 토큰 데이터 구조에 맞는 타입 정의

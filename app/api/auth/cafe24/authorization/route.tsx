@@ -1,3 +1,4 @@
+// ~app/api/auth/cafe24/access/authorization.tsx
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db'; // db 객체 불러오기
 
