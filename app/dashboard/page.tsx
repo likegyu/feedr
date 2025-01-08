@@ -56,8 +56,8 @@ const Dashboard = () => {
             return;
           }
   
-          if (data.shop_name) {
-            setStoreName(data.shop_name);
+          if (data.store.shop_name) {
+            setStoreName(data.store.shop_name);
           } else {
             setError('Shop name is missing in the response');
           }

@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Shop name not found in response' }, { status: 500 });
     }
   
-    return NextResponse.json({ shop_name: data.shop_name });
+    return NextResponse.json({ shop_name: data.store.shop_name });
   } catch (error) {
     console.error('Error parsing store data:', error);
     return NextResponse.json({ error: 'Failed to parse store data' }, { status: 500 });
