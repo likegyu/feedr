@@ -2,10 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 
-interface StoreInfo {
-  shop_name: string;
-}
-
 const Dashboard = () => {
   const [storeName, setStoreName] = useState<string>('');
   const [mallId, setMallId] = useState<string | null>(null);
@@ -38,7 +34,7 @@ const Dashboard = () => {
         const { access_token } = data;  // 여기서 access_token을 가져옴
         fetchStoreName(access_token, mallId); // access_token을 넘겨서 store 정보 가져오기
       })
-      .catch((err) => {
+      .catch(() => {  // err 변수를 사용하지 않음
         setError('Failed to fetch access token');
         setLoading(false);
       });
@@ -65,7 +61,7 @@ const Dashboard = () => {
       const data = await response.json();
       setStoreName(data.shop_name);
       setLoading(false);
-    } catch (err) {
+    } catch (error) {  // err 변수를 사용하지 않음
       setError('Failed to fetch store name');
       setLoading(false);
     }
