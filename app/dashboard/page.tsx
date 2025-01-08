@@ -63,6 +63,7 @@ const Dashboard = () => {
     } catch (error) {
       setError('Failed to fetch store name');
       setLoading(false);
+      console.error('Error fetching access token:', error); // 오류를 콘솔에 출력
     }
   };
 
