@@ -45,12 +45,12 @@ const Dashboard = () => {
     fetch(`/api/auth/cafe24/store-name?mall_id=${mallId}&access_token=${accessToken}`)
       .then((response) => response.json())
       .then((data) => {
+        console.log('Fetched store data:', data);
         if (data.error) {
           setError(data.error);
           setLoading(false);
           return;
         }
-
         setStoreName(data.shop_name);
         setLoading(false);
       })
