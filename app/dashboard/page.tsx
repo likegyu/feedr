@@ -9,7 +9,6 @@ const Dashboard = () => {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    // URL 파라미터에서 mall_id 추출
     const urlParams = new URLSearchParams(window.location.search);
     const mallId = urlParams.get('mall_id');
 
@@ -21,7 +20,6 @@ const Dashboard = () => {
 
     setMallId(mallId);
 
-    // DB에서 mall_id에 해당하는 access_token을 가져옴
     fetch(`/api/auth/store-token?mall_id=${mallId}`)
       .then((response) => response.json())
       .then((data) => {
@@ -31,12 +29,13 @@ const Dashboard = () => {
           return;
         }
 
-        const { access_token } = data;  // 여기서 access_token을 가져옴
-        fetchStoreName(access_token, mallId); // access_token을 넘겨서 store 정보 가져오기
+        const { access_token } = data;
+        fetchStoreName(access_token, mallId);
       })
-      .catch(() => {  // err 변수를 사용하지 않음
+      .catch((error) => {
         setError('Failed to fetch access token');
         setLoading(false);
+        console.error('Error fetching access token:', error); // 오류를 콘솔에 출력
       });
   }, []);
 
@@ -47,7 +46,7 @@ const Dashboard = () => {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,  // 여기서 accessToken을 사용
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
       });
@@ -61,7 +60,7 @@ const Dashboard = () => {
       const data = await response.json();
       setStoreName(data.shop_name);
       setLoading(false);
-    } catch (error) {  // err 변수를 사용하지 않음
+    } catch (error) {
       setError('Failed to fetch store name');
       setLoading(false);
     }
