@@ -41,31 +41,24 @@ const Dashboard = () => {
   }, []);
 
   const fetchStoreName = async (accessToken: string, mallId: string) => {
-    const url = `https://${mallId}.cafe24api.com/api/v2/admin/store?fields=shop_name&shop_no=1`;
+    // store-name API를 호출하여 상점 이름을 가져옵니다.
+    fetch(`/api/auth/cafe24/store-name?mall_id=${mallId}&access_token=${accessToken}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
+          setLoading(false);
+          return;
+        }
 
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
+        setStoreName(data.shop_name);
+        setLoading(false);
+      })
+      .catch((error) => {
         setError('Failed to fetch store name');
         setLoading(false);
-        return;
-      }
-
-      const data = await response.json();
-      setStoreName(data.shop_name);
-      setLoading(false);
-    } catch (error) {
-      setError('Failed to fetch store name');
-      setLoading(false);
-      console.error('Error fetching access token:', error); // 오류를 콘솔에 출력
-    }
+        console.error('Error fetching store name:', error);
+      });
   };
 
   if (loading) return <p>Loading...</p>;
