@@ -1,9 +1,9 @@
-// ~app/token-display/page.tsx
+// ~app/dashboard/page.tsx
 'use client'
 
 import { useEffect, useState } from 'react';
 
-const TokenDisplayPage = () => {
+const DashboardPage = () => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,4 +27,4 @@ const TokenDisplayPage = () => {
   );
 };
 
-export default TokenDisplayPage;
+export default DashboardPage;
