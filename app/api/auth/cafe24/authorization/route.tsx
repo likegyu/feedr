@@ -64,14 +64,14 @@ export async function GET(req: NextRequest) {
     try {
       await db.query(insertQuery, [
         access_token,
-        new Date(expires_at).getTime(),
+        expires_at, // 이미 ISO 문자열로 제공되므로 그대로 사용
         refresh_token,
-        new Date(refresh_token_expires_at).getTime(),
+        refresh_token_expires_at, // 이미 ISO 문자열로 제공되므로 그대로 사용
         client_id,
         mall_id,
         user_id,
         JSON.stringify(scopes), // 배열을 JSON 문자열로 저장
-        new Date(issued_at).getTime(),
+        issued_at, // 이미 ISO 문자열로 제공되므로 그대로 사용
       ]);
 
       console.log('Token data saved successfully!');
