@@ -1,14 +1,13 @@
-import { Pool } from 'pg';
+import { Pool, QueryResult } from 'pg';
 
-// ✅ Neon Database 연결 설정
 const pool = new Pool({
   connectionString: process.env.NEON_DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // SSL 인증서 검증 비활성화
+    rejectUnauthorized: false, 
   },
 });
 
-// ✅ DB 쿼리 실행 함수
+// `db.query` 반환 값에 대해 구체적인 타입 지정
 export const db = {
-  query: (text: string, params?: any[]) => pool.query(text, params),
+  query: async (text: string, params?: any[]): Promise<QueryResult<any>> => pool.query(text, params),
 };
