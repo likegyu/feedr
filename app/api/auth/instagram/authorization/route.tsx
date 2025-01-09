@@ -13,6 +13,20 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+
+    // 리다이렉트 URI 정규화
+    const normalizedRedirectUri = process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI?.replace(/\/$/, '');
+
+    // 디버깅을 위한 로그
+    console.log('인증 요청 정보:', {
+      requested_redirect_uri: normalizedRedirectUri,
+      current_url: request.url
+    });
+    
+    if (!normalizedRedirectUri) {
+      console.error('리다이렉트 URI가 설정되지 않았습니다.');
+      return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&error=설정_오류`, request.url));
+    }
     // Instagram 토큰 요청
     const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
       method: 'POST',
@@ -23,7 +37,7 @@ export async function GET(request: NextRequest) {
         client_id: process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_ID!,
         client_secret: process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_SECRET!,
         grant_type: 'authorization_code',
-        redirect_uri: process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI!,
+        redirect_uri: normalizedRedirectUri,
         code,
       }),
     });
@@ -32,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       console.error('Instagram 인증 실패:', data);
-      return NextResponse.redirect(new URL(`/dashboard/?mall_id=${mall_id}&state=${state}&error=인증_실패`, request.url));
+      return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&state=${state}&error=인증_실패`, request.url));
     }
 
     const { access_token, user_id } = data;
@@ -47,9 +61,9 @@ export async function GET(request: NextRequest) {
       [access_token, user_id, data.permissions || '', mall_id]
     );
 
-    return NextResponse.redirect(new URL(`/dashboard/?mall_id=${mall_id}&state=${state}&success=true`, request.url));
+    return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&state=${state}&success=true`, request.url));
   } catch (error) {
     console.error('Instagram 인증 처리 중 오류:', error);
-    return NextResponse.redirect(new URL(`/dashboard/?mall_id=${mall_id}&state=${state}&error=서버_오류`, request.url));
+    return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&state=${state}&error=서버_오류`, request.url));
   }
 }
