@@ -2,7 +2,7 @@
 import { Pool, QueryResult } from 'pg';
 
 // 카페24 토큰 데이터 구조에 맞는 타입 정의
-type Cafe24Token = {
+type Token = {
   cafe24_access_token: string;
   cafe24_expires_at: string;  // ISO 8601 문자열로 처리
   cafe24_refresh_token: string;
@@ -23,7 +23,7 @@ const pool = new Pool({
 
 // params를 구체화하고 반환값에 대해 타입을 지정
 export const db = {
-  query: async (text: string, params?: (string | number | boolean)[]): Promise<QueryResult<Cafe24Token>> => {
+  query: async (text: string, params?: (string | number | boolean)[]): Promise<QueryResult<Token>> => {
     return pool.query(text, params);
   },
 };
