@@ -5,6 +5,7 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
   const mall_id = url.searchParams.get('state');
+  const state = url.searchParams.get('state');
 
   if (!code || !mall_id) {
     console.error('필수 파라미터 누락:', { code: !!code, mall_id: !!mall_id });
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       console.error('Instagram 인증 실패:', data);
-      return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&error=인증_실패`, request.url));
+      return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&state=${state}&error=인증_실패`, request.url));
     }
 
     const { access_token, user_id } = data;
@@ -46,9 +47,9 @@ export async function GET(request: NextRequest) {
       [access_token, user_id, data.permissions || '', mall_id]
     );
 
-    return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&success=true`, request.url));
+    return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&state=${state}&success=true`, request.url));
   } catch (error) {
     console.error('Instagram 인증 처리 중 오류:', error);
-    return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&error=서버_오류`, request.url));
+    return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&state=${state}&error=서버_오류`, request.url));
   }
 }
