@@ -24,7 +24,7 @@ const InstagramConnect = () => {
 
   const checkInstagramStatus = async (mallId: string) => {
     try {
-      const response = await fetch(`/api/instagram/status?mall_id=${mallId}`);
+      const response = await fetch(`/api/auth/instagram/status?mall_id=${mallId}`);
       const data = await response.json();
       setStatus(data);
     } catch (error) {
