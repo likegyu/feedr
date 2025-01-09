@@ -38,7 +38,7 @@ const InstagramConnect = () => {
     process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_ID
   }&redirect_uri=${
     process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI
-  }?mall_id=${cafe24MallId}&scope=instagram_business_basic,instagram_graph_user_media&response_type=code`;
+  }&state=${new URLSearchParams(window.location.search).get('mall_id')}&scope=instagram_business_basic&response_type=code`;
 
   return (
     <div>

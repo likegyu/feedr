@@ -4,11 +4,11 @@ import { db } from '@/lib/db';
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  const mall_id = url.searchParams.get('mall_id');
+  const mall_id = url.searchParams.get('state');
 
   if (!code || !mall_id) {
     console.error('필수 파라미터 누락:', { code: !!code, mall_id: !!mall_id });
-    return NextResponse.redirect(new URL('/dashboard?error=인증_정보_누락', request.url));
+    return NextResponse.redirect(new URL('/?error=인증_정보_누락', request.url));
   }
 
   try {
