@@ -33,14 +33,26 @@ export async function GET(request: NextRequest) {
 
     const { access_token, user_id } = data;
 
-    // 데이터베이스 업데이트
+    // 단기 액세스 토큰을 장기 토큰으로 교환
+    const longLivedTokenResponse = await fetch(
+      `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.INSTAGRAM_CLIENT_SECRET}&access_token=${access_token}`
+    );
+
+    const longLivedTokenData = await longLivedTokenResponse.json();
+
+    if (!longLivedTokenResponse.ok) {
+      console.error('장기 토큰 교환 실패:', longLivedTokenData);
+      return NextResponse.redirect(new URL(`/dashboard?state=${state}&error=토큰_교환_실패`, request.url));
+    }
+
+    // 데이터베이스 업데이트 (장기 토큰 사용)
     await db.query(
       `UPDATE tokens 
        SET instagram_access_token = $1, 
-           instagram_user_id = $2, 
-           instagram_permissions = $3
+           instagram_user_id = $2,
+           instagram_expires_in = $3,
        WHERE cafe24_mall_id = $4`,
-      [access_token, user_id, data.permissions || '', state]
+      [longLivedTokenData.access_token, user_id, longLivedTokenData.expires_in, state]
     );
 
     return NextResponse.redirect(new URL(`/dashboard?state=${state}&success=true`, request.url));
