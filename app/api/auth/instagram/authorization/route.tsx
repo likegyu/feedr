@@ -14,19 +14,16 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Instagram 토큰 요청
+    const formData = new FormData();
+    formData.append('client_id', process.env.INSTAGRAM_CLIENT_ID!);
+    formData.append('client_secret', process.env.INSTAGRAM_CLIENT_SECRET!);
+    formData.append('grant_type', 'authorization_code');
+    formData.append('redirect_uri', process.env.INSTAGRAM_REDIRECT_URI!);
+    formData.append('code', code);
+
     const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        client_id: process.env.INSTAGRAM_CLIENT_ID!,
-        client_secret: process.env.INSTAGRAM_CLIENT_SECRET!,
-        grant_type: 'authorization_code',
-        redirect_uri: process.env.INSTAGRAM_REDIRECT_URI!,
-        code,
-      }),
+      body: formData
     });
 
     const data = await tokenResponse.json();
