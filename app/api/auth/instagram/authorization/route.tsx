@@ -34,9 +34,7 @@ export async function GET(request: NextRequest) {
     const { access_token, user_id } = data;
 
     // 단기 액세스 토큰을 장기 토큰으로 교환
-    const longLivedTokenResponse = await fetch(
-      'https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.INSTAGRAM_CLIENT_SECRET}&access_token=${access_token}'
-    );
+    const longLivedTokenResponse = await fetch(`https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.INSTAGRAM_CLIENT_SECRET}&access_token=${access_token}`);
 
     const longLivedTokenData = await longLivedTokenResponse.json();
 

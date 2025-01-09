@@ -116,9 +116,7 @@ export async function GET(req: NextRequest) {
 
           if (shouldRefreshInstagram) {
             try {
-              const instagramResponse = await fetch(
-                'https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${instagram_access_token}'
-              );
+              const instagramResponse = await fetch(`https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${instagram_access_token}`);
 
               const instagramData = await instagramResponse.json();
 
