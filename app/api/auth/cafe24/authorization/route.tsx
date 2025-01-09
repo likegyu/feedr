@@ -23,7 +23,9 @@ export async function GET(req: NextRequest) {
   cafe24Params.append('redirect_uri', cafe24RedirectUri);
 
   const cafe24AuthHeader = `Basic ${Buffer.from(`${cafe24ClientId}:${cafe24ClientSecret}`).toString('base64')}`;
-  
+  console.log('cafe24Code:', cafe24Code);
+  console.log('cafe24State:', cafe24State);
+  console.log('cafe24AuthHeader:', cafe24AuthHeader);
   // 액세스 토큰 요청
   try {
     const cafe24Response = await fetch(cafe24TokenUrl, {
