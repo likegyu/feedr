@@ -12,6 +12,9 @@ type Token = {
   cafe24_user_id: string;
   cafe24_scopes: string;  // JSON 문자열로 처리
   cafe24_issued_at: string;  // ISO 8601 문자열로 처리
+  instagram_access_token?: string;
+  instagram_user_id?: string;
+  instagram_permissions?: string;
 };
 
 const pool = new Pool({
