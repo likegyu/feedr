@@ -1,21 +1,29 @@
 // ~/app/api/auth/cafe24/store-name/route.tsx
 import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   const mallId = req.nextUrl.searchParams.get('mall_id');
-  const accessToken = req.nextUrl.searchParams.get('access_token');
 
-  if (!mallId || !accessToken) {
-    return NextResponse.json({ error: 'Mall ID or access token is missing' }, { status: 400 });
+  if (!mallId) {
+    return NextResponse.json({ error: 'Mall ID is missing' }, { status: 400 });
   }
 
-  const url = `https://${mallId}.cafe24api.com/api/v2/admin/store?fields=shop_name&shop_no=1`;
-
   try {
+    // DB에서 access_token 조회
+    const tokenResult = await db.query('SELECT access_token FROM tokens WHERE mall_id = $1', [mallId]);
+
+    if (tokenResult.rows.length === 0) {
+      return NextResponse.json({ error: 'Mall not found or not authorized' }, { status: 404 });
+    }
+
+    const { access_token } = tokenResult.rows[0];
+    const url = `https://${mallId}.cafe24api.com/api/v2/admin/store?fields=shop_name&shop_no=1`;
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Authorization': `Bearer ${access_token}`,
         'Content-Type': 'application/json',
       },
     });
@@ -27,7 +35,7 @@ export async function GET(req: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data.store.shop_name);
   } catch (error) {
-    console.error('Error fetching store name:', error);
-    return NextResponse.json('Internal server error', { status: 500 });
+    console.error('Error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
