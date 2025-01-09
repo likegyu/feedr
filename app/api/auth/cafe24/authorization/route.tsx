@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 토큰 저장 후 리다이렉트
-    return NextResponse.redirect(`${req.nextUrl.origin}/dashboard?mall_id=${cafe24MallId}`);
+    return NextResponse.redirect(`${req.nextUrl.origin}/dashboard?state=${cafe24MallId}`);
   } catch (error) {
     console.error('Error fetching Cafe24 access token:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

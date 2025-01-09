@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
-  const cafe24MallId = req.nextUrl.searchParams.get('mall_id');
+  const cafe24MallId = req.nextUrl.searchParams.get('state');
 
   if (!cafe24MallId) {
     return NextResponse.json({ error: 'Mall ID is missing' }, { status: 400 });

@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
-  const mall_id = url.searchParams.get('mall_id');
+  const mall_id = url.searchParams.get('state');
 
   if (!mall_id) {
     return NextResponse.json({ error: '몰 아이디가 필요합니다.' }, { status: 400 });
