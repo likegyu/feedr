@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       );
   
       return NextResponse.json({ 
-        isConnected: result.rowCount > 0 
+        isConnected: result.rowCount ? result.rowCount > 0 : false 
       });
     } catch (error) {
       console.error('Error checking Instagram connection status:', error);
