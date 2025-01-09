@@ -6,6 +6,10 @@ export async function GET(request: NextRequest) {
   const code = url.searchParams.get('code');
   const mall_id = url.searchParams.get('state');
   const state = url.searchParams.get('state');
+  console.log('code:', code);
+  console.log('mall_id:', mall_id);
+  console.log('state:', state);
+  console.log(request.url);
 
   if (!code || !mall_id) {
     console.error('필수 파라미터 누락:', { code: !!code, mall_id: !!mall_id });
