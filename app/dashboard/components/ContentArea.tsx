@@ -1,20 +1,41 @@
-// ~/dashboard/components/ContentArea.tsx
 'use client';
 
 import React from 'react';
+import Dashboard from './contents/Dashboard';
+import InstagramConnect from './contents/InstagramConnect';
+import FeedSettings from './contents/FeedSettings';
+import Notices from './contents/Notices';
+import ApiDocs from './contents/ApiDocs';
 
-interface ContentAreaProps {
+interface Cafe24ContentAreaProps {
   selectedMenu: string;
+  cafe24MallId: string | null;
+  cafe24StoreName: string;
 }
 
-const ContentArea: React.FC<ContentAreaProps> = ({ selectedMenu }) => {
-  return (
-    <div className="flex-1 p-6">
-      {selectedMenu === 'instagram' && <h2>📷 Instagram 연동 페이지</h2>}
-      {selectedMenu === 'account' && <h2>⚙️ 계정 설정 페이지</h2>}
-      {selectedMenu === '' && <h2>대시보드를 시작하려면 메뉴를 선택하세요.</h2>}
-    </div>
-  );
+const ContentArea: React.FC<Cafe24ContentAreaProps> = ({
+  selectedMenu,
+  cafe24MallId,
+  cafe24StoreName
+}) => {
+  const renderContent = () => {
+    switch (selectedMenu) {
+      case 'dashboard':
+        return <Dashboard mallId={cafe24MallId} storeName={cafe24StoreName} />;
+      case 'instagram':
+        return <InstagramConnect />;
+      case 'feed-settings':
+        return <FeedSettings />;
+      case 'notices':
+        return <Notices />;
+      case 'api-docs':
+        return <ApiDocs />;
+      default:
+        return <Dashboard mallId={cafe24MallId} storeName={cafe24StoreName} />;
+    }
+  };
+
+  return <div className="flex-1 p-6">{renderContent()}</div>;
 };
 
 export default ContentArea;

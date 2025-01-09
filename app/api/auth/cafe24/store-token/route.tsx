@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
     SELECT access_token
     FROM tokens
     WHERE mall_id = $1
+    AND access_token LIKE 'cafe24_%'
   `;
 
   try {
@@ -22,9 +23,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Mall not found or not authorized' }, { status: 404 });
     }
 
-    const { access_token } = result.rows[0];
+    const { cafe24_access_token } = result.rows[0];
 
-    return NextResponse.json({ access_token });
+    return NextResponse.json({ cafe24_access_token });
   } catch (error) {
     console.error('Error fetching access token from DB:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
