@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { cafe24_access_token } = tokenResult.rows[0];
-    const url = `https://${mallId}.cafe24api.com/api/v2/admin/store?fields=shop_name&shop_no=1`;
+    const url = `https://${cafe24MallId}.cafe24api.com/api/v2/admin/store?fields=shop_name&shop_no=1`;
 
     const response = await fetch(url, {
       method: 'GET',
