@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
   const code = url.searchParams.get('code');
   const mall_id = url.searchParams.get('state');
   const state = url.searchParams.get('state');
+  console.log(request.url);
 
   if (!code || !mall_id) {
     console.error('필수 파라미터 누락:', { code: !!code, mall_id: !!mall_id });
@@ -13,20 +14,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-
-    // 리다이렉트 URI 정규화
-    const normalizedRedirectUri = process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI?.replace(/\/$/, '');
-
-    // 디버깅을 위한 로그
-    console.log('인증 요청 정보:', {
-      requested_redirect_uri: normalizedRedirectUri,
-      current_url: request.url
-    });
-    
-    if (!normalizedRedirectUri) {
-      console.error('리다이렉트 URI가 설정되지 않았습니다.');
-      return NextResponse.redirect(new URL(`/dashboard?mall_id=${mall_id}&error=설정_오류`, request.url));
-    }
     // Instagram 토큰 요청
     const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
       method: 'POST',
@@ -37,7 +24,7 @@ export async function GET(request: NextRequest) {
         client_id: process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_ID!,
         client_secret: process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_SECRET!,
         grant_type: 'authorization_code',
-        redirect_uri: normalizedRedirectUri,
+        redirect_uri: process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI!,
         code,
       }),
     });
