@@ -56,7 +56,7 @@ const InstagramConnect = () => {
                   href={`https://instagram.com/${status.userName}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-black hover:text-slate-400"
                 >
                   {status.userName}
                 </a>
