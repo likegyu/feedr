@@ -46,9 +46,9 @@ export async function GET(req: NextRequest) {
     const cafe24Data = await cafe24Response.json();
     
     const { 
-      access_token: cafe24AccessTokenRaw, 
+      access_token: cafe24AccessToken, 
       expires_at: cafe24ExpiresAt, 
-      refresh_token: cafe24RefreshTokenRaw, 
+      refresh_token: cafe24RefreshToken, 
       refresh_token_expires_at: cafe24RefreshTokenExpiresAt, 
       client_id: cafe24ClientIdResponse, 
       mall_id: cafe24MallId, 
@@ -56,10 +56,7 @@ export async function GET(req: NextRequest) {
       scopes: cafe24Scopes, 
       issued_at: cafe24IssuedAt 
     } = cafe24Data;
-
-    const cafe24AccessToken = `cafe24_${cafe24AccessTokenRaw}`;
-    const cafe24RefreshToken = `cafe24_${cafe24RefreshTokenRaw}`;
-
+    
     // SQL 쿼리 작성
     const cafe24TokensInsertQuery = `
     INSERT INTO tokens (
