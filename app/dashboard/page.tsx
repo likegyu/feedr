@@ -16,7 +16,7 @@ const Cafe24Dashboard = () => {
   useEffect(() => {
     // 현재 URL의 쿼리 파라미터에서 mall_id 추출
     const urlParams = new URLSearchParams(window.location.search);
-    const cafe24MallIdParam = urlParams.get('mall_id');
+    const cafe24MallIdParam = urlParams.get('state');
 
     // mall_id가 없으면 함수 종료
     if (!cafe24MallIdParam) return;
@@ -25,7 +25,7 @@ const Cafe24Dashboard = () => {
     setCafe24MallId(cafe24MallIdParam);
 
     // 기존 API 라우터를 활용하여 store-name 요청
-    fetch(`/api/auth/cafe24/store-name?mall_id=${cafe24MallIdParam}`)
+    fetch(`/api/auth/cafe24/store-name?state=${cafe24MallIdParam}`)
       .then(async (cafe24Response) => {
         if (!cafe24Response.ok) {
           throw new Error('Failed to fetch Cafe24 store name');
