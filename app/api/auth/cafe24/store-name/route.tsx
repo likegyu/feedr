@@ -3,15 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
-  const mallId = req.nextUrl.searchParams.get('mall_id');
+  const cafe24MallId = req.nextUrl.searchParams.get('mall_id');
 
-  if (!mallId) {
+  if (!cafe24MallId) {
     return NextResponse.json({ error: 'Mall ID is missing' }, { status: 400 });
   }
 
   try {
     // DB에서 access_token 조회
-    const tokenResult = await db.query('SELECT cafe24_access_token FROM tokens WHERE mall_id = $1', [mallId]);
+    const tokenResult = await db.query('SELECT cafe24_access_token FROM tokens WHERE cafe24_mall_id = $1', [cafe24MallId]);
 
     if (tokenResult.rows.length === 0) {
       return NextResponse.json({ error: 'Mall not found or not authorized' }, { status: 404 });

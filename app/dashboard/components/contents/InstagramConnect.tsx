@@ -16,8 +16,8 @@ const InstagramConnect = () => {
         if (data.isConnected) {
           setIsConnected(true);
         }
-      } catch (error) {
-        setError('Failed to check Instagram connection status');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to check Instagram connection status');
       }
     };
 
