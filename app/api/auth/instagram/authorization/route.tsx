@@ -21,10 +21,10 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_ID!,
-        client_secret: process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_SECRET!,
+        client_id: process.env.INSTAGRAM_CLIENT_ID!,
+        client_secret: process.env.INSTAGRAM_CLIENT_SECRET!,
         grant_type: 'authorization_code',
-        redirect_uri: process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI!,
+        redirect_uri: process.env.INSTAGRAM_REDIRECT_URI!,
         code,
       }),
     });

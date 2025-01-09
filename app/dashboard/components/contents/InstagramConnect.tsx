@@ -35,9 +35,9 @@ const InstagramConnect = () => {
   };
 
   const instagramAuthUrl = `https://api.instagram.com/oauth/authorize?client_id=${
-    process.env.NEXT_PUBLIC_INSTAGRAM_CLIENT_ID
+    process.env.INSTAGRAM_CLIENT_ID
   }&redirect_uri=${
-    process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI
+    process.env.INSTAGRAM_REDIRECT_URI
   }&state=${new URLSearchParams(window.location.search).get('mall_id')}&scope=instagram_business_basic&response_type=code`;
 
   return (
