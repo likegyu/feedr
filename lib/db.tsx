@@ -14,6 +14,7 @@ type Token = {
   cafe24_issued_at: string;  // ISO 8601 문자열로 처리
   instagram_access_token?: string;
   instagram_user_id?: string;
+  instagram_expires_in?: number;
 };
 
 const pool = new Pool({

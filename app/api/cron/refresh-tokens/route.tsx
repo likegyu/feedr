@@ -26,12 +26,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Database Query Failed' }, { status: 500 });
     }
 
-    // 각 리프레시 토큰에 대해 병렬로 액세스 토큰 갱신 요청 보내기
-    const tokenPromises = await Promise.all(tokens.map(async (token) => {
-      const { cafe24_mall_id, cafe24_refresh_token } = token;
+    // 각 토큰에 대해 병렬로 갱신 요청 보내기
+    const tokenPromises = tokens.map(async (token) => {
+      const { 
+        cafe24_mall_id, 
+        cafe24_refresh_token, 
+        instagram_access_token,
+        instagram_expires_in 
+      } = token;
 
       try {
-        // Cafe24 API로 액세스 토큰 재발급 요청
+        // Cafe24 토큰 갱신 로직
         let response;
         try {
           response = await axios.post(
@@ -103,11 +108,43 @@ export async function GET(req: NextRequest) {
             cafe24IssuedAt,
           ]
         );
+
+        // Instagram 토큰 갱신 체크
+        if (instagram_access_token && instagram_expires_in) {
+          const twoDaysInSeconds = 2 * 24 * 60 * 60; // 2일을 초로 변환
+          const shouldRefreshInstagram = instagram_expires_in <= twoDaysInSeconds;
+
+          if (shouldRefreshInstagram) {
+            try {
+              const instagramResponse = await fetch(
+                'https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${instagram_access_token}'
+              );
+
+              const instagramData = await instagramResponse.json();
+
+              if (instagramResponse.ok) {
+                // Instagram 토큰 업데이트
+                await db.query(
+                  `UPDATE tokens 
+                   SET instagram_access_token = $1,
+                       instagram_expires_in = $2
+                   WHERE cafe24_mall_id = $3`,
+                  [instagramData.access_token, instagramData.expires_in, cafe24_mall_id]
+                );
+              } else {
+                console.error(`Instagram token refresh failed for mall_id ${cafe24_mall_id}:`, instagramData);
+              }
+            } catch (instagramError) {
+              console.error(`Instagram token refresh error for mall_id ${cafe24_mall_id}:`, instagramError);
+            }
+          }
+        }
+
       } catch (error) {
         const err = error as Error;
-        console.error(`Failed to refresh token for mall_id ${cafe24_mall_id}. Error details:`, err.message, err.stack);
+        console.error(`Failed to refresh tokens for mall_id ${cafe24_mall_id}:`, err);
       }
-    }));
+    });
 
     // 모든 리프레시 토큰 갱신을 병렬로 실행
     await Promise.all(tokenPromises);
