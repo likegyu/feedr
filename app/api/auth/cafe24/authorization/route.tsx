@@ -31,8 +31,8 @@ export async function GET(req: NextRequest) {
     const cafe24Response = await fetch(cafe24TokenUrl, {
       method: 'POST',
       headers: {
-        'Authorization': cafe24AuthHeader,
-        'Content-Type': 'application/x-www-form-urlencoded'
+      'Authorization': cafe24AuthHeader,
+      'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: cafe24Params.toString(),
     });
@@ -63,26 +63,26 @@ export async function GET(req: NextRequest) {
     // SQL 쿼리 작성
     const cafe24TokensInsertQuery = `
     INSERT INTO tokens (
-      access_token, 
-      expires_at, 
-      refresh_token, 
-      refresh_token_expires_at, 
-      client_id, 
-      mall_id, 
-      user_id, 
-      scopes, 
-      issued_at
+      cafe24_access_token,
+      cafe24_expires_at,
+      cafe24_refresh_token,
+      cafe24_refresh_token_expires_at,
+      cafe24_client_id,
+      cafe24_mall_id,
+      cafe24_user_id,
+      cafe24_scopes,
+      cafe24_issued_at
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    ON CONFLICT (mall_id) 
+    ON CONFLICT (cafe24_mall_id) 
     DO UPDATE SET 
-      access_token = $1, 
-      expires_at = $2, 
-      refresh_token = $3, 
-      refresh_token_expires_at = $4, 
-      client_id = $5, 
-      user_id = $7,
-      scopes = $8, 
-      issued_at = $9;
+      cafe24_access_token = $1,
+      cafe24_expires_at = $2,
+      cafe24_refresh_token = $3,
+      cafe24_refresh_token_expires_at = $4,
+      cafe24_client_id = $5,
+      cafe24_user_id = $7,
+      cafe24_scopes = $8,
+      cafe24_issued_at = $9;
     `;
 
     // DB에 데이터 삽입
