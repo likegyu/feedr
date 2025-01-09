@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       `UPDATE tokens 
        SET instagram_access_token = $1, 
            instagram_user_id = $2,
-           instagram_expires_in = $3,
+           instagram_expires_in = $3
        WHERE cafe24_mall_id = $4`,
       [longLivedTokenData.access_token, user_id, longLivedTokenData.expires_in, state]
     );
