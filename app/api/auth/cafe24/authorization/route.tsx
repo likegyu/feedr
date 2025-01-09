@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db'; // db 객체 불러오기
 
 export async function GET(req: NextRequest) {
-  const cafe24Code = req.nextUrl.searchParams.get('code');
-  const cafe24State = req.nextUrl.searchParams.get('state');
+  const { code: cafe24Code, state: cafe24State } = Object.fromEntries(req.nextUrl.searchParams);
   
   // 필요한 파라미터가 없으면 에러 처리
   if (!cafe24Code || !cafe24State) {
@@ -101,14 +100,13 @@ export async function GET(req: NextRequest) {
       console.log('Cafe24 token data saved successfully!');
     } catch (error) {
       console.error('Error saving Cafe24 token to database:', error);
-      return NextResponse.json({ error: 'Failed to save Cafe24 token data' }, { status: 500 });
+      const errorMessage = (error as Error).message;
+      return NextResponse.json({ error: 'Failed to save Cafe24 token data', details: errorMessage }, { status: 500 });
     }
 
     // 토큰 저장 후 리다이렉트
-    const host = req.nextUrl.origin;
-    const cafe24RedirectTo = `${host}/dashboard?mall_id=${cafe24MallId}`;
-    return NextResponse.redirect(cafe24RedirectTo);
-    
+    const cafe24RedirectTo = `${req.nextUrl.origin}/dashboard?mall_id=${cafe24MallId}`;
+    return NextResponse.redirect(`${req.nextUrl.origin}/dashboard?mall_id=${cafe24MallId}`);
   } catch (error) {
     console.error('Error fetching Cafe24 access token:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
