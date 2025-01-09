@@ -15,6 +15,7 @@ type Token = {
   instagram_access_token?: string;
   instagram_user_id?: string;
   instagram_expires_in?: number;
+  instagram_username?: string;
 };
 
 const pool = new Pool({

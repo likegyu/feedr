@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 interface InstagramStatus {
   isConnected: boolean;
-  userId?: string;
+  userName?: string;
 }
 
 const InstagramConnect = () => {
@@ -50,7 +50,17 @@ const InstagramConnect = () => {
           <div>
             <div className="mb-4 p-4 bg-green-50 text-green-700 rounded-lg">
               <p>✅ Instagram 계정이 연동되었습니다.</p>
-              <p className="text-sm mt-2">연동된 계정 ID: {status.userId}</p>
+              <p className="text-sm mt-2">
+                연동된 계정 ID:{' '}
+                <a
+                  href={`https://instagram.com/${status.userName}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  {status.userName}
+                </a>
+              </p>
             </div>
             <button
               onClick={() => checkInstagramStatus(cafe24MallId!)}

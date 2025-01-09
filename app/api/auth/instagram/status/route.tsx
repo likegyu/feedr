@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await db.query(
-      'SELECT instagram_access_token, instagram_user_id FROM tokens WHERE cafe24_mall_id = $1',
+      'SELECT instagram_access_token, instagram_username FROM tokens WHERE cafe24_mall_id = $1',
       [mall_id]
     );
 
@@ -19,10 +19,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ isConnected: false });
     }
 
-    const { instagram_access_token, instagram_user_id } = result.rows[0];
+    const { instagram_access_token, instagram_username } = result.rows[0];
     return NextResponse.json({
       isConnected: !!instagram_access_token,
-      userId: instagram_user_id
+      userName: instagram_username
     });
   } catch (error) {
     console.error('Instagram 상태 확인 중 오류:', error);
