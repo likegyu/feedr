@@ -14,7 +14,7 @@ const InstagramConnect = () => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const mallId = urlParams.get('mall_id');
+    const mallId = urlParams.get('state');
     setMallId(mallId);
 
     if (mallId) {
@@ -24,7 +24,7 @@ const InstagramConnect = () => {
 
   const checkInstagramStatus = async (mallId: string) => {
     try {
-      const response = await fetch(`/api/auth/instagram/status?mall_id=${mallId}`);
+      const response = await fetch(`/api/auth/instagram/status?state=${mallId}`);
       const data = await response.json();
       setStatus(data);
     } catch (error) {
