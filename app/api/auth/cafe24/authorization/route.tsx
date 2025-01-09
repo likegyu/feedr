@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
 
     // SQL 쿼리 작성
     const cafe24TokensInsertQuery = `
-    INSERT INTO cafe24_tokens (
+    INSERT INTO tokens (
       access_token, 
       expires_at, 
       refresh_token, 

@@ -28,17 +28,17 @@ export async function GET(req: NextRequest) {
 
     // 각 리프레시 토큰에 대해 병렬로 액세스 토큰 갱신 요청 보내기
     const tokenPromises = await Promise.all(tokens.map(async (token) => {
-      const { mall_id, refresh_token } = token;
+      const { cafe24_mall_id, cafe24_refresh_token } = token;
 
       try {
         // Cafe24 API로 액세스 토큰 재발급 요청
         let response;
         try {
           response = await axios.post(
-            `https://${mall_id}.cafe24api.com/api/v2/oauth/token`,
+            `https://${cafe24_mall_id}.cafe24api.com/api/v2/oauth/token`,
             new URLSearchParams({
               grant_type: 'refresh_token',
-              refresh_token: refresh_token,
+              refresh_token: cafe24_refresh_token,
             }),
             {
               headers: {
@@ -49,62 +49,63 @@ export async function GET(req: NextRequest) {
           );
         } catch (axiosError) {
           const error = axiosError as Error;
-          console.error(`Failed to request new token for mall_id ${mall_id}. Error details:`, error.message, error.stack);
+          console.error(`Failed to request new token for mall_id ${cafe24_mall_id}. Error details:`, error.message, error.stack);
           return;
         }
 
         // 응답 데이터에서 새 토큰 정보 추출
         const {
-          access_token,
-          expires_at,
-          refresh_token: new_refresh_token,
-          refresh_token_expires_at,
-          client_id,
-          user_id,
-          scopes,
-          issued_at,
+          access_token: cafe24AccessToken,
+          expires_at: cafe24ExpiresAt,
+          refresh_token: cafe24RefreshToken,
+          refresh_token_expires_at: cafe24RefreshTokenExpiresAt,
+          client_id: cafe24ClientId,
+          mall_id: cafe24MallId,
+          user_id: cafe24UserId,
+          scopes: cafe24Scopes,
+          issued_at: cafe24IssuedAt
         } = response.data;
 
         // DB에 업데이트
         await db.query(
           `
           INSERT INTO tokens (
-            access_token,
-            expires_at,
-            refresh_token,
-            refresh_token_expires_at,
-            client_id,
-            mall_id,
-            user_id,
-            scopes,
-            issued_at
+            cafe24_access_token,
+            cafe24_expires_at,
+            cafe24_refresh_token,
+            cafe24_refresh_token_expires_at,
+            cafe24_client_id,
+            cafe24_mall_id,
+            cafe24_user_id,
+            cafe24_scopes,
+            cafe24_issued_at
           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-          ON CONFLICT (mall_id) 
+          ON CONFLICT (cafe24_mall_id) 
           DO UPDATE SET 
-            access_token = $1,
-            expires_at = $2,
-            refresh_token = $3,
-            refresh_token_expires_at = $4,
-            client_id = $5,
-            user_id = $7,
-            scopes = $8,
-            issued_at = $9;
+            cafe24_access_token = $1,
+            cafe24_expires_at = $2,
+            cafe24_refresh_token = $3,
+            cafe24_refresh_token_expires_at = $4,
+            cafe24_client_id = $5,
+            cafe24_user_id = $7,
+            cafe24_scopes = $8,
+            cafe24_issued_at = $9;
           `,
           [
-            access_token,
-            expires_at,
-            new_refresh_token,
-            refresh_token_expires_at,
-            client_id,
-            mall_id,
-            user_id,
-            JSON.stringify(scopes),
-            issued_at,
+            cafe24AccessToken,
+            cafe24ExpiresAt,
+            cafe24RefreshToken,
+            cafe24RefreshTokenExpiresAt,
+            cafe24ClientId,
+            cafe24MallId,
+            cafe24UserId,
+            JSON.stringify(cafe24Scopes),
+            cafe24IssuedAt,
           ]
         );
       } catch (error) {
         const err = error as Error;
-        console.error(`Failed to refresh token for mall_id ${mall_id}. Error details:`, err.message, err.stack);
+        console.error(`Failed to refresh token for mall_id ${cafe24_mall_id}. Error details:`, err.message, err.stack);
       }
     }));
 
