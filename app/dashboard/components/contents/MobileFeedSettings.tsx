@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -15,6 +15,13 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { ImageIcon, PlayCircleIcon } from 'lucide-react';
 
 const MobileFeedSettings = () => {
+  useEffect(() => {
+    document.body.style.userSelect = 'none';
+    return () => {
+      document.body.style.userSelect = '';
+    };
+  }, []);
+
   const [mobileEmblaRef] = useEmblaCarousel({
     align: 'center',
     containScroll: 'keepSnaps',
