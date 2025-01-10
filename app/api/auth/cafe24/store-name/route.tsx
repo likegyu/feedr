@@ -1,5 +1,5 @@
 // ~/app/api/auth/cafe24/store-name/route.tsx
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { cookies } from 'next/headers';
 
