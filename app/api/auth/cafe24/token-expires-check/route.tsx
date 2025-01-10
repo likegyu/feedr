@@ -8,5 +8,5 @@ export async function GET() {
   if (!cafe24ExpiresAt) {
     return NextResponse.json({ error: '토큰 만료 시간을 가져올 수 없습니다.' }, { status: 400 });
   }
-  return NextResponse.json({ cafe24ExpiresAt});
+  return NextResponse.json({ data: { cafe24ExpiresAt } });
 }
