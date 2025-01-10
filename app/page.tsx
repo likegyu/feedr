@@ -7,7 +7,7 @@ export default function Home() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (mallId) {
-      window.location.href = `/api/auth/cafe24/access?state=${mallId}`;
+      window.location.href = `/api/auth/cafe24/access?mall_id=${mallId}`;
     }
   };
 

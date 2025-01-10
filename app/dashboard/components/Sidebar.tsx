@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { differenceInSeconds } from 'date-fns';
 
 interface SidebarProps {
   cafe24MallId: string | null;
   cafe24StoreName: string;
+  tokenExpiresAt: string | null;
   onMenuSelect: (menu: string) => void;
 }
 
@@ -69,11 +71,48 @@ const menuItems: MenuItem[] = [
   },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ cafe24MallId, cafe24StoreName, onMenuSelect }) => {
+const Sidebar: React.FC<SidebarProps> = ({ 
+  cafe24MallId, 
+  cafe24StoreName, 
+  tokenExpiresAt, 
+  onMenuSelect 
+}) => {
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+  const [expiresIn, setExpiresIn] = useState<string>('');
+
+  const formatTimeLeft = useCallback((seconds: number): string => {
+    if (seconds <= 0) return '로그인 토큰이 만료되었습니다 다시 로그인해 주세요';
+
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    const parts = [];
+    if (hours > 0) parts.push(`${hours}시간`);
+    if (minutes > 0) parts.push(`${minutes}분`);
+    parts.push(`${remainingSeconds}초`);
+
+    return `로그인 만료까지: ${parts.join(' ')}`;
+  }, []);
+
+  useEffect(() => {
+    if (!tokenExpiresAt) return;
+
+    const expiresDate = new Date(tokenExpiresAt);
+    
+    const updateTimeLeft = () => {
+      const now = new Date();
+      const secondsLeft = differenceInSeconds(expiresDate, now);
+      setExpiresIn(formatTimeLeft(secondsLeft));
+    };
+
+    updateTimeLeft();
+    const interval = setInterval(updateTimeLeft, 1000);
+    return () => clearInterval(interval);
+  }, [tokenExpiresAt, formatTimeLeft]);
 
   return (
-    <div className="w-64 bg-gray-900 text-white h-screen flex flex-col p-4">
+    <div className="w-64 bg-gray-900 text-white flex flex-col p-4">
       <div className="mb-6">
         <div className="h-12 flex items-center justify-center mb-4">
           <h1 className="text-xl font-medium">
@@ -83,9 +122,10 @@ const Sidebar: React.FC<SidebarProps> = ({ cafe24MallId, cafe24StoreName, onMenu
         <div className="px-2 border-gray-700 pt-4">
           <h2 className="text-lg font-bold">{cafe24StoreName || 'Loading...'}</h2>
           <p className="text-sm text-gray-400">{cafe24MallId}</p>
+          <p className="text-xs text-gray-400 mt-1">{expiresIn}</p>
         </div>
       </div>
-      <nav className="flex flex-col gap-2">
+      <nav className="flex-1 flex flex-col gap-2 overflow-y-auto">
         {menuItems.map((item) => (
           <div key={item.id}>
             <button

@@ -11,6 +11,7 @@ const Cafe24Dashboard = () => {
   const [cafe24StoreName, setCafe24StoreName] = useState<string>(''); // 쇼핑몰 이름
   const [cafe24MallId, setCafe24MallId] = useState<string | null>(null); // 쇼핑몰 ID
   const [selectedCafe24Menu, setSelectedCafe24Menu] = useState<string>(''); // 선택된 메뉴 (Instagram 연동, 계정 설정 등)
+  const [tokenExpiresAt, setTokenExpiresAt] = useState<string | null>(null); // 토큰 만료 시간
 
   // 페이지 로드 시 URL에서 mall_id를 가져와 데이터를 요청하는 로직
   useEffect(() => {
@@ -24,28 +25,44 @@ const Cafe24Dashboard = () => {
     // mallId 상태에 저장
     setCafe24MallId(cafe24MallIdParam);
 
-    // 기존 API 라우터를 활용하여 store-name 요청
-    fetch(`/api/auth/cafe24/store-name?state=${cafe24MallIdParam}`)
-      .then(async (cafe24Response) => {
-        if (!cafe24Response.ok) {
-          throw new Error('Failed to fetch Cafe24 store name');
+    // 스토어 이름과 토큰 만료 시간을 병렬로 조회
+    Promise.all([
+      fetch(`/api/auth/cafe24/store-name?state=${cafe24MallIdParam}`),
+      fetch(`/api/auth/cafe24/token-expires-check?state=${cafe24MallIdParam}`)
+    ])
+      .then(async ([storeResponse, tokenResponse]) => {
+        if (!storeResponse.ok || !tokenResponse.ok) {
+          throw new Error('Failed to fetch data');
         }
-        const cafe24StoreName = await cafe24Response.json();
-        setCafe24StoreName(cafe24StoreName);
+        const storeName = await storeResponse.json();
+        const tokenData = await tokenResponse.json();
+        
+        setCafe24StoreName(storeName);
+        setTokenExpiresAt(tokenData.expiresAt);
       })
       .catch(error => {
-        console.error('Error fetching Cafe24 store data:', error);
-        setCafe24StoreName(''); // 에러 시 빈 문자열로 설정
+        console.error('Error fetching data:', error);
+        setCafe24StoreName('');
+        setTokenExpiresAt(null);
       });
   }, []);
 
   // UI 렌더링
   return (
-    <div className="flex h-screen">
+    <div className="flex min-h-screen">
       {/* 좌측 사이드바 */}
-      <Sidebar cafe24MallId={cafe24MallId} cafe24StoreName={cafe24StoreName} onMenuSelect={setSelectedCafe24Menu} />
+      <Sidebar 
+        cafe24MallId={cafe24MallId} 
+        cafe24StoreName={cafe24StoreName} 
+        tokenExpiresAt={tokenExpiresAt}
+        onMenuSelect={setSelectedCafe24Menu} 
+      />
       {/* 우측 콘텐츠 영역 */}
-      <ContentArea selectedMenu={selectedCafe24Menu} cafe24MallId={cafe24MallId} cafe24StoreName={cafe24StoreName} />
+      <ContentArea 
+        selectedMenu={selectedCafe24Menu} 
+        cafe24MallId={cafe24MallId} 
+        cafe24StoreName={cafe24StoreName} 
+      />
     </div>
   );
 };

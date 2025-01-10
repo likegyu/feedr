@@ -38,7 +38,11 @@ const ContentArea: React.FC<Cafe24ContentAreaProps> = ({
     }
   };
 
-  return <div className="flex-1 p-6">{renderContent()}</div>;
+  return (
+    <div className="flex-1 p-6 overflow-y-auto">
+      {renderContent()}
+    </div>
+  );
 };
 
 export default ContentArea;
