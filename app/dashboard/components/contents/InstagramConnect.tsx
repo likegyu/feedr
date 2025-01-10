@@ -12,6 +12,7 @@ const InstagramConnect = () => {
   const [status, setStatus] = useState<InstagramStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [instagramAuthUrl, setInstagramAuthUrl] = useState<string>('');
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -20,6 +21,7 @@ const InstagramConnect = () => {
 
     if (mallId) {
       checkInstagramStatus(mallId);
+      fetchInstagramAuthUrl(mallId);
     }
   }, []);
 
@@ -32,6 +34,16 @@ const InstagramConnect = () => {
       console.error('Instagram 상태 확인 중 오류:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchInstagramAuthUrl = async (state: string) => {
+    try {
+      const response = await fetch(`/api/auth/instagram/get-auth-url?state=${state}`);
+      const data = await response.json();
+      setInstagramAuthUrl(data.url);
+    } catch (error) {
+      console.error('Instagram 인증 URL 가져오기 실패:', error);
     }
   };
 
@@ -59,12 +71,6 @@ const InstagramConnect = () => {
       setLoading(false);
     }
   };
-
-  const instagramAuthUrl = `https://api.instagram.com/oauth/authorize?client_id=${
-    process.env.INSTAGRAM_CLIENT_ID
-  }&redirect_uri=${
-    process.env.INSTAGRAM_REDIRECT_URI
-  }&state=${new URLSearchParams(window.location.search).get('state')}&scope=instagram_business_basic&response_type=code`;
 
   return (
     <div>
