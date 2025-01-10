@@ -1,8 +1,13 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Home() {
   const [mallId, setMallId] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,10 +25,11 @@ export default function Home() {
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center">
         <input
+          ref={inputRef}
           type="text"
           value={mallId}
           onChange={(e) => setMallId(e.target.value)}
-          placeholder="Mall ID를 입력하세요"
+          placeholder="카페24 ID를 입력하세요"
           className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1E60FF] focus:border-[#1E60FF] w-64 shadow-sm bg-gray-800 border-gray-700 text-white placeholder-gray-400"
           required
         />
