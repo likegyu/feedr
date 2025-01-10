@@ -44,21 +44,22 @@ const Cafe24Dashboard = () => {
           fetch(`/api/auth/cafe24/shop-name`),
           fetch(`/api/auth/cafe24/token-expires-check`)
         ])
-          .then(async ([shopResponse, tokenResponse]) => {
-            if (!shopResponse.ok || !tokenResponse.ok) {
-              throw new Error('Failed to fetch data');
-            }
-            const { data: shopData } = await shopResponse.json();
-            const { data: tokenData } = await tokenResponse.json();
-            
-            setCafe24ShopName(shopData.shopName);
-            setcafe24ExpiresAt(tokenData.cafe24ExpiresAt);
-          })
-          .catch(error => {
-            console.error('Error fetching data:', error);
-            setCafe24ShopName('');
-            setcafe24ExpiresAt('');
-          });
+        .then(async ([shopResponse, tokenResponse]) => {
+          if (!shopResponse.ok || !tokenResponse.ok) {
+            throw new Error('데이터를 가져오는데 실패했습니다');
+          }
+          
+          const { data: { cafe24ShopName } } = await shopResponse.json();
+          const { data: { cafe24ExpiresAt } } = await tokenResponse.json();
+          
+          setCafe24ShopName(cafe24ShopName);
+          setcafe24ExpiresAt(cafe24ExpiresAt);
+        })
+        .catch(error => {
+          console.error('데이터 조회 오류:', error);
+          setCafe24ShopName('');
+          setcafe24ExpiresAt('');
+        });
       } catch (error) {
         console.error('Error fetching cookies:', error);
       }
