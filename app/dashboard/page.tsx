@@ -52,7 +52,7 @@ const Cafe24Dashboard = () => {
             const tokenExpiresAt = await tokenResponse.json();
             
             setCafe24ShopName(shopName);
-            setcafe24ExpiresAt(tokenExpiresAt.expiresAt);
+            setcafe24ExpiresAt(tokenExpiresAt);
           })
           .catch(error => {
             console.error('Error fetching data:', error);
