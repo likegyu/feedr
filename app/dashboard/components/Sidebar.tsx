@@ -5,8 +5,8 @@ import { differenceInSeconds } from 'date-fns';
 
 interface SidebarProps {
   cafe24MallId: string | null;
-  cafe24StoreName: string;
-  tokenExpiresAt: string | null;
+  cafe24ShopName: string;
+  cafe24ExpiresAt: string | null;
   onMenuSelect: (menu: string) => void;
 }
 
@@ -73,8 +73,8 @@ const menuItems: MenuItem[] = [
 
 const Sidebar: React.FC<SidebarProps> = ({ 
   cafe24MallId, 
-  cafe24StoreName, 
-  tokenExpiresAt, 
+  cafe24ShopName, 
+  cafe24ExpiresAt, 
   onMenuSelect 
 }) => {
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
@@ -96,9 +96,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!tokenExpiresAt) return;
+    if (!cafe24ExpiresAt) return;
 
-    const expiresDate = new Date(tokenExpiresAt);
+    const expiresDate = new Date(cafe24ExpiresAt);
     
     const updateTimeLeft = () => {
       const now = new Date();
@@ -109,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     updateTimeLeft();
     const interval = setInterval(updateTimeLeft, 1000);
     return () => clearInterval(interval);
-  }, [tokenExpiresAt, formatTimeLeft]);
+  }, [cafe24ExpiresAt, formatTimeLeft]);
 
   return (
     <div className="w-64 bg-gray-900 text-white flex flex-col p-4">
@@ -120,7 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </h1>
         </div>
         <div className="px-2 border-gray-700 pt-4">
-          <h2 className="text-lg font-bold">{cafe24StoreName || 'Loading...'}</h2>
+          <h2 className="text-lg font-bold">{cafe24ShopName || 'Loading...'}</h2>
           <p className="text-sm text-gray-400">{cafe24MallId}</p>
           <p className="text-xs text-gray-400 mt-1">{expiresIn}</p>
         </div>

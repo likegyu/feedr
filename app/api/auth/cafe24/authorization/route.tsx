@@ -1,12 +1,13 @@
 // ~app/api/auth/cafe24/access/authorization.tsx
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db'; // db 객체 불러오기
+import { cookies } from 'next/headers';
 
 export async function GET(req: NextRequest) {
-  const { code: cafe24Code, state: cafe24State } = Object.fromEntries(req.nextUrl.searchParams);
+  const { code: cafe24Code, state: cafe24MallId } = Object.fromEntries(req.nextUrl.searchParams);
   
   // 필요한 파라미터가 없으면 에러 처리
-  if (!cafe24Code || !cafe24State) {
+  if (!cafe24Code || !cafe24MallId) {
     return NextResponse.json({ error: 'Cafe24 authorization code or state missing' }, { status: 400 });
   }
 
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
   const cafe24RedirectUri = process.env.CAFE24_REDIRECT_URI!;
   
   // 액세스 토큰 요청을 위한 데이터
-  const cafe24TokenUrl = `https://${cafe24State}.cafe24api.com/api/v2/oauth/token`;
+  const cafe24TokenUrl = `https://${cafe24MallId}.cafe24api.com/api/v2/oauth/token`;
   
   const cafe24Params = new URLSearchParams();
   cafe24Params.append('grant_type', 'authorization_code');
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
 
   const cafe24AuthHeader = `Basic ${Buffer.from(`${cafe24ClientId}:${cafe24ClientSecret}`).toString('base64')}`;
   console.log('cafe24Code:', cafe24Code);
-  console.log('cafe24State:', cafe24State);
+  console.log('cafe24MallId:', cafe24MallId);
   console.log('cafe24AuthHeader:', cafe24AuthHeader);
   // 액세스 토큰 요청
   try {
@@ -97,6 +98,18 @@ export async function GET(req: NextRequest) {
       ]);
 
       console.log('Cafe24 token data saved successfully!');
+
+      const cookieStore = await cookies();
+      const cookieData = {
+        cafe24_mall_id: cafe24MallId,
+        cafe24_access_token: cafe24AccessToken,
+        cafe24_expires_at: cafe24ExpiresAt,
+      };
+
+      Object.entries(cookieData).forEach(([name, value]) => {
+        cookieStore.set(name, value);
+      });
+
     } catch (error) {
       console.error('Error saving Cafe24 token to database:', error);
       const errorMessage = (error as Error).message;
@@ -104,7 +117,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 토큰 저장 후 리다이렉트
-    return NextResponse.redirect(`${req.nextUrl.origin}/dashboard?state=${cafe24MallId}`);
+    return NextResponse.redirect(`${req.nextUrl.origin}/dashboard`);
   } catch (error) {
     console.error('Error fetching Cafe24 access token:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

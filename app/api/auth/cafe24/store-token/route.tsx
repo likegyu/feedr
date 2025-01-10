@@ -3,27 +3,29 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
-  const mallId = req.nextUrl.searchParams.get('mall_id');
+  const cafe24MallId = req.nextUrl.searchParams.get('mall_id');
 
-  if (!mallId) {
+  if (!cafe24MallId) {
     return NextResponse.json({ error: 'Mall ID is missing' }, { status: 400 });
   }
 
   const query = `
-    SELECT access_token
-    FROM tokens
-    WHERE mall_id = $1
-    AND access_token LIKE 'cafe24_%'
+    SELECT 
+      cafe24_access_token
+    FROM 
+      tokens
+    WHERE 
+      cafe24_mall_id = $1
   `;
+  const cafe24AccessToken = await db.query(`${query} LIMIT 1`, [cafe24MallId]);
 
   try {
-    const result = await db.query(query, [mallId]);
 
-    if (result.rows.length === 0) {
+    if (!cafe24AccessToken.rows.length) {
       return NextResponse.json({ error: 'Mall not found or not authorized' }, { status: 404 });
     }
 
-    const { cafe24_access_token } = result.rows[0];
+    const { cafe24_access_token } = cafe24AccessToken.rows[0];
 
     return NextResponse.json({ cafe24_access_token });
   } catch (error) {

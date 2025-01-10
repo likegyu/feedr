@@ -11,18 +11,18 @@ import ApiDocs from './contents/ApiDocs';
 interface Cafe24ContentAreaProps {
   selectedMenu: string;
   cafe24MallId: string | null;
-  cafe24StoreName: string;
+  cafe24ShopName: string;
 }
 
 const ContentArea: React.FC<Cafe24ContentAreaProps> = ({
   selectedMenu,
   cafe24MallId,
-  cafe24StoreName
+  cafe24ShopName
 }) => {
   const renderContent = () => {
     switch (selectedMenu) {
       case 'dashboard':
-        return <Dashboard mallId={cafe24MallId} storeName={cafe24StoreName} />;
+        return <Dashboard mallId={cafe24MallId} storeName={cafe24ShopName} />;
       case 'instagram':
         return <InstagramConnect />;
       case 'pc-feed-settings':
@@ -34,7 +34,7 @@ const ContentArea: React.FC<Cafe24ContentAreaProps> = ({
       case 'api-docs':
         return <ApiDocs />;
       default:
-        return <Dashboard mallId={cafe24MallId} storeName={cafe24StoreName} />;
+        return <Dashboard mallId={cafe24MallId} storeName={cafe24ShopName} />;
     }
   };
 

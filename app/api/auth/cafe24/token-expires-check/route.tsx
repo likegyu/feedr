@@ -1,27 +1,16 @@
-import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers'
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const state = searchParams.get('state');
+export async function GET() {
+  const cookieStore = await cookies()
+  const cafe24ExpiresAt = cookieStore.get('cafe24_expires_at')?.value
 
-  if (!state) {
-    return NextResponse.json({ error: '필수 파라미터가 누락되었습니다.' }, { status: 400 });
+  if (!cafe24ExpiresAt) {
+    return NextResponse.json({ error: '토큰 만료 시간을 가져올 수 없습니다.' }, { status: 400 });
   }
 
-  try {
-    const result = await db.query(
-      'SELECT cafe24_expires_at FROM tokens WHERE cafe24_mall_id = $1',
-      [state]
-    );
-
-    if (result.rows.length === 0) {
-      return NextResponse.json({ error: '토큰 정보를 찾을 수 없습니다.' }, { status: 404 });
-    }
-
-    return NextResponse.json({ expiresAt: result.rows[0].cafe24_expires_at });
-  } catch (error) {
-    console.error('토큰 조회 중 오류:', error);
-    return NextResponse.json({ error: '토큰 조회 중 오류가 발생했습니다.' }, { status: 500 });
-  }
+  // ISO 시간을 Unix timestamp(초)로 변환
+  const expiresInSeconds = Math.floor(new Date(cafe24ExpiresAt).getTime() / 1000);
+  
+  return NextResponse.json({ expiresIn: expiresInSeconds });
 }
