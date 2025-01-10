@@ -3,7 +3,8 @@
 import React from 'react';
 import Dashboard from './contents/Dashboard';
 import InstagramConnect from './contents/InstagramConnect';
-import FeedSettings from './contents/FeedSettings';
+import PCFeedSettings from './contents/PCFeedSettings';
+import MobileFeedSettings from './contents/MobileFeedSettings';
 import Notices from './contents/Notices';
 import ApiDocs from './contents/ApiDocs';
 
@@ -24,8 +25,10 @@ const ContentArea: React.FC<Cafe24ContentAreaProps> = ({
         return <Dashboard mallId={cafe24MallId} storeName={cafe24StoreName} />;
       case 'instagram':
         return <InstagramConnect />;
-      case 'feed-settings':
-        return <FeedSettings />;
+      case 'pc-feed-settings':
+        return <PCFeedSettings />;
+      case 'mobile-feed-settings':
+        return <MobileFeedSettings />;
       case 'notices':
         return <Notices />;
       case 'api-docs':

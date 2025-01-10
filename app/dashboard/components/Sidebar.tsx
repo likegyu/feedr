@@ -1,7 +1,6 @@
-// ~/dashboard/components/Sidebar.tsx
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 interface SidebarProps {
   cafe24MallId: string | null;
@@ -14,6 +13,7 @@ interface MenuItem {
   label: string;
   icon: string;
   description?: string;
+  subMenus?: MenuItem[];
 }
 
 const menuItems: MenuItem[] = [
@@ -33,7 +33,27 @@ const menuItems: MenuItem[] = [
     id: 'feed-settings',
     label: '피드 설정',
     icon: '🎯',
-    description: '피드 표시 방식 및 스타일 설정'
+    description: '피드 표시 방식 및 스타일 설정',
+    subMenus: [
+      {
+        id: 'mobile-feed-settings',
+        label: '모바일 레이아웃',
+        icon: '📱',
+        description: '모바일 화면 레이아웃 설정'
+      },
+      {
+        id: 'pc-feed-settings',
+        label: 'PC 레이아웃',
+        icon: '💻',
+        description: 'PC 화면 레이아웃 설정'
+      },
+      {
+        id: 'feed-filter',
+        label: '필터 설정',
+        icon: '🔍',
+        description: '게시물 필터링 설정'
+      }
+    ]
   },
   {
     id: 'notices',
@@ -50,6 +70,8 @@ const menuItems: MenuItem[] = [
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ cafe24MallId, cafe24StoreName, onMenuSelect }) => {
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+
   return (
     <div className="w-64 bg-gray-900 text-white h-screen flex flex-col p-4">
       <div className="mb-6">
@@ -65,19 +87,50 @@ const Sidebar: React.FC<SidebarProps> = ({ cafe24MallId, cafe24StoreName, onMenu
       </div>
       <nav className="flex flex-col gap-2">
         {menuItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => onMenuSelect(item.id)}
-            className="flex items-center gap-3 hover:bg-gray-700 p-3 rounded transition-colors"
-          >
-            <span className="text-xl">{item.icon}</span>
-            <div className="text-left">
-              <div className="font-medium">{item.label}</div>
-              {item.description && (
-                <div className="text-xs text-gray-400">{item.description}</div>
+          <div key={item.id}>
+            <button
+              onClick={() => {
+                if (item.subMenus) {
+                  setExpandedMenu(expandedMenu === item.id ? null : item.id);
+                } else {
+                  onMenuSelect(item.id);
+                }
+              }}
+              className="w-full flex items-center gap-3 hover:bg-gray-700 p-3 rounded transition-colors"
+            >
+              <span className="text-xl">{item.icon}</span>
+              <div className="text-left flex-1">
+                <div className="font-medium">{item.label}</div>
+                {item.description && (
+                  <div className="text-xs text-gray-400">{item.description}</div>
+                )}
+              </div>
+              {item.subMenus && (
+                <span className="text-gray-400">
+                  {expandedMenu === item.id ? '▼' : '▶'}
+                </span>
               )}
-            </div>
-          </button>
+            </button>
+            {item.subMenus && expandedMenu === item.id && (
+              <div className="flex flex-col gap-1 bg-gray-800 rounded-md p-2 border border-gray-700 mt-1">
+                {item.subMenus.map((subItem) => (
+                  <button
+                    key={subItem.id}
+                    onClick={() => onMenuSelect(subItem.id)}
+                    className="flex items-center gap-3 hover:bg-gray-700 p-2 rounded transition-colors w-full"
+                  >
+                    <span className="text-sm">{subItem.icon}</span>
+                    <div className="text-left">
+                      <div className="font-medium text-sm">{subItem.label}</div>
+                      {subItem.description && (
+                        <div className="text-xs text-gray-400">{subItem.description}</div>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         ))}
       </nav>
     </div>
