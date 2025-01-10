@@ -6,6 +6,7 @@ import { cookies } from 'next/headers';
 export async function GET() {
   const cookieStore = await cookies()
   const cafe24AccessToken = cookieStore.get('cafe24_access_token')?.value
+  console.log('Access Token:', cafe24AccessToken ? 'exists' : 'missing');
 
   if (!cafe24AccessToken) {
     return NextResponse.json({ 
@@ -21,10 +22,13 @@ export async function GET() {
       WHERE cafe24_access_token = $1
       LIMIT 1
     `;
+    console.log('Executing DB query with token:', cafe24AccessToken.substring(0, 10) + '...');
     const result = await db.query(query, [cafe24AccessToken]);
-    const cafe24MallId = result.rows[0];
+    console.log('DB Query result:', result.rows);
 
+    const cafe24MallId = result.rows[0];
     if (!cafe24MallId) {
+      console.log('No mall ID found in database');
       return NextResponse.json({ 
         error: '스토어를 찾을 수 없거나 권한이 없습니다.' 
       }, { status: 404 });
@@ -33,6 +37,7 @@ export async function GET() {
     // Cafe24 API 호출
     const { cafe24_mall_id } = cafe24MallId;
     const cafe24ApiUrl = `https://${cafe24_mall_id}.cafe24api.com/api/v2/admin/store?fields=shop_name&shop_no=1`;
+    console.log('Calling Cafe24 API:', cafe24ApiUrl);
 
     const response = await fetch(cafe24ApiUrl, {
       method: 'GET',
@@ -42,13 +47,17 @@ export async function GET() {
       },
     });
 
+    console.log('Cafe24 API response status:', response.status);
     if (!response.ok) {
+      console.log('Cafe24 API error response:', await response.text());
       return NextResponse.json({ 
         error: '스토어 정보를 가져오는데 실패했습니다.' 
       }, { status: 500 });
     }
 
     const data = await response.json();
+    console.log('Cafe24 API response data:', data);
+    
     return NextResponse.json({ 
       data: { 
         cafe24ShopName: data.store.shop_name 
@@ -56,7 +65,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Detailed error:', error);
     return NextResponse.json({ 
       error: '서버 내부 오류가 발생했습니다.' 
     }, { status: 500 });
