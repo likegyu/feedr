@@ -19,8 +19,11 @@ const Cafe24Dashboard = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const cafe24MallIdParam = urlParams.get('state');
 
-    // mall_id가 없으면 함수 종료
-    if (!cafe24MallIdParam) return;
+    // mall_id가 없으면 루트로 리디렉션
+    if (!cafe24MallIdParam) {
+      window.location.href = '/';
+      return;
+    }
 
     // mallId 상태에 저장
     setCafe24MallId(cafe24MallIdParam);
