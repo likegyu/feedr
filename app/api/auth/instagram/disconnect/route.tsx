@@ -11,8 +11,9 @@ export async function POST(request: NextRequest) {
   }
   try {
     await db.query(
-      `UPDATE users
-          SET instagram_user_id = NULL,
+      `UPDATE tokens
+          SET instagram_access_token = NULL,
+              instagram_user_id = NULL,
               instagram_expires_in = NULL,
               instagram_username = NULL
           WHERE cafe24_mall_id = $1`,
