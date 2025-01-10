@@ -48,11 +48,11 @@ const Cafe24Dashboard = () => {
             if (!shopResponse.ok || !tokenResponse.ok) {
               throw new Error('Failed to fetch data');
             }
-            const shopName = await shopResponse.json();
-            const tokenExpiresAt = await tokenResponse.json();
+            const { data: shopData } = await shopResponse.json();
+            const { data: tokenData } = await tokenResponse.json();
             
-            setCafe24ShopName(shopName);
-            setcafe24ExpiresAt(tokenExpiresAt);
+            setCafe24ShopName(shopData.shopName);
+            setcafe24ExpiresAt(tokenData.cafe24ExpiresAt);
           })
           .catch(error => {
             console.error('Error fetching data:', error);
