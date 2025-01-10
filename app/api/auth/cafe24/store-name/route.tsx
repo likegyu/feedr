@@ -15,18 +15,23 @@ export async function GET() {
   }
 
   try {
-    // 스토어 ID 조회
     const query = `
       SELECT cafe24_mall_id
       FROM tokens
       WHERE cafe24_access_token = $1
       LIMIT 1
     `;
-    console.log('Executing DB query with token:', cafe24AccessToken.substring(0, 10) + '...');
+    // 토큰 값 로깅
+    console.log('Access Token:', cafe24AccessToken);
+    
     const result = await db.query(query, [cafe24AccessToken]);
-    console.log('DB Query result:', result.rows);
-
+    // 전체 쿼리 결과 로깅
+    console.log('Full DB Query result:', result);
+    
     const cafe24MallId = result.rows[0];
+    // cafe24MallId 값 확인
+    console.log('Extracted Mall ID:', cafe24MallId);
+
     if (!cafe24MallId) {
       console.log('No mall ID found in database');
       return NextResponse.json({ 
