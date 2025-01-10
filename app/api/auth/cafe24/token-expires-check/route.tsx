@@ -21,6 +21,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ expiresAt: result.rows[0].cafe24_expires_at });
   } catch (error) {
+    console.error('토큰 조회 중 오류:', error);
     return NextResponse.json({ error: '토큰 조회 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }
