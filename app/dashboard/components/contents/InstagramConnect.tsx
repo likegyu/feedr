@@ -11,6 +11,7 @@ const InstagramConnect = () => {
   const [cafe24MallId, setMallId] = useState<string | null>(null);
   const [status, setStatus] = useState<InstagramStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -34,6 +35,31 @@ const InstagramConnect = () => {
     }
   };
 
+  const disconnectInstagram = async () => {
+    try {
+      setError(null);
+      setLoading(true); // 로딩 상태 추가
+      
+      const response = await fetch(`/api/auth/instagram/disconnect?state=${cafe24MallId}`, {
+        method: 'POST'
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        await checkInstagramStatus(cafe24MallId!);
+      } else {
+        setError(data.error || 'Instagram 연동 해제에 실패했습니다.');
+        console.error('연동 해제 실패:', data);
+      }
+    } catch (error) {
+      setError('Instagram 연동 해제 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      console.error('Instagram 연동 해제 중 오류:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const instagramAuthUrl = `https://api.instagram.com/oauth/authorize?client_id=${
     process.env.INSTAGRAM_CLIENT_ID
   }&redirect_uri=${
@@ -44,6 +70,11 @@ const InstagramConnect = () => {
     <div>
       <h2 className="text-2xl font-bold mb-4">📷 Instagram 연동</h2>
       <div className="bg-white p-6 rounded-lg shadow">
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
+            ❌ {error}
+          </div>
+        )}
         {loading ? (
           <p>상태 확인 중...</p>
         ) : status?.isConnected ? (
@@ -62,12 +93,20 @@ const InstagramConnect = () => {
                 </a>
               </p>
             </div>
-            <button
-              onClick={() => checkInstagramStatus(cafe24MallId!)}
-              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-            >
-              상태 새로고침
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => checkInstagramStatus(cafe24MallId!)}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                상태 새로고침
+              </button>
+              <button
+                onClick={disconnectInstagram}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                연동 해제
+              </button>
+            </div>
           </div>
         ) : (
           <>
