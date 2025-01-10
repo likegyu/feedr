@@ -6,18 +6,16 @@ export async function POST(request: NextRequest) {
   const mall_id = url.searchParams.get('state');
 
   if (!mall_id) {
-    console.error('몰 아이디 누락');
-    return NextResponse.json({ error: '몰 아이디가 필요합니다.' }, { status: 400 });
+    console.error('Mall ID is missing');
+    return NextResponse.json({ error: 'Mall ID is required.' }, { status: 400 });
   }
-
   try {
-    const result = await db.query(
-      `UPDATE tokens 
-      SET instagram_access_token = NULL, 
-          instagram_user_id = NULL,
-          instagram_expires_in = NULL,
-          instagram_username = NULL
-      WHERE cafe24_mall_id = $1`,
+    await db.query(
+      `UPDATE users
+          SET instagram_user_id = NULL,
+              instagram_expires_in = NULL,
+              instagram_username = NULL
+          WHERE cafe24_mall_id = $1`,
       [mall_id]
     );
 
