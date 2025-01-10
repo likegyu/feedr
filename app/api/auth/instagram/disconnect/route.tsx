@@ -3,9 +3,9 @@ import { db } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   const url = new URL(request.url);
-  const mall_id = url.searchParams.get('state');
+  const state = url.searchParams.get('state');
 
-  if (!mall_id) {
+  if (!state) {
     console.error('Mall ID is missing');
     return NextResponse.json({ error: 'Mall ID is required.' }, { status: 400 });
   }
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
               instagram_expires_in = NULL,
               instagram_username = NULL
           WHERE cafe24_mall_id = $1`,
-      [mall_id]
+      [state]
     );
 
     return NextResponse.json({ success: true });
