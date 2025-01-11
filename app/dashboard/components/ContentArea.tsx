@@ -23,7 +23,7 @@ const ContentArea: React.FC<Cafe24ContentAreaProps> = ({
   const renderContent = () => {
     switch (selectedMenu) {
       case 'dashboard':
-        return <Dashboard mallId={cafe24MallId} storeName={cafe24ShopName} />;
+        return <Dashboard cafe24MallId={cafe24MallId} cafe24ShopName={cafe24ShopName} />;
       case 'instagram':
         return <InstagramConnect />;
       case 'pc-feed-settings':
@@ -35,7 +35,7 @@ const ContentArea: React.FC<Cafe24ContentAreaProps> = ({
       case 'api-docs':
         return <ApiDocs />;
       default:
-        return <Dashboard mallId={cafe24MallId} storeName={cafe24ShopName} />;
+        return <Dashboard cafe24MallId={cafe24MallId} cafe24ShopName={cafe24ShopName} />;
     }
   };
 
