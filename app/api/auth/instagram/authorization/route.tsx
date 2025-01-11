@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   if (!code) {
     console.error('필수 파라미터 누락:', { code: !!code });
-    return NextResponse.redirect(new URL('/?error=인증_정보_누락', request.url));
+    return NextResponse.redirect(new URL('/dashboard?error=인증_정보_누락', request.url));
   }
 
   try {
