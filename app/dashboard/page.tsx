@@ -60,8 +60,7 @@ const Cafe24Dashboard = () => {
           const { data: { cafe24ExpiresAt } } = await tokenResponse.json();
           setcafe24ExpiresAt(cafe24ExpiresAt);
         } catch (error) {
-          console.error('데이터 조회 오류:', error);
-          setCafe24ShopName('');
+          console.error('토큰 만료시간 조회 오류:', error);
           setcafe24ExpiresAt('');
         }
       } catch (error) {
