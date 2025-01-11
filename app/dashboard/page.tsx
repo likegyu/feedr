@@ -38,28 +38,32 @@ const Cafe24Dashboard = () => {
 
         // mallId 상태에 저장
         setCafe24MallId(cafe24MallId);
-
-        // 스토어 이름과 토큰 만료 시간을 병렬로 조회
-        Promise.all([
-          fetch(`/api/auth/cafe24/shop-name`),
-          fetch(`/api/auth/cafe24/token-expires-check`)
-        ])
-        .then(async ([shopResponse, tokenResponse]) => {
-          if (!shopResponse.ok || !tokenResponse.ok) {
-            throw new Error('데이터를 가져오는데 실패했습니다');
+        // 스토어 이름 조회
+        try {
+          const shopResponse = await fetch(`/api/auth/cafe24/shop-name`);
+          if (!shopResponse.ok) {
+            throw new Error('스토어 이름을 가져오는데 실패했습니다');
           }
-          
           const { data: { cafe24ShopName } } = await shopResponse.json();
-          const { data: { cafe24ExpiresAt } } = await tokenResponse.json();
-          
           setCafe24ShopName(cafe24ShopName);
+        } catch (error) {
+          console.error('스토어 이름 조회 오류:', error);
+          setCafe24ShopName('');
+        }
+
+        // 토큰 만료 시간 조회
+        try {
+          const tokenResponse = await fetch(`/api/auth/cafe24/token-expires-check`);
+          if (!tokenResponse.ok) {
+            throw new Error('토큰 정보를 가져오는데 실패했습니다');
+          }
+          const { data: { cafe24ExpiresAt } } = await tokenResponse.json();
           setcafe24ExpiresAt(cafe24ExpiresAt);
-        })
-        .catch(error => {
+        } catch (error) {
           console.error('데이터 조회 오류:', error);
           setCafe24ShopName('');
           setcafe24ExpiresAt('');
-        });
+        }
       } catch (error) {
         console.error('Error fetching cookies:', error);
       }
