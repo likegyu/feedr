@@ -10,8 +10,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface DashboardProps {
-  mallId: string | null;
-  storeName: string;
+  cafe24MallId: string | null;
+  cafe24ShopName: string;
 }
 
 interface InstagramStatus {
@@ -19,17 +19,16 @@ interface InstagramStatus {
   userName?: string;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ mallId, storeName }) => {
+const Dashboard: React.FC<DashboardProps> = ({ cafe24MallId, cafe24ShopName }) => {
   const [instagramStatus, setInstagramStatus] = useState<InstagramStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchInstagramStatus = async () => {
-      if (!mallId) return;
-      
+      if (!cafe24MallId) return;
       setLoading(true);
       try {
-        const response = await fetch(`/api/auth/instagram/status?state=${mallId}`);
+        const response = await fetch(`/api/auth/instagram/status`);
         const data = await response.json();
         setInstagramStatus(data);
       } catch (error) {
@@ -40,7 +39,7 @@ const Dashboard: React.FC<DashboardProps> = ({ mallId, storeName }) => {
     };
 
     fetchInstagramStatus();
-  }, [mallId]);
+  }, [cafe24MallId]);
 
   return (
     <div>
@@ -51,13 +50,13 @@ const Dashboard: React.FC<DashboardProps> = ({ mallId, storeName }) => {
             <CardTitle>매장 정보</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {storeName ? (
-              <p><span className="font-medium">스토어명:</span> {storeName}</p>
+            {cafe24ShopName ? (
+              <p><span className="font-medium">스토어명:</span> {cafe24ShopName}</p>
             ) : (
               <Skeleton className="h-6 w-3/4" />
             )}
-            {mallId ? (
-              <p><span className="font-medium">Mall ID:</span> {mallId}</p>
+            {cafe24MallId ? (
+              <p><span className="font-medium">Mall ID:</span> {cafe24MallId}</p>
             ) : (
               <Skeleton className="h-6 w-1/2" />
             )}

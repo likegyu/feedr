@@ -1,14 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { cookies } from 'next/headers'
 
-export async function POST(request: NextRequest) {
-  const url = new URL(request.url);
-  const state = url.searchParams.get('state');
-
-  if (!state) {
-    console.error('Mall ID is missing');
-    return NextResponse.json({ error: 'Mall ID is required.' }, { status: 400 });
+export async function POST() {
+  const cookieStore = await cookies()
+  const cafe24MallId = cookieStore.get('cafe24_mall_id')?.value
+  
+  if (!cafe24MallId) {
+    return NextResponse.json({ error: 'Mall ID not found' }, { status: 400 });
   }
+
   try {
     await db.query(
       `UPDATE tokens
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
               instagram_expires_in = NULL,
               instagram_username = NULL
           WHERE cafe24_mall_id = $1`,
-      [state]
+      [cafe24MallId]
     );
 
     return NextResponse.json({ success: true });
