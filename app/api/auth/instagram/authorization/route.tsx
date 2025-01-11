@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
-  const state = url.searchParams.get('state');
+  const cookieStore = await cookies()
+  const cafe24MallId = cookieStore.get('cafe24_mall_id')?.value
 
-  if (!code || !state) {
-    console.error('필수 파라미터 누락:', { code: !!code, state: !!state });
+
+  if (!code) {
+    console.error('필수 파라미터 누락:', { code: !!code });
     return NextResponse.redirect(new URL('/?error=인증_정보_누락', request.url));
   }
 
@@ -28,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       console.error('Instagram 인증 실패:', data);
-      return NextResponse.redirect(new URL(`/dashboard?state=${state}&error=인증_실패`, request.url));
+      return NextResponse.redirect(new URL(`/dashboard?error=인증_실패`, request.url));
     }
 
     const { access_token, user_id } = data;
@@ -40,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     if (!longLivedTokenResponse.ok) {
       console.error('장기 토큰 교환 실패:', longLivedTokenData);
-      return NextResponse.redirect(new URL(`/dashboard?state=${state}&error=토큰_교환_실패`, request.url));
+      return NextResponse.redirect(new URL(`/dashboard?error=토큰_교환_실패`, request.url));
     }
 
     // 데이터베이스 업데이트 (장기 토큰 사용)
@@ -63,13 +66,13 @@ export async function GET(request: NextRequest) {
         user_id,
         longLivedTokenData.expires_in,
         userData.username,
-        state
+        cafe24MallId
       ]
     );
 
-    return NextResponse.redirect(new URL(`/dashboard?state=${state}&success=true`, request.url));
+    return NextResponse.redirect(new URL(`/dashboard?success=true`, request.url));
   } catch (error) {
     console.error('Instagram 인증 처리 중 오류:', error);
-    return NextResponse.redirect(new URL(`/dashboard?state=${state}&error=서버_오류`, request.url));
+    return NextResponse.redirect(new URL(`/dashboard?error=서버_오류`, request.url));
   }
 }
