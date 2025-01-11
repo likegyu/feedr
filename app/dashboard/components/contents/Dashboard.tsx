@@ -1,6 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
 
 interface DashboardProps {
   mallId: string | null;
@@ -39,16 +45,21 @@ const Dashboard: React.FC<DashboardProps> = ({ mallId, storeName }) => {
     <div>
       <h2 className="text-2xl font-bold mb-4">📊 대시보드</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="p-4 bg-white rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-3">매장 정보</h3>
-          <div className="space-y-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>매장 정보</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
             <p><span className="font-medium">스토어명:</span> {storeName}</p>
             <p><span className="font-medium">Mall ID:</span> {mallId || '미설정'}</p>
-          </div>
-        </div>
-        <div className="p-4 bg-white rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-3">연동된 Instagram 계정</h3>
-          <div className="space-y-2">
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>연동된 Instagram 계정</CardTitle>
+          </CardHeader>
+          <CardContent>
             {loading ? (
               <p className="text-gray-500">로딩 중...</p>
             ) : instagramStatus?.isConnected ? (
@@ -69,8 +80,8 @@ const Dashboard: React.FC<DashboardProps> = ({ mallId, storeName }) => {
             ) : (
               <p className="text-gray-500">연동된 계정이 없습니다</p>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

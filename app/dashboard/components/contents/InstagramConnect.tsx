@@ -1,6 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface InstagramStatus {
   isConnected: boolean;
@@ -75,57 +79,66 @@ const InstagramConnect = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">📷 Instagram 연동</h2>
-      <div className="bg-white p-6 rounded-lg shadow">
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
-            ❌ {error}
-          </div>
-        )}
-        {loading ? (
-          <p>상태 확인 중...</p>
-        ) : status?.isConnected ? (
-          <div>
-            <div className="mb-4 p-4 bg-green-50 text-green-700 rounded-lg">
-              <p>✅ Instagram 계정이 연동되었습니다.</p>
-              <p className="text-sm mt-2">
-                연동된 계정 ID:{' '}
-                <a
-                  href={`https://instagram.com/${status.userName}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-black hover:text-slate-400"
+      <Card>
+        <CardContent className="p-6">
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>❌ {error}</AlertDescription>
+            </Alert>
+          )}
+          {loading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-[250px]" />
+              <Skeleton className="h-4 w-[200px]" />
+            </div>
+          ) : status?.isConnected ? (
+            <div>
+              <Alert variant="success" className="mb-4">
+                <AlertDescription>
+                  <p>✅ Instagram 계정이 연동되었습니다.</p>
+                  <p className="text-sm mt-2">
+                    연동된 계정 ID:{' '}
+                    <a
+                      href={`https://instagram.com/${status.userName}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-black hover:text-slate-400"
+                    >
+                      {status.userName}
+                    </a>
+                  </p>
+                </AlertDescription>
+              </Alert>
+              <div className="flex gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => checkInstagramStatus(cafe24MallId!)}
                 >
-                  {status.userName}
+                  상태 새로고침
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={disconnectInstagram}
+                >
+                  연동 해제
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="mb-4">Instagram 계정을 연동하여 쇼핑몰에 Instagram 피드를 자동으로 게시하세요.</p>
+              <Button
+                asChild
+                variant="default"
+              >
+                <a href={instagramAuthUrl}>
+                  Instagram 계정 연동하기
                 </a>
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => checkInstagramStatus(cafe24MallId!)}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-              >
-                상태 새로고침
-              </button>
-              <button
-                onClick={disconnectInstagram}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-              >
-                연동 해제
-              </button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <p className="mb-4">Instagram 계정을 연동하여 쇼핑몰에 Instagram 피드를 자동으로 게시하세요.</p>
-            <a
-              href={instagramAuthUrl}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Instagram 계정 연동하기
-            </a>
-          </>
-        )}
-      </div>
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

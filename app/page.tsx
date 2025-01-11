@@ -1,5 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const [mallId, setMallId] = useState('');
@@ -17,28 +19,28 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-12 bg-[rgb(17,24,39)] text-white">
+    <div className="flex flex-col items-center justify-center min-h-screen gap-12">
       <div className="w-96 h-32 rounded-xl mb-8 flex items-center justify-center">
         <h1 className="text-4xl font-medium tracking-normal">
           Feedr
         </h1>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center">
-        <input
+        <Input
           ref={inputRef}
           type="text"
           value={mallId}
           onChange={(e) => setMallId(e.target.value)}
           placeholder="카페24 ID를 입력하세요"
-          className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1E60FF] focus:border-[#1E60FF] w-64 shadow-sm bg-gray-800 border-gray-700 text-white placeholder-gray-400"
+          className="w-64"
           required
         />
-        <button
+        <Button
           type="submit"
-          className="px-8 py-3 text-white bg-[#1E60FF] rounded-lg hover:bg-[#1850D2] transition-colors w-64 font-medium shadow-sm"
+          className="w-64"
         >
           카페24 로그인
-        </button>
+        </Button>
       </form>
     </div>
   );

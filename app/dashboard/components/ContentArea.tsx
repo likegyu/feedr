@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Dashboard from './contents/Dashboard';
 import InstagramConnect from './contents/InstagramConnect';
 import PCFeedSettings from './contents/PCFeedSettings';
@@ -39,9 +40,9 @@ const ContentArea: React.FC<Cafe24ContentAreaProps> = ({
   };
 
   return (
-    <div className="flex-1 p-6 overflow-y-auto">
+    <ScrollArea className="flex-1 p-6">
       {renderContent()}
-    </div>
+    </ScrollArea>
   );
 };
 
