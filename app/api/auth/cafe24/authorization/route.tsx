@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   if (!cafe24Code || !cafe24MallId) {
     const urlWithErrorParams = new URL(req.nextUrl.origin);
     urlWithErrorParams.searchParams.append('error', 'Authorization failed');
-    return NextResponse.redirect(urlWithErrorParams);
+    return NextResponse.redirect(urlWithErrorParams.toString());
   }
 
   const cafe24ClientId = process.env.CAFE24_CLIENT_ID!;
