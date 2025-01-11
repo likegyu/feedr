@@ -10,20 +10,19 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { useSearchParams } from 'next/navigation';
 
 export default function Home() {
-  const [mallId, setMallId] = useState('');
-  const [showError, setShowError] = useState(false);
+  const [mallId, setMallId] = useState<string>('');
+  const [showError, setShowError] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    inputRef.current?.focus();
-    if (searchParams.get('error')) {
+    const searchParams = new URLSearchParams(window.location.search);
+    const error = searchParams.get('error');
+    if (error) {
       setShowError(true);
     }
-  }, [searchParams]);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
