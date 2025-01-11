@@ -128,7 +128,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      <div className="w-64 bg-gray-900 text-white flex flex-col p-4">
+      <div className="w-64 bg-gray-900 text-white flex flex-col p-4 h-dvh">
         <div className="mb-6">
           <div className="h-12 flex items-center justify-center mb-4">
             <h1 className="text-xl font-medium">
