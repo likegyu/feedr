@@ -32,7 +32,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-dhv gap-12">
+    <div className="fixed flex flex-col items-center justify-center w-dvw h-dvh gap-12">
       <div className="w-96 h-32 rounded-xl mb-8 flex items-center justify-center">
         <h1 className="text-4xl font-medium tracking-normal">
           Feedr

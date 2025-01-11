@@ -73,7 +73,7 @@ const Cafe24Dashboard = () => {
 
   // UI 렌더링
   return (
-    <div className="flex">
+    <div className="fixed flex w-dvw h-dvh">
       {/* 좌측 사이드바 */}
       <Sidebar 
         cafe24MallId={cafe24MallId} 
