@@ -40,7 +40,7 @@ const ContentArea: React.FC<Cafe24ContentAreaProps> = ({
   };
 
   return (
-    <ScrollArea className="flex-1 p-6">
+    <ScrollArea className="flex-1 p-6 h-dvh">
       {renderContent()}
     </ScrollArea>
   );
