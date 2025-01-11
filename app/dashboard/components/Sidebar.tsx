@@ -81,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [expiresIn, setExpiresIn] = useState<string>('');
 
   const formatTimeLeft = useCallback((seconds: number): string => {
-    if (seconds <= 0) return '로그인 토큰이 만료되었습니다 다시 로그인해 주세요';
+    if (seconds <= 0) return '로그인 토큰이 만료되었습니다.';
 
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);

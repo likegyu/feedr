@@ -48,7 +48,7 @@ const Cafe24Dashboard = () => {
           setCafe24ShopName(cafe24ShopName);
         } catch (error) {
           console.error('스토어 이름 조회 오류:', error);
-          setCafe24ShopName('');
+          setCafe24ShopName('스토어 이름을 가져오는데 실패했습니다');
         }
 
         // 토큰 만료 시간 조회
