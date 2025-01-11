@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useRouter } from "next/navigation"
-import { ChevronUp, Menu, Table2, Share2, SlidersHorizontal, Smartphone, Monitor, Filter, BellRing, FileText } from "lucide-react"
+import { ChevronUp, ChevronDown, Table2, Share2, SlidersHorizontal, Smartphone, Monitor, Filter, BellRing, FileText } from "lucide-react"
 
 
 interface SidebarProps {
@@ -172,7 +172,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
                 {item.subMenus && (
                   <span className="text-gray-400">
-                    {expandedMenu === item.id ? <ChevronUp /> : <Menu />}
+                    {expandedMenu === item.id ? <ChevronUp /> : <ChevronDown />}
                   </span>
                 )}
               </button>

@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Share2, Ban, UserRoundCheck } from "lucide-react"
+import { Ban, UserRoundCheck } from "lucide-react"
 
 interface InstagramStatus {
   isConnected: boolean;
@@ -79,7 +79,7 @@ const InstagramConnect = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4"><Share2 /> Instagram 연동</h2>
+      <h2 className="text-2xl font-bold mb-4">Instagram 연동</h2>
       <Card>
         <CardContent className="p-6">
           {error && (

@@ -12,7 +12,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ImageIcon, PlayCircleIcon, SlidersHorizontal } from 'lucide-react';
+import { ImageIcon, PlayCircleIcon, } from 'lucide-react';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const MobileFeedSettings = () => {
   const [mobileEmblaRef] = useEmblaCarousel({
@@ -142,7 +143,7 @@ const MobileFeedSettings = () => {
                 </div>
               </div>
               {/* 콘텐츠 영역 */}
-              <div className="h-[calc(100%-2.5rem)] overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <ScrollArea className="h-[calc(100%-2.5rem)] overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
                 {/* 배너 영역 */}
                 <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-600">
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -153,7 +154,7 @@ const MobileFeedSettings = () => {
                   </div>
                 </div>
                 {previewContent}
-              </div>
+              </ScrollArea>
             </div>
           </div>
         </div>
@@ -163,7 +164,7 @@ const MobileFeedSettings = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4"><SlidersHorizontal /> 모바일 레이아웃 설정</h2>
+      <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
       {renderMobilePreview()}
       <div className="bg-white p-6 rounded-lg shadow space-y-6">
         <div className="space-y-4">
