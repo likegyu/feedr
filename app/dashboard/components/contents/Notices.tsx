@@ -3,11 +3,12 @@
 import React from 'react';
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { BellRing } from 'lucide-react';
 
 const Notices = () => {
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">📢 공지사항</h2>
+      <h2 className="text-2xl font-bold mb-4"><BellRing /> 공지사항</h2>
       <Card>
         <CardContent className="p-6">
           <div className="space-y-4">

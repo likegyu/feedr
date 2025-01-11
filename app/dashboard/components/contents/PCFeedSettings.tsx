@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ImageIcon, PlayCircleIcon } from 'lucide-react';
+import { ImageIcon, PlayCircleIcon, SlidersHorizontal } from 'lucide-react';
 
 const FeedSettings = () => {
   const [emblaRef] = useEmblaCarousel({
@@ -131,7 +131,7 @@ const FeedSettings = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">🎯 피드 설정</h2>
+      <h2 className="text-2xl font-bold mb-4"><SlidersHorizontal /> PC 레이아웃 설정</h2>
       {renderPreview()}
       <div className="bg-white p-6 rounded-lg shadow space-y-6">
         <div className="space-y-4">

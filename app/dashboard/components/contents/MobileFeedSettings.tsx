@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ImageIcon, PlayCircleIcon } from 'lucide-react';
+import { ImageIcon, PlayCircleIcon, SlidersHorizontal } from 'lucide-react';
 
 const MobileFeedSettings = () => {
   const [mobileEmblaRef] = useEmblaCarousel({
@@ -163,7 +163,7 @@ const MobileFeedSettings = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">📱 모바일 피드 설정</h2>
+      <h2 className="text-2xl font-bold mb-4"><SlidersHorizontal /> 모바일 레이아웃 설정</h2>
       {renderMobilePreview()}
       <div className="bg-white p-6 rounded-lg shadow space-y-6">
         <div className="space-y-4">

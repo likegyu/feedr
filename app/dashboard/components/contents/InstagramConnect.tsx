@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Share2, Ban, UserRoundCheck } from "lucide-react"
 
 interface InstagramStatus {
   isConnected: boolean;
@@ -78,12 +79,12 @@ const InstagramConnect = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">📷 Instagram 연동</h2>
+      <h2 className="text-2xl font-bold mb-4"><Share2 /> Instagram 연동</h2>
       <Card>
         <CardContent className="p-6">
           {error && (
             <Alert variant="destructive" className="mb-4">
-              <AlertDescription>❌ {error}</AlertDescription>
+              <AlertDescription><Ban /> {error}</AlertDescription>
             </Alert>
           )}
           {loading ? (
@@ -95,7 +96,7 @@ const InstagramConnect = () => {
             <div>
               <Alert variant="success" className="mb-4">
                 <AlertDescription>
-                  <p>✅ Instagram 계정이 연동되었습니다.</p>
+                  <p><UserRoundCheck />Instagram 계정이 연동되었습니다.</p>
                   <p className="text-sm mt-2">
                     연동된 계정 ID:{' '}
                     <a

@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useRouter } from "next/navigation"
+import { ChevronUp, Menu, Table2, Share2, SlidersHorizontal, Smartphone, Monitor, Filter, BellRing, FileText } from "lucide-react"
 
 
 interface SidebarProps {
@@ -25,7 +26,7 @@ interface SidebarProps {
 interface MenuItem {
   id: string;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
   description?: string;
   subMenus?: MenuItem[];
 }
@@ -34,37 +35,37 @@ const menuItems: MenuItem[] = [
   {
     id: 'dashboard',
     label: '대시보드',
-    icon: '📊',
+    icon: <Table2 />,
     description: '피드 연동 현황 및 통계'
   },
   {
     id: 'instagram',
     label: 'Instagram 연동',
-    icon: '📷',
+    icon: <Share2 />,
     description: '인스타그램 계정을 연동하여 관리'
   },
   {
     id: 'feed-settings',
     label: '피드 설정',
-    icon: '🎯',
+    icon: <SlidersHorizontal />,
     description: '피드 표시 방식 및 스타일 설정',
     subMenus: [
       {
         id: 'mobile-feed-settings',
         label: '모바일 레이아웃',
-        icon: '📱',
+        icon: <Smartphone />,
         description: '모바일 화면 레이아웃 설정'
       },
       {
         id: 'pc-feed-settings',
         label: 'PC 레이아웃',
-        icon: '💻',
+        icon: <Monitor />,
         description: 'PC 화면 레이아웃 설정'
       },
       {
         id: 'feed-filter',
         label: '필터 설정',
-        icon: '🔍',
+        icon: <Filter />,
         description: '게시물 필터링 설정'
       }
     ]
@@ -72,13 +73,13 @@ const menuItems: MenuItem[] = [
   {
     id: 'notices',
     label: '공지사항',
-    icon: '📢',
+    icon: <BellRing />,
     description: '서비스 공지 및 업데이트'
   },
   {
     id: 'api-docs',
     label: 'API 문서',
-    icon: '📘',
+    icon: <FileText />,
     description: 'API 연동 가이드 및 문서'
   },
 ];
@@ -171,7 +172,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
                 {item.subMenus && (
                   <span className="text-gray-400">
-                    {expandedMenu === item.id ? '▼' : '▶'}
+                    {expandedMenu === item.id ? <ChevronUp /> : <Menu />}
                   </span>
                 )}
               </button>

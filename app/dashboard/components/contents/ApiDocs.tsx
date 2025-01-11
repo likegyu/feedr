@@ -3,11 +3,12 @@
 import React from 'react';
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FileText } from "lucide-react"
 
 const ApiDocs = () => {
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">📘 API 문서</h2>
+      <h2 className="text-2xl font-bold mb-4"><FileText />API 문서</h2>
       <Card>
         <CardContent className="p-6">
           <ScrollArea className="h-[400px] pr-4">
