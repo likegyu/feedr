@@ -2,14 +2,28 @@
 import { useState, useEffect, useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { useSearchParams } from 'next/navigation';
 
 export default function Home() {
   const [mallId, setMallId] = useState('');
+  const [showError, setShowError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     inputRef.current?.focus();
-  }, []);
+    if (searchParams.get('error')) {
+      setShowError(true);
+    }
+  }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +56,19 @@ export default function Home() {
           카페24 로그인
         </Button>
       </form>
+      <Dialog open={showError} onOpenChange={setShowError}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>로그인 실패</DialogTitle>
+            <DialogDescription>
+              인증에 실패했습니다. 다시 시도해주세요.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setShowError(false)}>확인</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

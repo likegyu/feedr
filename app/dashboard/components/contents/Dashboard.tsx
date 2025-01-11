@@ -7,6 +7,7 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DashboardProps {
   mallId: string | null;
@@ -20,7 +21,7 @@ interface InstagramStatus {
 
 const Dashboard: React.FC<DashboardProps> = ({ mallId, storeName }) => {
   const [instagramStatus, setInstagramStatus] = useState<InstagramStatus | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchInstagramStatus = async () => {
@@ -50,8 +51,16 @@ const Dashboard: React.FC<DashboardProps> = ({ mallId, storeName }) => {
             <CardTitle>매장 정보</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><span className="font-medium">스토어명:</span> {storeName}</p>
-            <p><span className="font-medium">Mall ID:</span> {mallId || '미설정'}</p>
+            {storeName ? (
+              <p><span className="font-medium">스토어명:</span> {storeName}</p>
+            ) : (
+              <Skeleton className="h-6 w-3/4" />
+            )}
+            {mallId ? (
+              <p><span className="font-medium">Mall ID:</span> {mallId}</p>
+            ) : (
+              <Skeleton className="h-6 w-1/2" />
+            )}
           </CardContent>
         </Card>
         
@@ -61,14 +70,17 @@ const Dashboard: React.FC<DashboardProps> = ({ mallId, storeName }) => {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p className="text-gray-500">로딩 중...</p>
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-5 w-48" />
+              </div>
             ) : instagramStatus?.isConnected ? (
               <div className="space-y-1">
                 <p className="text-green-600">✓ 연동됨</p>
                 <p>
                   <span className="font-medium">계정:</span>{' '}
                   <a 
-                    href={`https://instagram.com/${instagramStatus.userName}`}
+                    href={instagramStatus.userName ? `https://instagram.com/${instagramStatus.userName}` : '#'}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:text-blue-600"

@@ -31,8 +31,8 @@ const Cafe24Dashboard = () => {
         const { cafe24MallId } = await response.json(); // mallId 가져오기
         // mall_id가 없으면 루트로 리디렉션
         if (!cafe24MallId) {
-          console.error('Cafe24 mall ID not found');
-          router.push('/'); // window.location.href 대신 Next.js router 사용
+          const urlWithErrorParams = 'error';
+          router.push(`/?${urlWithErrorParams}=mallId is not found`);
           return;
         }
 

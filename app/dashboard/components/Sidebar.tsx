@@ -11,6 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useRouter } from "next/navigation"
 
 
@@ -135,8 +136,16 @@ const Sidebar: React.FC<SidebarProps> = ({
             </h1>
           </div>
           <div className="px-2 border-gray-700 pt-4">
-            <h2 className="text-lg font-bold">{cafe24ShopName || 'Loading...'}</h2>
-            <p className="text-sm text-gray-400">{cafe24MallId}</p>
+            {cafe24ShopName ? (
+              <h2 className="text-lg font-bold">{cafe24ShopName}</h2>
+            ) : (
+              <Skeleton className="h-7 w-full bg-gray-700" />
+            )}
+            {cafe24MallId ? (
+              <p className="text-sm text-gray-400">{cafe24MallId}</p>
+            ) : (
+              <Skeleton className="h-4 w-3/4 bg-gray-700 mt-2" />
+            )}
             <p className="text-xs text-gray-400 mt-1">{expiresIn}</p>
           </div>
         </div>

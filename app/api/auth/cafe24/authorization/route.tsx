@@ -8,7 +8,9 @@ export async function GET(req: NextRequest) {
   
   // 필요한 파라미터가 없으면 에러 처리
   if (!cafe24Code || !cafe24MallId) {
-    return NextResponse.json({ error: 'Cafe24 authorization code or state missing' }, { status: 400 });
+    const urlWithErrorParams = new URL(req.nextUrl.origin);
+    urlWithErrorParams.searchParams.append('error', 'Authorization failed');
+    return NextResponse.redirect(urlWithErrorParams);
   }
 
   const cafe24ClientId = process.env.CAFE24_CLIENT_ID!;
