@@ -11,6 +11,7 @@ type Token = {
   cafe24_mall_id: string;
   cafe24_user_id: string;
   cafe24_scopes: string;  // JSON 문자열로 처리
+  cafe24_shop_name: string;  
   cafe24_issued_at: string;  // ISO 8601 문자열로 처리
   instagram_access_token?: string;
   instagram_user_id?: string;

@@ -65,7 +65,7 @@ export async function GET() {
     
     return NextResponse.json({ 
       data: { 
-        cafe24ShopName: data.store.shop_name 
+        cafe24ShopName: data.store.shop_name
       }
     });
 
