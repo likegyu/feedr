@@ -6,8 +6,41 @@ import { db } from '@/lib/db';
 const CLIENT_ID = process.env.CAFE24_CLIENT_ID!;
 const CLIENT_SECRET = process.env.CAFE24_CLIENT_SECRET!;
 
+// 로깅 유틸리티 함수들
+function logError(context: string, error: any, additionalInfo?: object) {
+  const errorDetails = {
+    timestamp: new Date().toISOString(),
+    level: 'ERROR',
+    context,
+    error: {
+      message: error.message,
+      stack: error.stack,
+      ...(error.response?.data && { responseData: error.response.data }),
+    },
+    ...additionalInfo,
+  };
+  
+  console.error(JSON.stringify(errorDetails, null, 2));
+}
+
+function logInfo(context: string, message: string, additionalInfo?: object) {
+  const infoDetails = {
+    timestamp: new Date().toISOString(),
+    level: 'INFO',
+    context,
+    message,
+    ...additionalInfo,
+  };
+  
+  console.log(JSON.stringify(infoDetails, null, 2));
+}
+
 // CRON Route Handler
 export async function GET(req: NextRequest) {
+  const startTime = Date.now();
+  let successCount = 0;
+  let failureCount = 0;
+
   try {
     // 보안 검증
     const authHeader = req.headers.get('authorization');
@@ -21,8 +54,7 @@ export async function GET(req: NextRequest) {
       const { rows } = await db.query('SELECT * FROM tokens');
       tokens = rows;
     } catch (dbError) {
-      const error = dbError as Error;
-      console.error('Failed to fetch tokens from database. Error details:', error.message, error.stack);
+      logError('Database Query', dbError, { operation: 'SELECT tokens' });
       return NextResponse.json({ error: 'Database Query Failed' }, { status: 500 });
     }
 
@@ -53,8 +85,10 @@ export async function GET(req: NextRequest) {
             }
           );
         } catch (axiosError) {
-          const error = axiosError as Error;
-          console.error(`Failed to request new token for mall_id ${cafe24_mall_id}. Error details:`, error.message, error.stack);
+          logError('Cafe24 Token Refresh', axiosError, { 
+            mallId: cafe24_mall_id,
+            operation: 'refresh_token' 
+          });
           return;
         }
 
@@ -133,24 +167,57 @@ export async function GET(req: NextRequest) {
                 console.error(`Instagram token refresh failed for mall_id ${cafe24_mall_id}:`, instagramData);
               }
             } catch (instagramError) {
-              console.error(`Instagram token refresh error for mall_id ${cafe24_mall_id}:`, instagramError);
+              logError('Instagram Token Refresh', instagramError, {
+                mallId: cafe24_mall_id,
+                operation: 'refresh_instagram_token'
+              });
             }
           }
         }
 
+        // 토큰 갱신 성공 시
+        successCount++;
+        logInfo('Token Refresh Success', `Successfully refreshed tokens for mall ${cafe24_mall_id}`, {
+          mallId: cafe24_mall_id,
+          tokenTypes: ['cafe24', instagram_access_token ? 'instagram' : null].filter(Boolean)
+        });
+
       } catch (error) {
-        const err = error as Error;
-        console.error(`Failed to refresh tokens for mall_id ${cafe24_mall_id}:`, err);
+        failureCount++;
+        logError('Token Refresh Process', error, {
+          mallId: cafe24_mall_id,
+          operation: 'overall_token_refresh'
+        });
       }
     });
 
     // 모든 리프레시 토큰 갱신을 병렬로 실행
-    await Promise.all(tokenPromises);
+    await Promise.allSettled(tokenPromises);
 
-    return NextResponse.json({ message: 'Tokens refreshed successfully' });
+    const executionTime = Date.now() - startTime;
+    logInfo('Cron Job Completion', 'Token refresh job completed', {
+      totalProcessed: tokens.length,
+      successCount,
+      failureCount,
+      executionTimeMs: executionTime
+    });
+
+    return NextResponse.json({ 
+      message: 'Tokens refreshed successfully',
+      stats: {
+        total: tokens.length,
+        success: successCount,
+        failure: failureCount,
+        executionTimeMs: executionTime
+      }
+    });
+
   } catch (error) {
-    const err = error as Error;
-    console.error('Cron route error. Error details:', err.message, err.stack);
+    logError('Cron Job Execution', error, { 
+      endpoint: '/api/cron/refresh-tokens',
+      executionTimeMs: Date.now() - startTime
+    });
+    
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
 // ~/app/lib/db.tsx
 import { Pool, QueryResult } from 'pg';
 
-// 카페24 토큰 데이터 구조에 맞는 타입 정의
+//토큰 데이터 구조에 맞는 타입 정의
 type Token = {
   cafe24_access_token: string;
   cafe24_expires_at: string;  // ISO 8601 문자열로 처리
@@ -16,6 +16,7 @@ type Token = {
   instagram_user_id?: string;
   instagram_expires_in?: number;
   instagram_username?: string;
+  feed_filter?: string;
 };
 
 const pool = new Pool({
