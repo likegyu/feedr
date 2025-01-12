@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { db } from '@/lib/db';
 
 // Cafe24 API 요청에 필요한 상수들
 const CLIENT_ID = process.env.CAFE24_CLIENT_ID!;
 const CLIENT_SECRET = process.env.CAFE24_CLIENT_SECRET!;
+
+// Add type definitions
+interface ErrorResponse {
+  data?: unknown;
+  [key: string]: unknown;
+}
 
 // 로깅 유틸리티 함수들
 function logError(context: string, error: unknown, additionalInfo?: object) {
@@ -15,7 +21,9 @@ function logError(context: string, error: unknown, additionalInfo?: object) {
     error: {
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-      ...((error as any)?.response?.data && { responseData: (error as any).response.data }),
+      ...(error instanceof AxiosError && error.response 
+          ? { responseData: error.response.data as ErrorResponse } 
+          : {}),
     },
     ...additionalInfo,
   };
