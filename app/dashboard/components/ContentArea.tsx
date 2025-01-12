@@ -6,7 +6,7 @@ import Dashboard from './contents/Dashboard';
 import InstagramConnect from './contents/InstagramConnect';
 import PCFeedSettings from './contents/PCFeedSettings';
 import MobileFeedSettings from './contents/MobileFeedSettings';
-import FeedFilter, { MediaFilter } from './contents/FeedFilter';
+import FeedFilter from './contents/FeedFilter';
 import Notices from './contents/Notices';
 import ApiDocs from './contents/ApiDocs';
 

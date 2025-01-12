@@ -7,15 +7,15 @@ const CLIENT_ID = process.env.CAFE24_CLIENT_ID!;
 const CLIENT_SECRET = process.env.CAFE24_CLIENT_SECRET!;
 
 // 로깅 유틸리티 함수들
-function logError(context: string, error: any, additionalInfo?: object) {
+function logError(context: string, error: unknown, additionalInfo?: object) {
   const errorDetails = {
     timestamp: new Date().toISOString(),
     level: 'ERROR',
     context,
     error: {
-      message: error.message,
-      stack: error.stack,
-      ...(error.response?.data && { responseData: error.response.data }),
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      ...((error as any)?.response?.data && { responseData: (error as any).response.data }),
     },
     ...additionalInfo,
   };

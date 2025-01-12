@@ -16,7 +16,6 @@ const FeedFilter = () => {
   const [selectedFilter, setSelectedFilter] = useState<MediaFilter>('all');
   const [savedFilter, setSavedFilter] = useState<MediaFilter>('all');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // DB에서 현재 필터 설정 가져오기
   useEffect(() => {
@@ -35,7 +34,6 @@ const FeedFilter = () => {
           setSavedFilter(filterData.filter);
         }
       } catch (error) {
-        setError('상태 확인에 실패했습니다.');
         console.error(error);
       } finally {
         setLoading(false);
@@ -59,7 +57,6 @@ const FeedFilter = () => {
       const data = await response.json();
       setSavedFilter(data.filter);
     } catch (error) {
-      setError('필터 적용에 실패했습니다.');
       console.error(error);
     } finally {
       setLoading(false);
