@@ -1,6 +1,6 @@
 'use client';
 
-import { Table2, Share2, SlidersHorizontal, Smartphone, Monitor, Filter, BellRing, FileText, type LucideIcon } from "lucide-react"
+import { Table2, Share2, SlidersHorizontal, Smartphone, Monitor, Filter, BellRing, FileText, } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,

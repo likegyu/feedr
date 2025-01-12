@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { cookies } from 'next/headers';
 import axios from 'axios';
@@ -6,7 +6,7 @@ import axios from 'axios';
 const CLIENT_ID = process.env.CAFE24_CLIENT_ID;
 const CLIENT_SECRET = process.env.CAFE24_CLIENT_SECRET;
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   const cookieStore = await cookies();
   const currentCafe24Token = cookieStore.get('cafe24_access_token')?.value;
 
