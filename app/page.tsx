@@ -1,5 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { differenceInSeconds } from 'date-fns';
+import { useRouter } from 'next/navigation';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,14 +17,39 @@ export default function Home() {
   const [mallId, setMallId] = useState<string>('');
   const [showError, setShowError] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
+    // 에러 파라미터 체크
     const searchParams = new URLSearchParams(window.location.search);
     const error = searchParams.get('error');
     if (error) {
       setShowError(true);
+      return;
     }
-  }, []);
+
+    // 토큰 만료 시간 체크
+    const checkTokenExpiration = async () => {
+      try {
+        const response = await fetch('/api/auth/cafe24/token-expires-check');
+        if (response.ok) {
+          const { data } = await response.json();
+          const diffInSeconds = differenceInSeconds(
+            new Date(data.cafe24ExpiresAt),
+            new Date()
+          );
+
+          if (diffInSeconds > 0) {
+            router.push('/dashboard');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check token expiration:', error);
+      }
+    };
+
+    checkTokenExpiration();
+  }, [router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

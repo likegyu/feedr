@@ -22,10 +22,14 @@ function useInterval(callback: () => void, delay: number) {
 }
 
 export function NavUser() {
-    const [cafe24ShopName, setCafe24ShopName] = useState<string>('');
-    const [expiresAt, setExpiresAt] = useState<string>('');
+    const [cafe24ShopName, setCafe24ShopName] = useState<string>(() => 
+        localStorage.getItem('cafe24ShopName') || ''
+    );
+    const [expiresAt, setExpiresAt] = useState<string>(() => 
+        localStorage.getItem('cafe24ExpiresAt') || ''
+    );
     const [remainingTime, setRemainingTime] = useState<string>('');
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(!cafe24ShopName || !expiresAt);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     // 남은 시간 계산 함수
@@ -53,6 +57,12 @@ export function NavUser() {
 
     useEffect(() => {
         const fetchData = async () => {
+            // 캐시된 데이터가 있으면 API 호출 스킵
+            if (cafe24ShopName && expiresAt) {
+                setIsLoading(false);
+                return;
+            }
+
             try {
                 const [shopNameRes, expiresRes] = await Promise.all([
                     fetch("/api/auth/cafe24/shop-name"),
@@ -62,11 +72,13 @@ export function NavUser() {
                 if (shopNameRes.ok) {
                     const { data } = await shopNameRes.json();
                     setCafe24ShopName(data.cafe24ShopName);
+                    localStorage.setItem('cafe24ShopName', data.cafe24ShopName);
                 }
 
                 if (expiresRes.ok) {
                     const { data } = await expiresRes.json();
                     setExpiresAt(data.cafe24ExpiresAt);
+                    localStorage.setItem('cafe24ExpiresAt', data.cafe24ExpiresAt);
                 }
             } catch (error) {
                 console.error('Failed to fetch data:', error);
@@ -76,7 +88,7 @@ export function NavUser() {
         };
 
         fetchData();
-    }, []);
+    }, [cafe24ShopName, expiresAt]);
 
     const refreshCafe24Token = async () => {
         setIsRefreshing(true);
@@ -85,7 +97,13 @@ export function NavUser() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
             });
-            if (!res.ok) throw new Error("토큰 갱신 실패");
+            if (res.ok) {
+                // 토큰 갱신 후 캐시 초기화
+                localStorage.removeItem('cafe24ExpiresAt');
+                const { data } = await res.json();
+                setExpiresAt(data.cafe24ExpiresAt);
+                localStorage.setItem('cafe24ExpiresAt', data.cafe24ExpiresAt);
+            }
         } catch (error) {
             console.error(error);
         } finally {
