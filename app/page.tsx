@@ -1,54 +1,34 @@
 'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import { differenceInSeconds } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export default function Home() {
-  const [mallId, setMallId] = useState<string>('');
-  const [showError, setShowError] = useState<boolean>(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [mallId, setMallId] = useState('');
+  const [showError, setShowError] = useState(false);
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // 에러 파라미터 체크
-    const searchParams = new URLSearchParams(window.location.search);
-    const error = searchParams.get('error');
-    if (error) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error')) {
       setShowError(true);
       return;
     }
 
-    // 토큰 만료 시간 체크
-    const checkTokenExpiration = async () => {
-      try {
-        const response = await fetch('/api/auth/cafe24/token-expires-check');
-        if (response.ok) {
-          const { data } = await response.json();
-          const diffInSeconds = differenceInSeconds(
-            new Date(data.cafe24ExpiresAt),
-            new Date()
-          );
-
-          if (diffInSeconds > 0) {
-            router.push('/dashboard');
-          }
+    fetch('/api/auth/cafe24/token-expires-check')
+      .then(res => res.ok && res.json())
+      .then(data => {
+        if (data?.data?.cafe24ExpiresAt && 
+            differenceInSeconds(new Date(data.data.cafe24ExpiresAt), new Date()) > 0) {
+          router.push('/dashboard');
         }
-      } catch (error) {
-        console.error('Failed to check token expiration:', error);
-      }
-    };
-
-    checkTokenExpiration();
+      })
+      .catch(console.error);
   }, [router]);
 
   const handleSubmit = (e: React.FormEvent) => {
