@@ -65,34 +65,34 @@ const FeedFilter = () => {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>미디어 필터</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-        </CardContent>
-      </Card>
+      <div>
+        <h2 className="text-2xl font-bold mb-4">필터 설정</h2>
+        <Card>
+          <CardContent className="space-y-4 p-6">
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-full" />
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   if (!isInstagramConnected) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>미디어 필터</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert>
-            <AlertDescription className="flex items-center gap-2">
-              <Info className="h-4 w-4" />
-              필터 설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <div>
+        <h2 className="text-2xl font-bold mb-4">필터 설정</h2>
+        <Card>
+          <CardContent className='p-6'>
+            <Alert>
+              <AlertDescription className="flex items-center gap-2">
+                <Info className="h-4 w-4" />
+                필터 설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
@@ -101,39 +101,39 @@ const FeedFilter = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>미디어 필터</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <RadioGroup
-          value={selectedFilter}
-          onValueChange={handleFilterChange}
-        >
-          <div className="flex items-center space-x-2 mb-2">
-            <RadioGroupItem value="all" id="all" />
-            <Label htmlFor="all">모든 미디어</Label>
-          </div>
-          <div className="flex items-center space-x-2 mb-2">
-            <RadioGroupItem value="image" id="image" />
-            <Label htmlFor="image">사진만</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="video" id="video" />
-            <Label htmlFor="video">동영상만</Label>
-          </div>
-        </RadioGroup>
-      </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={handleApplyFilter}
-          className="w-full"
-          disabled={loading || selectedFilter === savedFilter}
-        >
-          {loading ? '저장 중...' : '필터 적용'}
-        </Button>
-      </CardFooter>
-    </Card>
+    <div>
+      <h2 className="text-2xl font-bold mb-4">필터 설정</h2>
+      <Card>
+        <CardContent>
+          <RadioGroup
+            value={selectedFilter}
+            onValueChange={handleFilterChange}
+          >
+            <div className="flex items-center space-x-2 mb-2">
+              <RadioGroupItem value="all" id="all" />
+              <Label htmlFor="all">모든 미디어</Label>
+            </div>
+            <div className="flex items-center space-x-2 mb-2">
+              <RadioGroupItem value="image" id="image" />
+              <Label htmlFor="image">사진만</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="video" id="video" />
+              <Label htmlFor="video">동영상만</Label>
+            </div>
+          </RadioGroup>
+        </CardContent>
+        <CardFooter>
+          <Button 
+            onClick={handleApplyFilter}
+            className="w-full"
+            disabled={loading || selectedFilter === savedFilter}
+          >
+            {loading ? '저장 중...' : '필터 적용'}
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 

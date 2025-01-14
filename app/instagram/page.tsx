@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Ban, UserRoundCheck } from "lucide-react"
+import { Ban, UserRoundCheck, Info } from "lucide-react"
+import { useAuthDialog } from "@/components/auth-dialog-provider"
 
 interface InstagramStatus {
   isConnected: boolean;
@@ -13,12 +14,37 @@ interface InstagramStatus {
 }
 
 const InstagramConnect = () => {
+  const { onOpen } = useAuthDialog();
   const [status, setStatus] = useState<InstagramStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [instagramAuthUrl, setInstagramAuthUrl] = useState<string>('');
+  const [showTokenAlert, setShowTokenAlert] = useState(false);
+
+  const checkTokenExpiration = async () => {
+    try {
+      const response = await fetch('/api/auth/cafe24/token-expires-check');
+      const data = await response.json();
+      
+      if (!data?.data?.cafe24ExpiresAt || new Date(data.data.cafe24ExpiresAt) <= new Date()) {
+        setShowTokenAlert(true);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('토큰 만료 확인 실패:', error);
+      setShowTokenAlert(true);
+      return false;
+    }
+  };
 
   const checkInstagramStatus = useCallback(async () => {
+    const isTokenValid = await checkTokenExpiration();
+    if (!isTokenValid) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`/api/auth/instagram/status`);
       const data = await response.json();
@@ -77,6 +103,17 @@ const InstagramConnect = () => {
       <h2 className="text-2xl font-bold mb-4">Instagram 연동</h2>
       <Card>
         <CardContent className="p-6">
+          {showTokenAlert && (
+            <Alert className="mb-4">
+              <AlertDescription className="flex items-center gap-2">
+                <Info className="h-4 w-4" />
+                카페24 로그인이 필요합니다. 다시 로그인해 주세요.
+                <Button onClick={onOpen} variant="default" size="sm" className="ml-1 h-7">
+                로그인
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
           {error && (
             <Alert variant="destructive" className="mb-4">
               <AlertDescription><Ban /> {error}</AlertDescription>
@@ -126,8 +163,14 @@ const InstagramConnect = () => {
               <Button
                 asChild
                 variant="default"
+                disabled={showTokenAlert}
+                className={showTokenAlert ? 'opacity-50 cursor-not-allowed' : ''}
               >
-                <a href={instagramAuthUrl}>
+                <a 
+                  href={instagramAuthUrl}
+                  className={showTokenAlert ? 'pointer-events-none cursor-not-allowed' : ''}
+                  onClick={(e) => showTokenAlert && e.preventDefault()}
+                >
                   Instagram 계정 연동하기
                 </a>
               </Button>

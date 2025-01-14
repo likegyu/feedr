@@ -8,6 +8,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
+import { AuthDialogProvider } from "@/components/auth-dialog-provider"
 
 function InitializeCafe24() {
   const { initialized, setShopName, setExpiresAt, setIsLoading, setInitialized } = useCafe24Store();
@@ -52,15 +53,17 @@ export function RootLayoutClient({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <InitializeCafe24 />
-      <AppSidebar />
-      <SidebarInset>
-        <main className="m-7">
-          <SidebarTrigger />
-          {children}
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+    <AuthDialogProvider>
+      <SidebarProvider>
+        <InitializeCafe24 />
+        <AppSidebar />
+        <SidebarInset>
+          <main className="m-7">
+            <SidebarTrigger />
+            {children}
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </AuthDialogProvider>
   );
 }
