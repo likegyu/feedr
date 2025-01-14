@@ -26,7 +26,7 @@ export async function GET(request: Request) {
   } catch (err: unknown) {
     console.error('Cafe24 auth error:', err);
     return NextResponse.json(
-      { error: '카페24 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.' },
+      { error: '유효하지 않은 카페24 ID 이거나, 카페24 서버에 연결할 수 없습니다.' },
       { status: 500 }
     );
   }
