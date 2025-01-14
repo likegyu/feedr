@@ -19,10 +19,23 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
   const [showError, setShowError] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: 로그인 로직 구현
-    setShowError(true)
+    if (!mallId) {
+      setShowError(true)
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/auth/cafe24/access?mall_id=${mallId}`);
+      if (response.ok) {
+        window.location.href = response.url;
+      } else {
+        setShowError(true)
+      }
+    } catch (error) {
+      setShowError(true)
+    }
   }
 
   return (
