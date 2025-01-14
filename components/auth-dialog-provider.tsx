@@ -5,15 +5,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
+// 상수 추가
+const CLIENT_ID = process.env.CAFE24_CLIENT_ID || '';
+const REDIRECT_URI = process.env.CAFE24_REDIRECT_URI || '';
+
 type AuthDialogContextType = {
   isOpen: boolean
   onOpen: () => void
   onClose: () => void
-}
-
-type AuthError = {
-  message: string;
-  code: string;
 }
 
 const AuthDialogContext = createContext<AuthDialogContextType | undefined>(undefined)
@@ -31,21 +30,18 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
       return
     }
 
-    try {
-      const response = await fetch(`/api/auth/cafe24/access?mall_id=${mallId}`);
-      if (response.ok) {
-        window.location.href = response.url;
-      } else {
-        setShowError(true)
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Authentication failed:', error.message);
-      } else {
-        console.error('An unexpected error occurred');
-      }
-      setShowError(true)
-    }
+    // mallId에서 .cafe24.com 도메인을 제거
+    const scope = [
+      'mall.read_store',
+      'mall.read_application',
+      'mall.write_application',
+      'mall.write_design',
+      'mall.read_design'
+    ].join(',');
+
+    const authUrl = `https://${mallId}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID}&state=${mallId}&redirect_uri=${REDIRECT_URI}&scope=${scope}`;
+
+    window.location.href = authUrl;
   }
 
   return (
@@ -70,7 +66,7 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
               type="text"
               value={mallId}
               onChange={(e) => setMallId(e.target.value)}
-              placeholder="카페24 ID를 입력하세요"
+              placeholder="예: yourmall.cafe24.com"
               required
             />
             <DialogFooter>
