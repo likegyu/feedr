@@ -83,7 +83,7 @@ const FeedFilter = () => {
       <div>
         <h2 className="text-2xl font-bold mb-4">필터 설정</h2>
         <Card>
-          <CardContent className='p-6'>
+          <CardContent className='p-6 pt-6'>
             <Alert>
               <AlertDescription className="flex items-center gap-2">
                 <Info className="h-4 w-4" />
