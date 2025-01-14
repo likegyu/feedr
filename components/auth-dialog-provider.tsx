@@ -33,7 +33,8 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
       } else {
         setShowError(true)
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Authentication failed:', error);
       setShowError(true)
     }
   }
