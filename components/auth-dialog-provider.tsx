@@ -11,6 +11,11 @@ type AuthDialogContextType = {
   onClose: () => void
 }
 
+type AuthError = {
+  message: string;
+  code: string;
+}
+
 const AuthDialogContext = createContext<AuthDialogContextType | undefined>(undefined)
 
 export function AuthDialogProvider({ children }: { children: React.ReactNode }) {
@@ -33,8 +38,12 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
       } else {
         setShowError(true)
       }
-    } catch (error: unknown) {
-      console.error('Authentication failed:', error);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Authentication failed:', error.message);
+      } else {
+        console.error('An unexpected error occurred');
+      }
       setShowError(true)
     }
   }
