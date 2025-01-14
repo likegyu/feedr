@@ -104,7 +104,7 @@ const FeedFilter = () => {
     <div>
       <h2 className="text-2xl font-bold mb-4">필터 설정</h2>
       <Card>
-        <CardContent>
+        <CardContent className='p-6 pt-6'>
           <RadioGroup
             value={selectedFilter}
             onValueChange={handleFilterChange}
