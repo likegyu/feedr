@@ -20,9 +20,8 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
   const [isOpen, setIsOpen] = useState(false)
   const [mallId, setMallId] = useState("")
   const [showError, setShowError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("인증에 실패했습니다. 다시 시도해주세요.");
   const inputRef = useRef<HTMLInputElement>(null)
-  const CLIENT_ID = process.env.CAFE24_CLIENT_ID;
-  const REDIRECT_URI = process.env.CAFE24_REDIRECT_URI;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,18 +30,21 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
       return
     }
 
-    // mallId에서 .cafe24.com 도메인을 제거
-    const scope = [
-      'mall.read_store',
-      'mall.read_application',
-      'mall.write_application',
-      'mall.write_design',
-      'mall.read_design'
-    ].join(',');
-
-    const authUrl = `https://${mallId}.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${CLIENT_ID}&state=${mallId}&redirect_uri=${REDIRECT_URI}&scope=${scope}`;
-
-    window.location.href = authUrl;
+    try {
+      const response = await fetch(`/api/auth/cafe24/get-auth-url?mallId=${mallId}`);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setErrorMessage(data.error);
+        setShowError(true);
+        return;
+      }
+      
+      window.location.assign(data.url);
+    } catch (error) {
+      setErrorMessage("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      setShowError(true);
+    }
   }
 
   return (
@@ -87,7 +89,7 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
           <DialogHeader>
             <DialogTitle>로그인 실패</DialogTitle>
             <DialogDescription>
-              인증에 실패했습니다. 다시 시도해주세요.
+              {errorMessage}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
