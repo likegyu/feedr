@@ -23,7 +23,8 @@ export async function GET(request: Request) {
     const authUrl = `${baseUrl}/api/v2/oauth/authorize?response_type=code&client_id=${process.env.CAFE24_CLIENT_ID}&state=${mallId}&redirect_uri=${process.env.CAFE24_REDIRECT_URI}&scope=mall.read_store,mall.read_application,mall.write_application,mall.write_design,mall.read_design`;
 
     return NextResponse.json({ url: authUrl });
-  } catch (error) {
+  } catch (err: unknown) {
+    console.error('Cafe24 auth error:', err);
     return NextResponse.json(
       { error: '카페24 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.' },
       { status: 500 }

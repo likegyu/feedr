@@ -41,7 +41,8 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
       }
       
       window.location.assign(data.url);
-    } catch (error) {
+    } catch (err: unknown) {
+      console.error('Auth dialog error:', err);
       setErrorMessage("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
       setShowError(true);
     }
