@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 // 상수 추가
-const CLIENT_ID = process.env.CAFE24_CLIENT_ID || '';
-const REDIRECT_URI = process.env.CAFE24_REDIRECT_URI || '';
+
 
 type AuthDialogContextType = {
   isOpen: boolean
@@ -22,6 +21,8 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
   const [mallId, setMallId] = useState("")
   const [showError, setShowError] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const CLIENT_ID = process.env.CAFE24_CLIENT_ID;
+  const REDIRECT_URI = process.env.CAFE24_REDIRECT_URI;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -66,7 +67,7 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
               type="text"
               value={mallId}
               onChange={(e) => setMallId(e.target.value)}
-              placeholder="예: yourmall.cafe24.com"
+              placeholder="카페24 ID를 입력해주세요"
               required
             />
             <DialogFooter>
