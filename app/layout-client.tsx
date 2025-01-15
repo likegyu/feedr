@@ -33,7 +33,7 @@ function InitializeCafe24() {
 
         if (expiresRes.ok) {
           const { data } = await expiresRes.json();
-          setExpiresAt(data.expiresAt); // API 응답에 맞는 속성명 사용
+          setExpiresAt(data.cafe24ExpiresAt); // API 응답에 맞는 속성명 사용
         }
         
       } catch (error) {
