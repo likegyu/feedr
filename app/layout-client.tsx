@@ -81,12 +81,14 @@ function InitializeCafe24() {
 
 export function RootLayoutClient({
   children,
+  defaultOpen,
 }: Readonly<{
   children: React.ReactNode;
+  defaultOpen: boolean;
 }>) {
   return (
     <AuthDialogProvider>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={defaultOpen}>
         <InitializeCafe24 />
         <AppSidebar />
         <SidebarInset>

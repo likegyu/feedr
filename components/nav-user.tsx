@@ -104,7 +104,7 @@ export function NavUser() {
                         </Tooltip>
                     </TooltipProvider>
                     <User className="size-6 shrink-0 group-data-[collapsible=icon]:hidden block" />
-                    <div className="grid flex-1 text-left gap-0.5">
+                    <div className="grid flex-1 text-left gap-0.5 group-data-[collapsible=icon]:hidden">
                         {isLoading ? (
                             <>
                                 <Skeleton className="h-[18px] w-[120px]" />
