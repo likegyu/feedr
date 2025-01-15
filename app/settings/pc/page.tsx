@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const FeedSettings = () => {
   const { toast } = useToast();
-  const [isInstagramConnected, setIsInstagramConnected] = useState(false);
+  const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
 
   useEffect(() => {
     const checkInstagramStatus = async () => {
@@ -200,7 +200,7 @@ const FeedSettings = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
-      {!isInstagramConnected && (
+      {isInstagramConnected === false && (
         <div className="flex gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
           <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
         </div>
