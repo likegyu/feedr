@@ -43,6 +43,7 @@ const Dashboard = () => {
         const fetchCafe24ShopName = async () => {
             setLoading(true);
             const isTokenValid = await checkTokenExpiration();
+            console.log('Token valid:', isTokenValid);
             
             if (!isTokenValid) {
                 setLoading(false);
@@ -51,11 +52,13 @@ const Dashboard = () => {
 
             try {
                 const response = await fetch(`/api/auth/cafe24/shop-name`);
+                console.log('Cafe24 API Response:', response.status);
                 const data = await response.json();
+                console.log('Cafe24 API Data:', data);
                 setCafe24ShopName(data.cafe24ShopName);
                 setCafe24MallId(data.cafe24MallId);
             } catch (error) {
-                console.error('카페24 상태 조회 실패:', error);
+                console.error('카페24 상태 조회 상세 에러:', error);
             } finally {
                 setLoading(false);
             }
@@ -69,11 +72,13 @@ const Dashboard = () => {
             setLoading(true);
             try {
                 const response = await fetch(`/api/auth/instagram/status`);
+                console.log('Instagram API Response:', response.status);
                 const data = await response.json();
+                console.log('Instagram API Data:', data);
                 setInstagramStatus(data.isConnected);
                 setInstagramUserName(data.userName);
             } catch (error) {
-                console.error('Instagram 상태 조회 실패:', error);
+                console.error('Instagram 상태 조회 상세 에러:', error);
             } finally {
                 setLoading(false);
             }
