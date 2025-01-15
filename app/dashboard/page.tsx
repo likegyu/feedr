@@ -103,15 +103,18 @@ const Dashboard = () => {
                         <CardTitle>매장 정보</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
-                        {cafe24ShopName ? (
-                            <p><span className="font-medium">스토어명:</span> {cafe24ShopName}</p>
+                        {loading ? (
+                            <>
+                                <Skeleton className="h-6 w-3/4" />
+                                <Skeleton className="h-6 w-1/2" />
+                            </>
+                        ) : cafe24ShopName ? (
+                            <>
+                                <p><span className="font-medium">스토어명:</span> {cafe24ShopName}</p>
+                                <p><span className="font-medium">Mall ID:</span> {cafe24MallId}</p>
+                            </>
                         ) : (
-                            <Skeleton className="h-6 w-3/4" />
-                        )}
-                        {cafe24MallId ? (
-                            <p><span className="font-medium">Mall ID:</span> {cafe24MallId}</p>
-                        ) : (
-                            <Skeleton className="h-6 w-1/2" />
+                            <p className="text-gray-500">매장 정보가 없습니다</p>
                         )}
                     </CardContent>
                 </Card>
