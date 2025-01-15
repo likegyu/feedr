@@ -14,10 +14,46 @@ import { AuthDialogProvider } from "@/components/auth-dialog-provider"
 function InitializeCafe24() {
   const { initialized, expiresAt, setShopName, setExpiresAt, setIsLoading, setInitialized } = useCafe24Store();
 
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    const fetchData = async () => {
+      if (initialized) return;
+
+      try {
+        setIsLoading(true);
+        const [shopNameRes, expiresRes] = await Promise.all([
+          fetch("/api/auth/cafe24/shop-name"),
+          fetch("/api/auth/cafe24/token-expires-check")
+        ]);
+
+        if (shopNameRes.ok) {
+          const { data } = await shopNameRes.json();
+          setShopName(data.cafe24ShopName);
+        }
+
+        if (expiresRes.ok) {
+          const { data } = await expiresRes.json();
+          setExpiresAt(data.expiresAt);
+        }
+        
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+        setInitialized(true); // 모든 초기화 작업이 완료된 후 initialized를 true로 설정
+      }
+    };
+
+    fetchData();
+  }, [initialized, setShopName, setExpiresAt, setIsLoading, setInitialized]);
+
+    
   // 토큰 만료 체크
   useEffect(() => {
     const checkExpiration = () => {
-      if (expiresAt) {
+      // initialized가 true이고 expiresAt이 있을 때만 체크
+      if (initialized && expiresAt) {
         const diffInSeconds = differenceInSeconds(new Date(expiresAt), new Date());
         const isExpired = diffInSeconds <= 0;
         const hasInitialReload = sessionStorage.getItem('tokenExpiredReload');
@@ -38,39 +74,8 @@ function InitializeCafe24() {
     const interval = setInterval(checkExpiration, 60000); // 1분마다 체크
     checkExpiration(); // 초기 체크
     return () => clearInterval(interval);
-  }, [expiresAt]);
+  }, [expiresAt, initialized]);
 
-  // 초기 데이터 로드
-  useEffect(() => {
-    const fetchData = async () => {
-      if (initialized) return;
-
-      try {
-        const [shopNameRes, expiresRes] = await Promise.all([
-          fetch("/api/auth/cafe24/shop-name"),
-          fetch("/api/auth/cafe24/token-expires-check")
-        ]);
-
-        if (shopNameRes.ok) {
-          const { data } = await shopNameRes.json();
-          setShopName(data.cafe24ShopName);
-        }
-
-        if (expiresRes.ok) {
-          const { data } = await expiresRes.json();
-          setExpiresAt(data.cafe24ExpiresAt);
-        }
-        
-        setInitialized(true);
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [initialized, setShopName, setExpiresAt, setIsLoading, setInitialized]);
 
   return null;
 }
