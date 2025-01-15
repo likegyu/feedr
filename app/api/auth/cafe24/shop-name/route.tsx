@@ -64,8 +64,10 @@ export async function GET() {
     console.log('Cafe24 API response data:', data);
     
     return NextResponse.json({ 
-      cafe24ShopName: data.store.shop_name,
-      cafe24MallId: cafe24_mall_id
+      data: {
+        cafe24ShopName: data.store.shop_name,
+        cafe24MallId: cafe24_mall_id
+      }
     });
 
   } catch (error) {

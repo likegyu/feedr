@@ -51,7 +51,7 @@ const Dashboard = () => {
 
             try {
                 const response = await fetch(`/api/auth/cafe24/shop-name`);
-                const data = await response.json();
+                const { data } = await response.json();
                 setCafe24ShopName(data.cafe24ShopName);
                 setCafe24MallId(data.cafe24MallId);
             } catch (error) {
