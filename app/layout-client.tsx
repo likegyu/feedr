@@ -18,6 +18,8 @@ function InitializeCafe24() {
   // 초기 데이터 로드
   useEffect(() => {
     const fetchData = async () => {
+      if (initialized) return; // 이미 초기화되었다면 중복 실행 방지
+
       try {
         const [shopNameRes, expiresRes] = await Promise.all([
           fetch("/api/auth/cafe24/shop-name"),
@@ -31,7 +33,7 @@ function InitializeCafe24() {
 
         if (expiresRes.ok) {
           const { data } = await expiresRes.json();
-          setExpiresAt(data.expiresAt);
+          setExpiresAt(data.expiresAt); // API 응답에 맞는 속성명 사용
         }
         
       } catch (error) {

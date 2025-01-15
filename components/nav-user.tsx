@@ -17,19 +17,40 @@ const formatTime = (seconds: number) => {
 
 function useInterval(callback: () => void, delay: number) {
   useEffect(() => {
+    callback(); // 즉시 실행
     const id = setInterval(callback, delay);
     return () => clearInterval(id);
   }, [callback, delay]);
 }
 
 export function NavUser() {
-    const { cafe24ShopName, expiresAt, remainingTime, isLoading, isRefreshing, setRemainingTime, setIsRefreshing } = useCafe24Store()
+    const { 
+        cafe24ShopName, 
+        expiresAt, 
+        remainingTime, 
+        isLoading, 
+        isRefreshing, 
+        initialized, // initialized 추가
+        setRemainingTime, 
+        setIsRefreshing 
+    } = useCafe24Store()
 
     const calculateRemainingTime = useCallback(() => {
-        if (!expiresAt) return;
+        // initialized 체크 추가
+        if (!initialized || !expiresAt) {
+            setRemainingTime('시간 정보 없음');
+            return;
+        }
         const diffInSeconds = differenceInSeconds(new Date(expiresAt), new Date());
         setRemainingTime(diffInSeconds <= 0 ? '만료됨' : formatTime(diffInSeconds));
-    }, [expiresAt, setRemainingTime]);
+    }, [expiresAt, initialized, setRemainingTime]);
+
+    // initialized가 의존성에 추가됨
+    useEffect(() => {
+        if (initialized) {
+            calculateRemainingTime();
+        }
+    }, [initialized, calculateRemainingTime]);
 
     useInterval(calculateRemainingTime, 1000);
 
