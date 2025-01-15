@@ -99,7 +99,9 @@ const MobileFeedSettings = () => {
         title: "설정이 저장되었습니다",
         description: "모바일 레이아웃 설정이 성공적으로 저장되었습니다.",
       });
-    } catch (error) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다';
+      console.error('설정 저장 오류:', errorMessage);
       toast({
         title: "오류가 발생했습니다",
         description: "설정 저장 중 문제가 발생했습니다. 다시 시도해주세요.",
