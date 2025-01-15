@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from "react";
+import { differenceInSeconds } from 'date-fns';
 import { useCafe24Store } from "@/store/cafe24Store";
 import {
   SidebarInset,
@@ -16,8 +17,11 @@ function InitializeCafe24() {
   // 토큰 만료 체크
   useEffect(() => {
     const checkExpiration = () => {
-      if (expiresAt && new Date(expiresAt) <= new Date()) {
-        window.location.reload();
+      if (expiresAt) {
+        const diffInSeconds = differenceInSeconds(new Date(expiresAt), new Date());
+        if (diffInSeconds <= 0) {
+          window.location.reload();
+        }
       }
     };
 
