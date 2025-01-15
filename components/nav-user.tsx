@@ -63,6 +63,7 @@ export function NavUser() {
             console.error(error);
         } finally {
             setIsRefreshing(false);
+            window.location.reload();
         }
     }
 
