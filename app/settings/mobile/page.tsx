@@ -64,26 +64,44 @@ const MobileFeedSettings = () => {
       setIsLoading(true);
       try {
         const response = await fetch('/api/settings/feed');
+        if (!response.ok) {
+          throw new Error('설정 로드에 실패했습니다');
+        }
+
         const data = await response.json();
-        
+        console.log('서버 응답:', data); // 디버깅용
+
         if (data.mobile_feed_settings) {
-          setMobileLayoutSettings(JSON.parse(data.mobile_feed_settings));
+          const settings = typeof data.mobile_feed_settings === 'string' 
+            ? JSON.parse(data.mobile_feed_settings)
+            : data.mobile_feed_settings;
+            
+          console.log('파싱된 설정:', settings); // 디버깅용
+          setMobileLayoutSettings(settings);
         } else {
-          // DB에 저장된 설정이 없을 경우 기본값 설정
-          setMobileLayoutSettings({
-            layout: 'grid',
+          // 기본값 설정 - layout 타입을 명시적으로 지정
+          const defaultSettings: {
+            layout: 'grid' | 'carousel';
+            columns: number;
+            rows: number;
+            gap: number;
+            borderRadius: number;
+            showMediaType: boolean;
+          } = {
+            layout: 'grid', // 리터럴 타입으로 지정
             columns: 2,
             rows: 3,
             gap: 8,
             borderRadius: 8,
             showMediaType: true,
-          });
+          };
+          setMobileLayoutSettings(defaultSettings);
         }
       } catch (error) {
         console.error('설정 로드 중 오류:', error);
         toast({
           title: "설정 로드 실패",
-          description: "설정을 불러오는데 실패했습니다. 새로고침을 해주세요.",
+          description: error instanceof Error ? error.message : "설정을 불러오는데 실패했습니다.",
           variant: "destructive",
         });
       } finally {

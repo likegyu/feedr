@@ -57,32 +57,50 @@ const FeedSettings = () => {
     checkInstagramStatus();
   }, []);
 
-  // 설정 로드
+  // 설정 로드 수정
   useEffect(() => {
     const loadSettings = async () => {
       setIsLoading(true);
       try {
         const response = await fetch('/api/settings/feed');
-        const data = await response.json();
+        if (!response.ok) {
+          throw new Error('설정 로드에 실패했습니다');
+        }
         
+        const data = await response.json();
+        console.log('서버 응답:', data); // 디버깅용
+
         if (data.pc_feed_settings) {
-          setLayoutSettings(JSON.parse(data.pc_feed_settings));
+          const settings = typeof data.pc_feed_settings === 'string' 
+            ? JSON.parse(data.pc_feed_settings)
+            : data.pc_feed_settings;
+            
+          console.log('파싱된 설정:', settings); // 디버깅용
+          setLayoutSettings(settings);
         } else {
-          // DB에 저장된 설정이 없을 경우 기본값 설정
-          setLayoutSettings({
-            layout: 'grid',
+          // 기본값 설정 - layout 타입을 명시적으로 지정
+          const defaultSettings: {
+            layout: 'grid' | 'carousel';
+            columns: number;
+            rows: number;
+            gap: number;
+            borderRadius: number;
+            showMediaType: boolean;
+          } = {
+            layout: 'grid', // 리터럴 타입으로 지정
             columns: 3,
             rows: 2,
             gap: 16,
             borderRadius: 8,
             showMediaType: true,
-          });
+          };
+          setLayoutSettings(defaultSettings);
         }
       } catch (error) {
         console.error('설정 로드 중 오류:', error);
         toast({
           title: "설정 로드 실패",
-          description: "설정을 불러오는데 실패했습니다. 새로고침을 해주세요.",
+          description: error instanceof Error ? error.message : "설정을 불러오는데 실패했습니다.",
           variant: "destructive",
         });
       } finally {
