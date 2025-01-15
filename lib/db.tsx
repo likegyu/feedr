@@ -17,9 +17,9 @@ type Token = {
   instagram_user_id?: string;
   instagram_expires_in?: number;
   instagram_username?: string;
-  feed_filter: string;
-  pc_feed_settings: string;    // JSON 문자열로 저장
-  mobile_feed_settings: string; // JSON 문자열로 저장
+  feed_filter?: string;
+  pc_feed_settings?: string;    // JSON 문자열로 저장, optional
+  mobile_feed_settings?: string; // JSON 문자열로 저장, optional
 };
 
 const pool = new Pool({
