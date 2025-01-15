@@ -156,17 +156,23 @@ export async function GET(req: NextRequest) {
         if (instagram_access_token && instagram_expires_in && instagram_issued_at) {
           const twoDaysInSeconds = 2 * 24 * 60 * 60;
           const currentTime = Math.floor(Date.now() / 1000);
-          const tokenExpirationTime = instagram_issued_at + instagram_expires_in;
+          
+          // 문자열을 숫자로 변환
+          const issuedAt = Number(instagram_issued_at);
+          const expiresIn = Number(instagram_expires_in);
+          const tokenExpirationTime = issuedAt + expiresIn;
+        
           console.log({
             currentTime,
             tokenExpirationTime,
-            instagram_issued_at,
-            instagram_expires_in,
+            instagram_issued_at: issuedAt,
+            instagram_expires_in: expiresIn,
             isExpired: currentTime > tokenExpirationTime,
             remainingTime: tokenExpirationTime - currentTime
           });
+        
           const shouldRefreshInstagram = currentTime > tokenExpirationTime || 
-          (tokenExpirationTime - currentTime) <= twoDaysInSeconds;
+            (tokenExpirationTime - currentTime) <= twoDaysInSeconds;
 
           if (shouldRefreshInstagram) {
             try {
