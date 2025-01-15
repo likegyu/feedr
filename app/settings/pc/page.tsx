@@ -17,6 +17,15 @@ import { Button } from '@/components/ui/button';
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 
+type PcLayoutSettings = {
+  layout: 'grid' | 'carousel';
+  columns: number;
+  rows: number;
+  gap: number;
+  borderRadius: number;
+  showMediaType: boolean;
+};
+
 const FeedSettings = () => {
   const { toast } = useToast();
   const [isInstagramConnected, setIsInstagramConnected] = useState(false);
@@ -46,7 +55,7 @@ const FeedSettings = () => {
     inViewThreshold: 0.7,    // 성능 최적화를 위한 임계값
   });
 
-  const [layoutSettings, setLayoutSettings] = useState({
+  const [layoutSettings, setLayoutSettings] = useState<PcLayoutSettings>({
     layout: 'grid',
     columns: 3,
     rows: 2,      // 로우 수 추가
@@ -55,7 +64,7 @@ const FeedSettings = () => {
     showMediaType: true, // 미디어 타입 표시 여부 추가
   });
 
-  const [originalLayoutSettings, setOriginalLayoutSettings] = useState<any>(null);
+  const [originalLayoutSettings, setOriginalLayoutSettings] = useState<PcLayoutSettings | null>(null);
 
   const handleSettingChange = (key: string, value: string | number | boolean) => {
     setLayoutSettings(prev => ({

@@ -18,6 +18,15 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { ImageIcon, PlayCircleIcon, Info } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+type MobileLayoutSettings = {
+  layout: 'grid' | 'carousel';
+  columns: number;
+  rows: number;
+  gap: number;
+  borderRadius: number;
+  showMediaType: boolean;
+};
+
 const MobileFeedSettings = () => {
   const { toast } = useToast();
   const [isInstagramConnected, setIsInstagramConnected] = useState(false);
@@ -40,7 +49,7 @@ const MobileFeedSettings = () => {
     showMediaType: true, // 미디어 타입 표시 여부 추가
   });
 
-  const [originalLayoutSettings, setOriginalLayoutSettings] = useState<any>(null);
+  const [originalLayoutSettings, setOriginalLayoutSettings] = useState<MobileLayoutSettings | null>(null);
 
   useEffect(() => {
     const checkInstagramStatus = async () => {
