@@ -19,9 +19,18 @@ function InitializeCafe24() {
     const checkExpiration = () => {
       if (expiresAt) {
         const diffInSeconds = differenceInSeconds(new Date(expiresAt), new Date());
-        if (diffInSeconds <= 0 && !sessionStorage.getItem('hasReloaded')) {
-          sessionStorage.setItem('hasReloaded', 'true');
+        const isExpired = diffInSeconds <= 0;
+        const hasInitialReload = sessionStorage.getItem('tokenExpiredReload');
+
+        // 만료되었고 아직 첫 리로드를 하지 않은 경우에만 리로드
+        if (isExpired && !hasInitialReload) {
+          sessionStorage.setItem('tokenExpiredReload', 'true');
           window.location.reload();
+        }
+        
+        // 만료 상태가 아닐 때는 리로드 플래그 제거
+        if (!isExpired) {
+          sessionStorage.removeItem('tokenExpiredReload');
         }
       }
     };
