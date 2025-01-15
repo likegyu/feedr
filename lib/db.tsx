@@ -15,11 +15,12 @@ type Token = {
   cafe24_issued_at: string;  // ISO 8601 문자열로 처리
   instagram_access_token?: string;
   instagram_user_id?: string;
-  instagram_expires_in?: number;
+  instagram_expires_in?: number; // UNIX timestamp로 저장
   instagram_username?: string;
   feed_filter?: string;
   pc_feed_settings?: string;    // JSON 문자열로 저장, optional
   mobile_feed_settings?: string; // JSON 문자열로 저장, optional
+  instagram_issued_at?: number; // UNIX timestamp로 저장
 };
 
 const pool = new Pool({

@@ -54,18 +54,21 @@ export async function GET(request: NextRequest) {
     const userData = await userResponse.json();
 
     // DB 업데이트 쿼리 수정
+    const currentTime = Math.floor(Date.now() / 1000);
     await db.query(
       `UPDATE tokens 
       SET instagram_access_token = $1, 
           instagram_user_id = $2,
           instagram_expires_in = $3,
-          instagram_username = $4
-      WHERE cafe24_mall_id = $5`,
+          instagram_username = $4,
+          instagram_issued_at = $5
+      WHERE cafe24_mall_id = $6`,
       [
         longLivedTokenData.access_token,
         user_id,
         longLivedTokenData.expires_in,
         userData.username,
+        currentTime,
         cafe24MallId
       ]
     );

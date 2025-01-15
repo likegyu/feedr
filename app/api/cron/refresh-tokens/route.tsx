@@ -72,7 +72,8 @@ export async function GET(req: NextRequest) {
         cafe24_mall_id, 
         cafe24_refresh_token, 
         instagram_access_token,
-        instagram_expires_in 
+        instagram_expires_in,
+        instagram_issued_at
       } = token;
 
       try {
@@ -152,24 +153,27 @@ export async function GET(req: NextRequest) {
         );
 
         // Instagram 토큰 갱신 체크
-        if (instagram_access_token && instagram_expires_in) {
-          const twoDaysInSeconds = 2 * 24 * 60 * 60; // 2일을 초로 변환
-          const shouldRefreshInstagram = instagram_expires_in <= twoDaysInSeconds;
+        if (instagram_access_token && instagram_expires_in && instagram_issued_at) {
+          const twoDaysInSeconds = 2 * 24 * 60 * 60; // 172800초
+          const currentTime = Math.floor(Date.now() / 1000);
+          const tokenExpirationTime = instagram_issued_at + instagram_expires_in;
+          const remainingSeconds = tokenExpirationTime - currentTime;
+          const shouldRefreshInstagram = remainingSeconds <= twoDaysInSeconds;
 
           if (shouldRefreshInstagram) {
             try {
               const instagramResponse = await fetch(`https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${instagram_access_token}`);
-
               const instagramData = await instagramResponse.json();
 
               if (instagramResponse.ok) {
-                // Instagram 토큰 업데이트
+                const newIssuedAt = Math.floor(Date.now() / 1000);
                 await db.query(
                   `UPDATE tokens 
                    SET instagram_access_token = $1,
-                       instagram_expires_in = $2
-                   WHERE cafe24_mall_id = $3`,
-                  [instagramData.access_token, instagramData.expires_in, cafe24_mall_id]
+                       instagram_expires_in = $2,
+                       instagram_issued_at = $3
+                   WHERE cafe24_mall_id = $4`,
+                  [instagramData.access_token, instagramData.expires_in, newIssuedAt, cafe24_mall_id]
                 );
               } else {
                 console.error(`Instagram token refresh failed for mall_id ${cafe24_mall_id}:`, instagramData);
