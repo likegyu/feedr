@@ -40,8 +40,6 @@ const MobileFeedSettings = () => {
     showMediaType: true, // 미디어 타입 표시 여부 추가
   });
 
-  const [originalLayoutSettings, setOriginalLayoutSettings] = useState<any>(null);
-
   useEffect(() => {
     const checkInstagramStatus = async () => {
       try {
@@ -64,9 +62,7 @@ const MobileFeedSettings = () => {
         const response = await fetch('/api/settings/feed');
         const data = await response.json();
         if (data.mobile_feed_settings) {
-          const parsed = JSON.parse(data.mobile_feed_settings);
-          setMobileLayoutSettings(parsed);
-          setOriginalLayoutSettings(parsed);
+          setMobileLayoutSettings(JSON.parse(data.mobile_feed_settings));
         }
       } catch (error) {
         console.error('설정 로드 중 오류:', error);
@@ -234,14 +230,6 @@ const MobileFeedSettings = () => {
     );
   };
 
-  const isModified = JSON.stringify(mobileLayoutSettings) !== JSON.stringify(originalLayoutSettings);
-
-  const getButtonLabel = () => {
-    if (!isInstagramConnected) return "인스타그램 연동 필요";
-    if (!isModified) return "이미 저장된 설정입니다";
-    return "설정 저장하기";
-  };
-
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
@@ -349,9 +337,9 @@ const MobileFeedSettings = () => {
           <Button 
             className="w-full"
             onClick={handleSaveSettings}
-            disabled={!isInstagramConnected || !isModified}
+            disabled={!isInstagramConnected}
           >
-            {getButtonLabel()}
+            {isInstagramConnected ? "설정 저장하기" : "인스타그램 연동 필요"}
           </Button>
         </div>
       </div>

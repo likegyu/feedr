@@ -55,8 +55,6 @@ const FeedSettings = () => {
     showMediaType: true, // 미디어 타입 표시 여부 추가
   });
 
-  const [originalLayoutSettings, setOriginalLayoutSettings] = useState<any>(null);
-
   const handleSettingChange = (key: string, value: string | number | boolean) => {
     setLayoutSettings(prev => ({
       ...prev,
@@ -71,9 +69,7 @@ const FeedSettings = () => {
         const response = await fetch('/api/settings/feed');
         const data = await response.json();
         if (data.pc_feed_settings) {
-          const parsed = JSON.parse(data.pc_feed_settings);
-          setLayoutSettings(parsed);
-          setOriginalLayoutSettings(parsed);
+          setLayoutSettings(JSON.parse(data.pc_feed_settings));
         }
       } catch (error) {
         console.error('설정 로드 중 오류:', error);
@@ -112,8 +108,6 @@ const FeedSettings = () => {
       });
     }
   };
-
-  const isModified = JSON.stringify(layoutSettings) !== JSON.stringify(originalLayoutSettings);
 
   const renderPreview = () => {
     // 레이아웃에 따라 아이템 개수 계산
@@ -201,12 +195,6 @@ const FeedSettings = () => {
         )}
       </div>
     );
-  };
-
-  const getButtonLabel = () => {
-    if (!isInstagramConnected) return "인스타그램 연동 필요";
-    if (!isModified) return "이미 저장된 설정입니다";
-    return "설정 저장하기";
   };
 
   return (
@@ -316,9 +304,9 @@ const FeedSettings = () => {
             <Button 
               className="w-full"
               onClick={handleSaveSettings}
-              disabled={!isInstagramConnected || !isModified}
+              disabled={!isInstagramConnected}
             >
-              {getButtonLabel()}
+              {isInstagramConnected ? "설정 저장하기" : "인스타그램 연동 필요"}
             </Button>
           </div>
         </div>
