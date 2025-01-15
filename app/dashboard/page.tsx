@@ -66,7 +66,6 @@ const Dashboard = () => {
 
     useEffect(() => {
         const fetchInstagramStatus = async () => {
-            if (!cafe24MallId) return;
             setLoading(true);
             try {
                 const response = await fetch(`/api/auth/instagram/status`);
