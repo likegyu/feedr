@@ -154,11 +154,19 @@ export async function GET(req: NextRequest) {
 
         // Instagram 토큰 갱신 체크
         if (instagram_access_token && instagram_expires_in && instagram_issued_at) {
-          const twoDaysInSeconds = 2 * 24 * 60 * 60; // 172800초
+          const twoDaysInSeconds = 2 * 24 * 60 * 60;
           const currentTime = Math.floor(Date.now() / 1000);
           const tokenExpirationTime = instagram_issued_at + instagram_expires_in;
-          const remainingSeconds = tokenExpirationTime - currentTime;
-          const shouldRefreshInstagram = remainingSeconds <= twoDaysInSeconds;
+          console.log({
+            currentTime,
+            tokenExpirationTime,
+            instagram_issued_at,
+            instagram_expires_in,
+            isExpired: currentTime > tokenExpirationTime,
+            remainingTime: tokenExpirationTime - currentTime
+          });
+          const shouldRefreshInstagram = currentTime > tokenExpirationTime || 
+          (tokenExpirationTime - currentTime) <= twoDaysInSeconds;
 
           if (shouldRefreshInstagram) {
             try {
