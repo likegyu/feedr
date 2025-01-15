@@ -120,8 +120,8 @@ export function NavUser() {
                             </>
                         )}
                     </div>
-                    <SidebarMenuAction className="flex" onClick={refreshCafe24Token}>
-                        <RefreshCcw className={`size-4 w-4 h-4 rounded-full ${isRefreshing ? 'animate-spin' : ''}`} />
+                    <SidebarMenuAction className="flex !w-6 !h-6 rounded-full" onClick={refreshCafe24Token}>
+                        <RefreshCcw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                     </SidebarMenuAction>
                 </div>
             </SidebarMenuItem>
