@@ -189,14 +189,50 @@ export async function GET(req: NextRequest) {
                    WHERE cafe24_mall_id = $4`,
                   [instagramData.access_token, instagramData.expires_in, newIssuedAt, cafe24_mall_id]
                 );
+
+                // 인스타그램 토큰 갱신 성공 로그
+                const successDetails = {
+                  timestamp: new Date().toISOString(),
+                  mallId: cafe24_mall_id,
+                  tokenInfo: {
+                    previousExpiresIn: instagram_expires_in,
+                    newExpiresIn: instagramData.expires_in,
+                    previousIssuedAt: instagram_issued_at,
+                    newIssuedAt,
+                    tokenPreview: `${instagramData.access_token.substring(0, 6)}...`,
+                    expirationDate: new Date((newIssuedAt + instagramData.expires_in) * 1000).toISOString()
+                  }
+                };
+
+                logInfo('Instagram Token Refresh Success', 'Successfully refreshed Instagram token', successDetails);
+                console.log('Instagram token refresh success details:', JSON.stringify(successDetails, null, 2));
               } else {
                 console.error(`Instagram token refresh failed for mall_id ${cafe24_mall_id}:`, instagramData);
               }
             } catch (instagramError) {
+              const errorDetails = {
+                timestamp: new Date().toISOString(),
+                mallId: cafe24_mall_id,
+                tokenInfo: {
+                  instagram_access_token: `${instagram_access_token?.substring(0, 6)}...`,
+                  instagram_expires_in,
+                  instagram_issued_at
+                },
+                error: instagramError instanceof Error ? {
+                  name: instagramError.name,
+                  message: instagramError.message,
+                  stack: instagramError.stack
+                } : String(instagramError)
+              };
+
               logError('Instagram Token Refresh', instagramError, {
+                ...errorDetails,
                 mallId: cafe24_mall_id,
                 operation: 'refresh_instagram_token'
               });
+
+              // 콘솔에도 자세한 에러 정보 출력
+              console.error('Instagram token refresh detailed error:', JSON.stringify(errorDetails, null, 2));
             }
           }
         }
