@@ -95,7 +95,7 @@ export function NavUser() {
                                         )}
                                     </div>
                                     <RefreshCcw 
-                                        className={`size-5.5 p-1 self-center hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors cursor-pointer rounded-md ${isRefreshing ? 'animate-spin' : ''}`} 
+                                        className={`size-5.5 p-1 self-center hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors cursor-pointer rounded-full ${isRefreshing ? 'animate-spin' : ''}`} 
                                         onClick={refreshCafe24Token}
                                     />
                                 </div>
@@ -121,7 +121,7 @@ export function NavUser() {
                         )}
                     </div>
                     <SidebarMenuAction className="flex" onClick={refreshCafe24Token}>
-                        <RefreshCcw className={`size-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        <RefreshCcw className={`size-4 w-4 h-4 rounded-full ${isRefreshing ? 'animate-spin' : ''}`} />
                     </SidebarMenuAction>
                 </div>
             </SidebarMenuItem>
