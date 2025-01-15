@@ -17,22 +17,9 @@ import { Button } from '@/components/ui/button';
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 
-type PcLayoutSettings = {
-  layout: 'grid' | 'carousel';
-  columns: number;
-  rows: number;
-  gap: number;
-  borderRadius: number;
-  showMediaType: boolean;
-};
-
 const FeedSettings = () => {
   const { toast } = useToast();
   const [isInstagramConnected, setIsInstagramConnected] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  // 초기값을 null로 설정
-  const [layoutSettings, setLayoutSettings] = useState<PcLayoutSettings | null>(null);
-  const [originalLayoutSettings, setOriginalLayoutSettings] = useState<PcLayoutSettings | null>(null);
 
   useEffect(() => {
     const checkInstagramStatus = async () => {
@@ -43,8 +30,6 @@ const FeedSettings = () => {
       } catch (error) {
         console.error('인스타그램 상태 확인 중 오류:', error);
         setIsInstagramConnected(false);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -61,13 +46,29 @@ const FeedSettings = () => {
     inViewThreshold: 0.7,    // 성능 최적화를 위한 임계값
   });
 
-  // 설정 로드 로직 수정
+  const [layoutSettings, setLayoutSettings] = useState({
+    layout: 'grid',
+    columns: 3,
+    rows: 2,      // 로우 수 추가
+    gap: 16,
+    borderRadius: 8,
+    showMediaType: true, // 미디어 타입 표시 여부 추가
+  });
+
+  const [originalLayoutSettings, setOriginalLayoutSettings] = useState<any>(null);
+
+  const handleSettingChange = (key: string, value: string | number | boolean) => {
+    setLayoutSettings(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  // 설정 로드
   useEffect(() => {
     const loadSettings = async () => {
       try {
         const response = await fetch('/api/settings/feed');
-        if (!response.ok) throw new Error('설정 로드 실패');
-        
         const data = await response.json();
         if (data.pc_feed_settings) {
           const parsed = JSON.parse(data.pc_feed_settings);
@@ -76,25 +77,11 @@ const FeedSettings = () => {
         }
       } catch (error) {
         console.error('설정 로드 중 오류:', error);
-        toast({
-          title: "설정 로드 실패",
-          description: "설정을 불러오는데 실패했습니다. 다시 시도해주세요.",
-          variant: "destructive",
-        });
       }
     };
 
     loadSettings();
-  }, [toast]);
-
-  const handleSettingChange = (key: string, value: string | number | boolean) => {
-    if (!layoutSettings) return;
-    
-    setLayoutSettings({
-      ...layoutSettings,
-      [key]: value
-    });
-  };
+  }, []);
 
   const handleSaveSettings = async () => {
     try {
@@ -129,8 +116,6 @@ const FeedSettings = () => {
   const isModified = JSON.stringify(layoutSettings) !== JSON.stringify(originalLayoutSettings);
 
   const renderPreview = () => {
-    if (!layoutSettings) return null;  // null 체크 추가
-
     // 레이아웃에 따라 아이템 개수 계산
     const itemCount = layoutSettings.layout === 'carousel' 
       ? 9 
@@ -224,18 +209,13 @@ const FeedSettings = () => {
     return "설정 저장하기";
   };
 
-  // 설정값이 로드되지 않았을 때 로딩 표시
-  if (!layoutSettings) {
-    return <div>설정을 불러오는 중...</div>;
-  }
-
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
-      {!isLoading && !isInstagramConnected && (
-        <div className="flex gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
-          <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
-        </div>
+      {!isInstagramConnected && (
+        <div className="flex  gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
+        <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
+      </div>
       )}
       {renderPreview()}
       <div className="bg-white p-6 rounded-lg shadow space-y-6">

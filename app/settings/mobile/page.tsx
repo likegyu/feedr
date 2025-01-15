@@ -18,22 +18,9 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { ImageIcon, PlayCircleIcon, Info } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-type MobileLayoutSettings = {
-  layout: 'grid' | 'carousel';
-  columns: number;
-  rows: number;
-  gap: number;
-  borderRadius: number;
-  showMediaType: boolean;
-};
-
 const MobileFeedSettings = () => {
   const { toast } = useToast();
   const [isInstagramConnected, setIsInstagramConnected] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [mobileLayoutSettings, setMobileLayoutSettings] = useState<MobileLayoutSettings | null>(null);
-  const [originalLayoutSettings, setOriginalLayoutSettings] = useState<MobileLayoutSettings | null>(null);
-
   const [mobileEmblaRef] = useEmblaCarousel({
     align: 'center',
     containScroll: 'keepSnaps',
@@ -44,6 +31,17 @@ const MobileFeedSettings = () => {
     inViewThreshold: 0.7,
   });
 
+  const [mobileLayoutSettings, setMobileLayoutSettings] = useState({
+    layout: 'grid',
+    columns: 2, // 모바일에 맞게 기본값 수정
+    rows: 3,    // 모바일에 맞게 기본값 수정
+    gap: 8,     // 모바일에 맞게 기본값 수정
+    borderRadius: 8,
+    showMediaType: true, // 미디어 타입 표시 여부 추가
+  });
+
+  const [originalLayoutSettings, setOriginalLayoutSettings] = useState<any>(null);
+
   useEffect(() => {
     const checkInstagramStatus = async () => {
       try {
@@ -53,8 +51,6 @@ const MobileFeedSettings = () => {
       } catch (error) {
         console.error('인스타그램 상태 확인 중 오류:', error);
         setIsInstagramConnected(false);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -66,8 +62,6 @@ const MobileFeedSettings = () => {
     const loadSettings = async () => {
       try {
         const response = await fetch('/api/settings/feed');
-        if (!response.ok) throw new Error('설정 로드 실패');
-        
         const data = await response.json();
         if (data.mobile_feed_settings) {
           const parsed = JSON.parse(data.mobile_feed_settings);
@@ -76,24 +70,17 @@ const MobileFeedSettings = () => {
         }
       } catch (error) {
         console.error('설정 로드 중 오류:', error);
-        toast({
-          title: "설정 로드 실패",
-          description: "설정을 불러오는데 실패했습니다. 다시 시도해주세요.",
-          variant: "destructive",
-        });
       }
     };
 
     loadSettings();
-  }, [toast]);
+  }, []);
 
   const handleMobileSettingChange = (key: string, value: string | number | boolean) => {
-    if (!mobileLayoutSettings) return;
-    
-    setMobileLayoutSettings({
-      ...mobileLayoutSettings,
+    setMobileLayoutSettings(prev => ({
+      ...prev,
       [key]: value
-    });
+    }));
   };
 
   // 설정 저장 로직 수정
@@ -128,8 +115,6 @@ const MobileFeedSettings = () => {
   };
 
   const renderMobilePreview = () => {
-    if (!mobileLayoutSettings) return null;  // null 체크 추가
-
     const itemCount = mobileLayoutSettings.layout === 'carousel' 
       ? 9 
       : mobileLayoutSettings.columns * mobileLayoutSettings.rows;
@@ -257,15 +242,10 @@ const MobileFeedSettings = () => {
     return "설정 저장하기";
   };
 
-  // 로딩 체크 조건 수정 - isSettingsLoading 제거
-  if (!mobileLayoutSettings) {
-    return <div>설정을 불러오는 중...</div>;
-  }
-
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
-      {!isLoading && !isInstagramConnected && (
+      {!isInstagramConnected && (
         <div className="flex  gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
           <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
         </div>
