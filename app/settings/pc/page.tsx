@@ -22,6 +22,7 @@ const FeedSettings = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
+  const [initialSettings, setInitialSettings] = useState<any>(null);
   const [layoutSettings, setLayoutSettings] = useState<{
     layout: 'grid' | 'carousel';
     columns: number;
@@ -70,32 +71,24 @@ const FeedSettings = () => {
         const data = await response.json();
         console.log('서버 응답:', data); // 디버깅용
 
+        let settings;
         if (data.pc_feed_settings) {
-          const settings = typeof data.pc_feed_settings === 'string' 
+          settings = typeof data.pc_feed_settings === 'string' 
             ? JSON.parse(data.pc_feed_settings)
             : data.pc_feed_settings;
-            
-          console.log('파싱된 설정:', settings); // 디버깅용
-          setLayoutSettings(settings);
         } else {
-          // 기본값 설정 - layout 타입을 명시적으로 지정
-          const defaultSettings: {
-            layout: 'grid' | 'carousel';
-            columns: number;
-            rows: number;
-            gap: number;
-            borderRadius: number;
-            showMediaType: boolean;
-          } = {
-            layout: 'grid', // 리터럴 타입으로 지정
+          settings = {
+            layout: 'grid',
             columns: 3,
             rows: 2,
             gap: 16,
             borderRadius: 8,
             showMediaType: true,
           };
-          setLayoutSettings(defaultSettings);
         }
+        
+        setInitialSettings(settings);
+        setLayoutSettings(settings);
       } catch (error) {
         console.error('설정 로드 중 오류:', error);
         toast({
@@ -110,6 +103,12 @@ const FeedSettings = () => {
 
     loadSettings();
   }, []);
+
+  // 설정 변경 여부 확인 함수
+  const hasSettingsChanged = () => {
+    if (!initialSettings || !layoutSettings) return false;
+    return JSON.stringify(initialSettings) !== JSON.stringify(layoutSettings);
+  };
 
   const handleSettingChange = (key: string, value: string | number | boolean) => {
     if (!layoutSettings) return;
@@ -383,9 +382,13 @@ const FeedSettings = () => {
             <Button 
               className="w-full"
               onClick={handleSaveSettings}
-              disabled={!isInstagramConnected}
+              disabled={!isInstagramConnected || !hasSettingsChanged()}
             >
-              {isInstagramConnected ? "설정 저장하기" : "인스타그램 연동 필요"}
+              {!isInstagramConnected 
+                ? "인스타그램 연동 필요"
+                : !hasSettingsChanged()
+                ? "변경사항 없음"
+                : "설정 저장하기"}
             </Button>
           </div>
         </div>

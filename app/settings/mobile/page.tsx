@@ -23,6 +23,7 @@ const MobileFeedSettings = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
+  const [initialSettings, setInitialSettings] = useState<any>(null);
   const [mobileLayoutSettings, setMobileLayoutSettings] = useState<{
     layout: 'grid' | 'carousel';
     columns: number;
@@ -71,32 +72,24 @@ const MobileFeedSettings = () => {
         const data = await response.json();
         console.log('서버 응답:', data); // 디버깅용
 
+        let settings;
         if (data.mobile_feed_settings) {
-          const settings = typeof data.mobile_feed_settings === 'string' 
+          settings = typeof data.mobile_feed_settings === 'string' 
             ? JSON.parse(data.mobile_feed_settings)
             : data.mobile_feed_settings;
-            
-          console.log('파싱된 설정:', settings); // 디버깅용
-          setMobileLayoutSettings(settings);
         } else {
-          // 기본값 설정 - layout 타입을 명시적으로 지정
-          const defaultSettings: {
-            layout: 'grid' | 'carousel';
-            columns: number;
-            rows: number;
-            gap: number;
-            borderRadius: number;
-            showMediaType: boolean;
-          } = {
-            layout: 'grid', // 리터럴 타입으로 지정
+          settings = {
+            layout: 'grid',
             columns: 2,
             rows: 3,
             gap: 8,
             borderRadius: 8,
             showMediaType: true,
           };
-          setMobileLayoutSettings(defaultSettings);
         }
+        
+        setInitialSettings(settings);
+        setMobileLayoutSettings(settings);
       } catch (error) {
         console.error('설정 로드 중 오류:', error);
         toast({
@@ -150,6 +143,12 @@ const MobileFeedSettings = () => {
         variant: "destructive",
       });
     }
+  };
+
+  // 설정 변경 여부 확인 함수
+  const hasSettingsChanged = () => {
+    if (!initialSettings || !mobileLayoutSettings) return false;
+    return JSON.stringify(initialSettings) !== JSON.stringify(mobileLayoutSettings);
   };
 
   const renderMobilePreview = () => {
@@ -413,9 +412,13 @@ const MobileFeedSettings = () => {
           <Button 
             className="w-full"
             onClick={handleSaveSettings}
-            disabled={!isInstagramConnected}
+            disabled={!isInstagramConnected || !hasSettingsChanged()}
           >
-            {isInstagramConnected ? "설정 저장하기" : "인스타그램 연동 필요"}
+            {!isInstagramConnected 
+              ? "인스타그램 연동 필요"
+              : !hasSettingsChanged()
+              ? "변경사항 없음"
+              : "설정 저장하기"}
           </Button>
         </div>
       </div>
