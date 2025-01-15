@@ -201,9 +201,9 @@ const FeedSettings = () => {
     <div>
       <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
       {!isInstagramConnected && (
-        <div className="flex  gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
-        <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
-      </div>
+        <div className="flex gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
+          <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
+        </div>
       )}
       {renderPreview()}
       <div className="bg-white p-6 rounded-lg shadow space-y-6">
