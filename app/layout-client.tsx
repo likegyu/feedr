@@ -19,7 +19,8 @@ function InitializeCafe24() {
     const checkExpiration = () => {
       if (expiresAt) {
         const diffInSeconds = differenceInSeconds(new Date(expiresAt), new Date());
-        if (diffInSeconds <= 0) {
+        if (diffInSeconds <= 0 && !sessionStorage.getItem('hasReloaded')) {
+          sessionStorage.setItem('hasReloaded', 'true');
           window.location.reload();
         }
       }
