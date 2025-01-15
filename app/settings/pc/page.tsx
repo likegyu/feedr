@@ -16,11 +16,32 @@ import { ImageIcon, PlayCircleIcon, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FeedSettings = () => {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
+  const [layoutSettings, setLayoutSettings] = useState<{
+    layout: 'grid' | 'carousel';
+    columns: number;
+    rows: number;
+    gap: number;
+    borderRadius: number;
+    showMediaType: boolean;
+  } | null>(null);
 
+  const [emblaRef] = useEmblaCarousel({
+    align: 'center',
+    containScroll: 'keepSnaps',
+    dragFree: false,           // 스냅 효과를 위해 false로 설정
+    loop: true,
+    skipSnaps: true,         // 정확한 스냅 위치 유지
+    direction: 'ltr',
+    inViewThreshold: 0.7,    // 성능 최적화를 위한 임계값
+  });
+
+  // Instagram 연동 상태 확인
   useEffect(() => {
     const checkInstagramStatus = async () => {
       try {
@@ -36,48 +57,50 @@ const FeedSettings = () => {
     checkInstagramStatus();
   }, []);
 
-  const [emblaRef] = useEmblaCarousel({
-    align: 'center',
-    containScroll: 'keepSnaps',
-    dragFree: false,           // 스냅 효과를 위해 false로 설정
-    loop: true,
-    skipSnaps: true,         // 정확한 스냅 위치 유지
-    direction: 'ltr',
-    inViewThreshold: 0.7,    // 성능 최적화를 위한 임계값
-  });
-
-  const [layoutSettings, setLayoutSettings] = useState({
-    layout: 'grid',
-    columns: 3,
-    rows: 2,      // 로우 수 추가
-    gap: 16,
-    borderRadius: 8,
-    showMediaType: true, // 미디어 타입 표시 여부 추가
-  });
-
-  const handleSettingChange = (key: string, value: string | number | boolean) => {
-    setLayoutSettings(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
   // 설정 로드
   useEffect(() => {
     const loadSettings = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch('/api/settings/feed');
         const data = await response.json();
+        
         if (data.pc_feed_settings) {
           setLayoutSettings(JSON.parse(data.pc_feed_settings));
+        } else {
+          // DB에 저장된 설정이 없을 경우 기본값 설정
+          setLayoutSettings({
+            layout: 'grid',
+            columns: 3,
+            rows: 2,
+            gap: 16,
+            borderRadius: 8,
+            showMediaType: true,
+          });
         }
       } catch (error) {
         console.error('설정 로드 중 오류:', error);
+        toast({
+          title: "설정 로드 실패",
+          description: "설정을 불러오는데 실패했습니다. 새로고침을 해주세요.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadSettings();
   }, []);
+
+  const handleSettingChange = (key: string, value: string | number | boolean) => {
+    if (!layoutSettings) return;
+    
+    setLayoutSettings(prev => ({
+      ...prev!,
+      [key]: value
+    }));
+  };
 
   const handleSaveSettings = async () => {
     try {
@@ -110,6 +133,9 @@ const FeedSettings = () => {
   };
 
   const renderPreview = () => {
+    // layoutSettings가 null인 경우 처리
+    if (!layoutSettings) return null;
+
     // 레이아웃에 따라 아이템 개수 계산
     const itemCount = layoutSettings.layout === 'carousel' 
       ? 9 
@@ -196,6 +222,41 @@ const FeedSettings = () => {
       </div>
     );
   };
+
+  const PreviewSkeleton = () => (
+    <div className="mb-8 bg-gray-50 p-4 rounded-lg">
+      <Skeleton className="h-4 w-3/4 mb-4" />
+      <div className="bg-white rounded-lg p-4">
+        <div className="grid grid-cols-3 gap-4">
+          {Array(6).fill(0).map((_, i) => (
+            <Skeleton key={i} className="aspect-square rounded-lg" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const SettingsSkeleton = () => (
+    <div className="bg-white p-6 rounded-lg shadow space-y-6">
+      {Array(5).fill(0).map((_, i) => (
+        <div key={i} className="space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      ))}
+    </div>
+  );
+
+  // Preview 및 설정 UI 렌더링 조건부 처리
+  if (isLoading || !layoutSettings) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
+        <PreviewSkeleton />
+        <SettingsSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div>

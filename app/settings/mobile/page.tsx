@@ -17,10 +17,21 @@ import {
 import useEmblaCarousel from 'embla-carousel-react';
 import { ImageIcon, PlayCircleIcon, Info } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MobileFeedSettings = () => {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
+  const [mobileLayoutSettings, setMobileLayoutSettings] = useState<{
+    layout: 'grid' | 'carousel';
+    columns: number;
+    rows: number;
+    gap: number;
+    borderRadius: number;
+    showMediaType: boolean;
+  } | null>(null);
+
   const [mobileEmblaRef] = useEmblaCarousel({
     align: 'center',
     containScroll: 'keepSnaps',
@@ -31,15 +42,7 @@ const MobileFeedSettings = () => {
     inViewThreshold: 0.7,
   });
 
-  const [mobileLayoutSettings, setMobileLayoutSettings] = useState({
-    layout: 'grid',
-    columns: 2, // 모바일에 맞게 기본값 수정
-    rows: 3,    // 모바일에 맞게 기본값 수정
-    gap: 8,     // 모바일에 맞게 기본값 수정
-    borderRadius: 8,
-    showMediaType: true, // 미디어 타입 표시 여부 추가
-  });
-
+  // Instagram 연동 상태 확인
   useEffect(() => {
     const checkInstagramStatus = async () => {
       try {
@@ -58,14 +61,33 @@ const MobileFeedSettings = () => {
   // 설정 로드 로직 수정
   useEffect(() => {
     const loadSettings = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch('/api/settings/feed');
         const data = await response.json();
+        
         if (data.mobile_feed_settings) {
           setMobileLayoutSettings(JSON.parse(data.mobile_feed_settings));
+        } else {
+          // DB에 저장된 설정이 없을 경우 기본값 설정
+          setMobileLayoutSettings({
+            layout: 'grid',
+            columns: 2,
+            rows: 3,
+            gap: 8,
+            borderRadius: 8,
+            showMediaType: true,
+          });
         }
       } catch (error) {
         console.error('설정 로드 중 오류:', error);
+        toast({
+          title: "설정 로드 실패",
+          description: "설정을 불러오는데 실패했습니다. 새로고침을 해주세요.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -73,8 +95,10 @@ const MobileFeedSettings = () => {
   }, []);
 
   const handleMobileSettingChange = (key: string, value: string | number | boolean) => {
+    if (!mobileLayoutSettings) return;
+    
     setMobileLayoutSettings(prev => ({
-      ...prev,
+      ...prev!,
       [key]: value
     }));
   };
@@ -111,6 +135,9 @@ const MobileFeedSettings = () => {
   };
 
   const renderMobilePreview = () => {
+    // mobileLayoutSettings가 null인 경우 처리
+    if (!mobileLayoutSettings) return null;
+
     const itemCount = mobileLayoutSettings.layout === 'carousel' 
       ? 9 
       : mobileLayoutSettings.columns * mobileLayoutSettings.rows;
@@ -229,6 +256,37 @@ const MobileFeedSettings = () => {
       </div>
     );
   };
+
+  const PreviewSkeleton = () => (
+    <div className="mb-8 bg-gray-50 p-4 rounded-lg">
+      <Skeleton className="h-4 w-3/4 mb-4" />
+      <div className="flex justify-center">
+        <Skeleton className="w-[320px] h-[640px] rounded-[3rem]" />
+      </div>
+    </div>
+  );
+
+  const SettingsSkeleton = () => (
+    <div className="bg-white p-6 rounded-lg shadow space-y-6">
+      {Array(5).fill(0).map((_, i) => (
+        <div key={i} className="space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      ))}
+    </div>
+  );
+
+  // Preview 및 설정 UI 렌더링 조건부 처리
+  if (isLoading || !mobileLayoutSettings) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
+        <PreviewSkeleton />
+        <SettingsSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div>
