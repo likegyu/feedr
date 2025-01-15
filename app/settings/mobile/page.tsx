@@ -18,20 +18,14 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { ImageIcon, PlayCircleIcon, Info } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FeedSettings } from '@/types/settings';
 
 const MobileFeedSettings = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
-  const [initialSettings, setInitialSettings] = useState<any>(null);
-  const [mobileLayoutSettings, setMobileLayoutSettings] = useState<{
-    layout: 'grid' | 'carousel';
-    columns: number;
-    rows: number;
-    gap: number;
-    borderRadius: number;
-    showMediaType: boolean;
-  } | null>(null);
+  const [initialSettings, setInitialSettings] = useState<FeedSettings | null>(null);
+  const [mobileLayoutSettings, setMobileLayoutSettings] = useState<FeedSettings | null>(null);
 
   const [mobileEmblaRef] = useEmblaCarousel({
     align: 'center',
@@ -72,7 +66,7 @@ const MobileFeedSettings = () => {
         const data = await response.json();
         console.log('서버 응답:', data); // 디버깅용
 
-        let settings;
+        let settings: FeedSettings;
         if (data.mobile_feed_settings) {
           settings = typeof data.mobile_feed_settings === 'string' 
             ? JSON.parse(data.mobile_feed_settings)
@@ -103,7 +97,7 @@ const MobileFeedSettings = () => {
     };
 
     loadSettings();
-  }, []);
+  }, [toast]);
 
   const handleMobileSettingChange = (key: string, value: string | number | boolean) => {
     if (!mobileLayoutSettings) return;

@@ -17,20 +17,14 @@ import { Button } from '@/components/ui/button';
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FeedSettings as FeedSettingsType } from '@/types/settings';
 
 const FeedSettings = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
-  const [initialSettings, setInitialSettings] = useState<any>(null);
-  const [layoutSettings, setLayoutSettings] = useState<{
-    layout: 'grid' | 'carousel';
-    columns: number;
-    rows: number;
-    gap: number;
-    borderRadius: number;
-    showMediaType: boolean;
-  } | null>(null);
+  const [initialSettings, setInitialSettings] = useState<FeedSettingsType | null>(null);
+  const [layoutSettings, setLayoutSettings] = useState<FeedSettingsType | null>(null);
 
   const [emblaRef] = useEmblaCarousel({
     align: 'center',
@@ -71,7 +65,7 @@ const FeedSettings = () => {
         const data = await response.json();
         console.log('서버 응답:', data); // 디버깅용
 
-        let settings;
+        let settings: FeedSettingsType;
         if (data.pc_feed_settings) {
           settings = typeof data.pc_feed_settings === 'string' 
             ? JSON.parse(data.pc_feed_settings)
@@ -102,7 +96,7 @@ const FeedSettings = () => {
     };
 
     loadSettings();
-  }, []);
+  }, [toast]);
 
   // 설정 변경 여부 확인 함수
   const hasSettingsChanged = () => {
