@@ -18,10 +18,7 @@ function InitializeCafe24() {
   // 초기 데이터 로드
   useEffect(() => {
     const fetchData = async () => {
-      if (initialized) return;
-
       try {
-        setIsLoading(true);
         const [shopNameRes, expiresRes] = await Promise.all([
           fetch("/api/auth/cafe24/shop-name"),
           fetch("/api/auth/cafe24/token-expires-check")
