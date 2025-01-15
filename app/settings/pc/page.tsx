@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -12,9 +12,30 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ImageIcon, PlayCircleIcon, } from 'lucide-react';
+import { ImageIcon, PlayCircleIcon, Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 
 const FeedSettings = () => {
+  const { toast } = useToast();
+  const [isInstagramConnected, setIsInstagramConnected] = useState(false);
+
+  useEffect(() => {
+    const checkInstagramStatus = async () => {
+      try {
+        const response = await fetch('/api/auth/instagram/status');
+        const data = await response.json();
+        setIsInstagramConnected(data.isConnected);
+      } catch (error) {
+        console.error('인스타그램 상태 확인 중 오류:', error);
+        setIsInstagramConnected(false);
+      }
+    };
+
+    checkInstagramStatus();
+  }, []);
+
   const [emblaRef] = useEmblaCarousel({
     align: 'center',
     containScroll: 'keepSnaps',
@@ -39,6 +60,51 @@ const FeedSettings = () => {
       ...prev,
       [key]: value
     }));
+  };
+
+  // 설정 로드
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await fetch('/api/settings/feed');
+        const data = await response.json();
+        if (data.pc_feed_settings) {
+          setLayoutSettings(JSON.parse(data.pc_feed_settings));
+        }
+      } catch (error) {
+        console.error('설정 로드 중 오류:', error);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  const handleSaveSettings = async () => {
+    try {
+      const response = await fetch('/api/settings/feed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'pc',
+          settings: layoutSettings,
+        }),
+      });
+
+      if (!response.ok) throw new Error('설정 저장 실패');
+
+      toast({
+        title: "설정이 저장되었습니다",
+        description: "PC 레이아웃 설정이 성공적으로 저장되었습니다.",
+      });
+    } catch (error) {
+      toast({
+        title: "오류가 발생했습니다",
+        description: "설정 저장 중 문제가 발생했습니다. 다시 시도해주세요.",
+        variant: "destructive",
+      });
+    }
   };
 
   const renderPreview = () => {
@@ -132,6 +198,11 @@ const FeedSettings = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
+      {!isInstagramConnected && (
+        <div className="flex  gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
+        <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
+      </div>
+      )}
       {renderPreview()}
       <div className="bg-white p-6 rounded-lg shadow space-y-6">
         <div className="space-y-4">
@@ -225,8 +296,20 @@ const FeedSettings = () => {
               }
             />
           </div>
+
+          {/* 저장 버튼 추가 */}
+          <div className="pt-4 border-t">
+            <Button 
+              className="w-full"
+              onClick={handleSaveSettings}
+              disabled={!isInstagramConnected}
+            >
+              {isInstagramConnected ? "설정 저장하기" : "인스타그램 연동 필요"}
+            </Button>
+          </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 };

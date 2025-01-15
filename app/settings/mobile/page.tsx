@@ -1,9 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -12,10 +15,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ImageIcon, PlayCircleIcon, } from 'lucide-react';
+import { ImageIcon, PlayCircleIcon, Info } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const MobileFeedSettings = () => {
+  const { toast } = useToast();
+  const [isInstagramConnected, setIsInstagramConnected] = useState(false);
   const [mobileEmblaRef] = useEmblaCarousel({
     align: 'center',
     containScroll: 'keepSnaps',
@@ -35,11 +40,72 @@ const MobileFeedSettings = () => {
     showMediaType: true, // 미디어 타입 표시 여부 추가
   });
 
+  useEffect(() => {
+    const checkInstagramStatus = async () => {
+      try {
+        const response = await fetch('/api/auth/instagram/status');
+        const data = await response.json();
+        setIsInstagramConnected(data.isConnected);
+      } catch (error) {
+        console.error('인스타그램 상태 확인 중 오류:', error);
+        setIsInstagramConnected(false);
+      }
+    };
+
+    checkInstagramStatus();
+  }, []);
+
+  // 설정 로드 로직 수정
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await fetch('/api/settings/feed');
+        const data = await response.json();
+        if (data.mobile_feed_settings) {
+          setMobileLayoutSettings(JSON.parse(data.mobile_feed_settings));
+        }
+      } catch (error) {
+        console.error('설정 로드 중 오류:', error);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
   const handleMobileSettingChange = (key: string, value: string | number | boolean) => {
     setMobileLayoutSettings(prev => ({
       ...prev,
       [key]: value
     }));
+  };
+
+  // 설정 저장 로직 수정
+  const handleSaveSettings = async () => {
+    try {
+      const response = await fetch('/api/settings/feed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'mobile',
+          settings: mobileLayoutSettings,
+        }),
+      });
+
+      if (!response.ok) throw new Error('설정 저장 실패');
+
+      toast({
+        title: "설정이 저장되었습니다",
+        description: "모바일 레이아웃 설정이 성공적으로 저장되었습니다.",
+      });
+    } catch (error) {
+      toast({
+        title: "오류가 발생했습니다",
+        description: "설정 저장 중 문제가 발생했습니다. 다시 시도해주세요.",
+        variant: "destructive",
+      });
+    }
   };
 
   const renderMobilePreview = () => {
@@ -165,6 +231,11 @@ const MobileFeedSettings = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
+      {!isInstagramConnected && (
+        <div className="flex  gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
+          <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
+        </div>
+      )}
       {renderMobilePreview()}
       <div className="bg-white p-6 rounded-lg shadow space-y-6">
         <div className="space-y-4">
@@ -258,7 +329,19 @@ const MobileFeedSettings = () => {
             />
           </div>
         </div>
+
+        {/* 저장 버튼 수정 */}
+        <div className="pt-4 border-t">
+          <Button 
+            className="w-full"
+            onClick={handleSaveSettings}
+            disabled={!isInstagramConnected}
+          >
+            {isInstagramConnected ? "설정 저장하기" : "인스타그램 연동 필요"}
+          </Button>
+        </div>
       </div>
+      <Toaster />
     </div>
   );
 };
