@@ -11,8 +11,22 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { AuthDialogProvider } from "@/components/auth-dialog-provider"
 
 function InitializeCafe24() {
-  const { initialized, setShopName, setExpiresAt, setIsLoading, setInitialized } = useCafe24Store();
+  const { initialized, expiresAt, setShopName, setExpiresAt, setIsLoading, setInitialized } = useCafe24Store();
 
+  // 토큰 만료 체크
+  useEffect(() => {
+    const checkExpiration = () => {
+      if (expiresAt && new Date(expiresAt) <= new Date()) {
+        window.location.reload();
+      }
+    };
+
+    const interval = setInterval(checkExpiration, 60000); // 1분마다 체크
+    checkExpiration(); // 초기 체크
+    return () => clearInterval(interval);
+  }, [expiresAt]);
+
+  // 초기 데이터 로드
   useEffect(() => {
     const fetchData = async () => {
       if (initialized) return;
