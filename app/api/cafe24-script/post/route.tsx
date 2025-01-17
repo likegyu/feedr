@@ -19,7 +19,7 @@ export async function POST() {
       shop_no: 1,
       request: {
         display_location: ['MAIN'],
-        src: 'https://cithmb.vercel.app/api/cafe24-script.js',  // Updated path
+        src: 'https://cithmb.vercel.app/cafe24-script.js',  // Updated path
         skin_no: [1]
       }
     };
