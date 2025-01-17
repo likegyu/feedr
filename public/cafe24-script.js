@@ -1,4 +1,4 @@
-(function(CAFE24API) {
+(function() {
   const MOBILE_BREAKPOINT = 768;
   const CACHE_DURATION = 1000 * 60 * 30;
   const EMBLA_CDN = 'https://unpkg.com/embla-carousel/embla-carousel.umd.js';
@@ -22,15 +22,48 @@
   class InstagramFeed {
     constructor() {
       this.mallId = CAFE24API.MALL_ID;
-      this.apiEndpoint = 'https://cithmb.vercel.app/api/cafe24-script/db';
+      this.apiEndpoint = 'https://cithmb.vercel.app/api/settings/feed';
       this.container = null;
       this.pcSettings = null;
       this.mobileSettings = null;
       this.mediaItems = [];
-      this.feedFilter = 'all'; // 기본값
+      this.feedFilter = 'all';
       this.currentLayout = null;
       this.handleResize = throttle(this.handleResize.bind(this), RESIZE_THROTTLE);
+      this.cleanup = this.cleanup.bind(this);
+      this.createContainer();
       this.init();
+    }
+
+    createContainer() {
+      const footer = document.querySelector('#footer');
+      if (!footer) return;
+
+      this.container = document.createElement('div');
+      this.container.id = 'instagram-feed';
+      this.container.style.cssText = `
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto 40px;
+        padding: 0 20px;
+      `;
+
+      footer.parentNode.insertBefore(this.container, footer);
+    }
+
+    cleanup() {
+      window.removeEventListener('resize', this.handleResize);
+      window.removeEventListener('unload', this.cleanup);
+
+      ['pc', 'mobile'].forEach(type => {
+        const element = this.container?.querySelector(`.embla-${type}-${this.mallId}`);
+        if (element?.embla) {
+          element.embla.destroy();
+        }
+      });
+
+      const styleId = `instagram-feed-styles-${this.mallId}`;
+      document.getElementById(styleId)?.remove();
     }
 
     // 초기화
@@ -207,8 +240,16 @@
 
     // PC/모바일 각각 스타일 삽입
     injectStyles() {
-      const styles = document.createElement('style');
-      styles.textContent = `
+      const styleId = `instagram-feed-styles-${this.mallId}`;
+      let styleTag = document.getElementById(styleId);
+      
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = styleId;
+        document.head.appendChild(styleTag);
+      }
+
+      styleTag.textContent = `
         ${this.generateStyles('pc')}
         ${this.generateStyles('mobile')}
         @media (max-width: ${MOBILE_BREAKPOINT - 1}px) {
@@ -218,7 +259,6 @@
           #instagram-feed-mobile-${this.mallId} { display: none; }
         }
       `;
-      document.head.appendChild(styles);
     }
 
     generateStyles(type) {
@@ -347,7 +387,7 @@
         const element = this.container.querySelector(`.embla-${type}-${this.mallId}`);
         if (!element || !window.EmblaCarousel) return;
 
-        new window.EmblaCarousel(element, {
+        const embla = new window.EmblaCarousel(element, {
           align: 'center',
           containScroll: 'keepSnaps',
           dragFree: false,
@@ -356,6 +396,8 @@
           direction: 'ltr',
           inViewThreshold: 0.7
         });
+
+        element.embla = embla;
       });
     }
   }
@@ -366,7 +408,4 @@
   } else {
     new InstagramFeed();
   }
-})(CAFE24API.init({
-  client_id: 'FVxX96V5FRclfqXvKveEDD',
-  version: '2024-12-01'
-}));
+})();
