@@ -248,7 +248,14 @@
       try {
         const response = await fetch(endpoint);
         if (!response.ok) throw new Error('Instagram API 요청 실패');
-        return await response.json();
+        const data = await response.json();
+        return {
+          ...data,
+          data: data.data.map(item => ({
+            ...item,
+            display_url: item.thumbnail_url || item.media_url
+          }))
+        };
       } catch (error) {
         console.debug('Instagram API Error:', error);
         return { data: [] };
@@ -385,12 +392,19 @@
     renderItem(item, type) {
       return `
         <div class="feed-item-${type}-${this.mallId}">
-          <img 
-            src="${item.media_url}" 
-            alt="${item.caption || ''}"
-            loading="lazy"
-            style="width: 100%; height: 100%; object-fit: cover;"
+          <a 
+            href="${item.permalink}" 
+            target="_blank"
+            rel="noopener noreferrer"
+            style="display: block; width: 100%; height: 100%;"
           >
+            <img 
+              src="${item.display_url}" 
+              alt="${item.caption || ''}"
+              loading="lazy"
+              style="width: 100%; height: 100%; object-fit: cover;"
+            >
+          </a>
         </div>
       `;
     }

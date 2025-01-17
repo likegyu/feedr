@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { cookies } from 'next/headers';
 
@@ -40,70 +40,28 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const mallId = searchParams.get('mallId');
+export async function GET() {
   try {
+    const cookieStore = await cookies();
+    const cafe24MallId = cookieStore.get('cafe24_mall_id')?.value;
     
-    if (!mallId) {
-      return NextResponse.json(
-        { error: '몰 아이디가 필요합니다.' },
-        { 
-          status: 400,
-          headers: {
-            'Access-Control-Allow-Origin': `https://${mallId}.cafe24.com`,
-            'Access-Control-Allow-Methods': 'GET, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Allow-Credentials': 'true'
-          }
-        }
-      );
+    if (!cafe24MallId) {
+      return NextResponse.json({ error: '몰 아이디가 필요합니다.' }, { status: 400 });
     }
 
     const result = await db.query(
-      `SELECT 
-        pc_feed_settings,
-        mobile_feed_settings,
-        feed_filter,
-        instagram_access_token
-      FROM tokens 
-      WHERE cafe24_mall_id = $1`,
-      [mallId]
+      'SELECT pc_feed_settings, mobile_feed_settings FROM tokens WHERE cafe24_mall_id = $1',
+      [cafe24MallId]
     );
 
-    return NextResponse.json(result.rows[0] || {}, {
-      headers: {
-        'Access-Control-Allow-Origin': `https://${mallId}.cafe24.com`,
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Credentials': 'true'
-      }
-    });
+    if (result.rows.length === 0) {
+      return NextResponse.json({ error: '설정을 찾을 수 없습니다.' }, { status: 404 });
+    }
+
+    return NextResponse.json(result.rows[0]);
 
   } catch (error) {
-    console.error('피드 설정 조회 중 오류:', error);
-    return NextResponse.json(
-      { error: '서버 오류가 발생했습니다.' }, 
-      { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': `https://${mallId}.cafe24.com`,
-          'Access-Control-Allow-Methods': 'GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type',
-          'Access-Control-Allow-Credentials': 'true'
-        }
-      }
-    );
+    console.error('설정 조회 중 오류:', error);
+    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
   }
-}
-
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*.cafe24.com',
-      'Access-Control-Allow-Methods': 'GET',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
 }
