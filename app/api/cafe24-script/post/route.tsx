@@ -17,11 +17,10 @@ export async function POST() {
 
     const scriptTagData = {
       shop_no: 1,
-      script_tag: {        // 추가: script_tag 객체로 감싸기
-        client_id: process.env.CAFE24_CLIENT_ID,
-        src: 'https://cithmb.vercel.app/cafe24-script.js',
+      request: {
         display_location: ['MAIN'],
-        skin_no: ['1'],    // 문자열 배열로 변경
+        src: 'https://oigrq7gz0i7a8rtf.public.blob.vercel-storage.com/cafe24-script.js',  // Updated path
+        skin_no: [1]
       }
     };
 
