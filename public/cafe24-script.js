@@ -19,9 +19,26 @@
   // 캐시 키 생성
   const getCacheKey = (mallId, type) => `instagram_feed_cache_${mallId}_${type}`;
 
+  // CAFE24API 로드 대기
+  function waitForCAFE24API() {
+    return new Promise((resolve) => {
+      if (window.CAFE24API) {
+        resolve(window.CAFE24API);
+        return;
+      }
+
+      const checkAPI = setInterval(() => {
+        if (window.CAFE24API) {
+          clearInterval(checkAPI);
+          resolve(window.CAFE24API);
+        }
+      }, 100);
+    });
+  }
+
   class InstagramFeed {
-    constructor() {
-      this.mallId = CAFE24API.MALL_ID;
+    constructor(mallId) {
+      this.mallId = mallId;
       this.apiEndpoint = 'https://cithmb.vercel.app/api/settings/feed';
       this.container = null;
       this.pcSettings = null;
@@ -402,10 +419,21 @@
     }
   }
 
-  // DOM이 로딩된 후 스크립트 실행
+  // 초기화 함수
+  async function initialize() {
+    try {
+      const CAFE24API = await waitForCAFE24API();
+      const mallId = CAFE24API.MALL_ID;
+      new InstagramFeed(mallId);
+    } catch (error) {
+      console.error('초기화 실패:', error);
+    }
+  }
+
+  // DOM 로드 후 실행
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new InstagramFeed());
+    document.addEventListener('DOMContentLoaded', initialize);
   } else {
-    new InstagramFeed();
+    initialize();
   }
 })();
