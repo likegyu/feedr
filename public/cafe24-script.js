@@ -39,7 +39,7 @@
   class InstagramFeed {
     constructor(mallId) {
       this.mallId = mallId;
-      this.apiEndpoint = 'https://cithmb.vercel.app/api/settings/feed';
+      this.apiEndpoint = 'https://cithmb.vercel.app/api/cafe24-script/get';
       this.container = null;
       this.pcSettings = null;
       this.mobileSettings = null;
