@@ -21,6 +21,7 @@ type Token = {
   pc_feed_settings?: string;    // JSON 문자열로 저장, optional
   mobile_feed_settings?: string; // JSON 문자열로 저장, optional
   instagram_issued_at?: number; // UNIX timestamp로 저장
+  script_tag_no?: number;
 };
 
 const pool = new Pool({

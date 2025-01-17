@@ -124,6 +124,16 @@ const MobileFeedSettings = () => {
 
       if (!response.ok) throw new Error('설정 저장 실패');
 
+      // Cafe24 스크립트 업데이트
+      const scriptResponse = await fetch('/api/cafe24-script/put', {
+        method: 'PUT',
+      });
+      
+      if (!scriptResponse.ok) {
+        console.error('Cafe24 스크립트 업데이트 실패');
+      }
+      
+
       toast({
         title: "설정이 저장되었습니다",
         description: "모바일 레이아웃 설정이 성공적으로 저장되었습니다.",

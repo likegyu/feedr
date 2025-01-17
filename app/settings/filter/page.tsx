@@ -56,6 +56,15 @@ const FeedFilter = () => {
       if (!response.ok) throw new Error('필터 저장 실패');
       const data = await response.json();
       setSavedFilter(data.filter);
+
+      // Cafe24 스크립트 업데이트
+      const scriptResponse = await fetch('/api/cafe24-script/put', {
+        method: 'PUT',
+      });
+      
+      if (!scriptResponse.ok) {
+        console.error('Cafe24 스크립트 업데이트 실패');
+      }
     } catch (error) {
       console.error(error);
     } finally {
