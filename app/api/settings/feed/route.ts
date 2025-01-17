@@ -41,19 +41,20 @@ export async function POST(request: Request) {
 }
 
 export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const mallId = searchParams.get('mallId');
   try {
-    const { searchParams } = new URL(req.url);
-    const mallId = searchParams.get('mallId');
-
+    
     if (!mallId) {
       return NextResponse.json(
         { error: '몰 아이디가 필요합니다.' },
         { 
           status: 400,
           headers: {
-            'Access-Control-Allow-Origin': '*.cafe24.com',
-            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Origin': `https://${mallId}.cafe24.com`,
+            'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Allow-Credentials': 'true'
           }
         }
       );
@@ -72,9 +73,10 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(result.rows[0] || {}, {
       headers: {
-        'Access-Control-Allow-Origin': '*.cafe24.com',
-        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Origin': `https://${mallId}.cafe24.com`,
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Credentials': 'true'
       }
     });
 
@@ -85,9 +87,10 @@ export async function GET(req: NextRequest) {
       { 
         status: 500,
         headers: {
-          'Access-Control-Allow-Origin': '*.cafe24.com',
-          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Origin': `https://${mallId}.cafe24.com`,
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Allow-Credentials': 'true'
         }
       }
     );
