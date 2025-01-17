@@ -20,7 +20,7 @@ export async function POST() {
       request: {
         display_location: ['MAIN'],
         src: 'https://cithmb.vercel.app/cafe24-script.js',  // Updated path
-        skin_no: [1]
+        skin_no: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
       }
     };
 
