@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { db } from '@/lib/db';
 
-export async function PUT(req: NextRequest) {
+export async function PUT() {
   try {
     const cookieStore = await cookies();
     const mallId = cookieStore.get('cafe24_mall_id')?.value;
