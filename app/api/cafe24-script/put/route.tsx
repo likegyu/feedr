@@ -34,7 +34,7 @@ export async function PUT() {
       shop_no: 1,
       request: {
         display_location: ['MAIN'],
-        src: 'https://oigrq7gz0i7a8rtf.public.blob.vercel-storage.com/cafe24-script.js',
+        src: 'https://cithmb.vercel.app/cafe24-script.js',
         skin_no: [1]
       }
     };
