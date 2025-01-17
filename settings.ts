@@ -38,12 +38,12 @@ const SettingsAPI = {
 
 // Carousel Config
 const carouselConfig = {
-  align: 'center',
-  containScroll: 'keepSnaps',
+  align: 'center' as const,
+  containScroll: 'keepSnaps' as const,
   dragFree: false,
   loop: true,  
   skipSnaps: true,
-  direction: 'ltr',
+  direction: 'ltr' as const,
   inViewThreshold: 0.7
 };
 
