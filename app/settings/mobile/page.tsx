@@ -156,6 +156,7 @@ const MobileFeedSettings = () => {
   };
 
   const renderMobilePreview = () => {
+    // mobileLayoutSettings가 null인 경우 처리
     if (!mobileLayoutSettings) return null;
 
     const itemCount = mobileLayoutSettings.layout === 'carousel' 
@@ -235,7 +236,7 @@ const MobileFeedSettings = () => {
     );
 
     return (
-      <div className="mb-8 bg-gray-50 p-4 sm:p-8 rounded-lg">
+      <div className="mb-8 bg-gray-50 p-8 rounded-lg">
         <p className="text-sm text-gray-500 mb-4">
           {mobileLayoutSettings.layout === 'carousel' 
             ? '👉 옆으로 스크롤하여 더 많은 이미지를 확인해보세요' 
@@ -243,33 +244,28 @@ const MobileFeedSettings = () => {
           }
         </p>
         <div className="flex justify-center">
-          <div 
-            className="relative w-full max-w-[320px] bg-black rounded-[3rem] p-2 sm:p-4 shadow-xl"
-            style={{
-              aspectRatio: '320/640',
-            }}
-          >
-            {/* 노치 디자인 - 반응형으로 수정 */}
-            <div className="absolute z-20 top-2 sm:top-4 left-1/2 transform -translate-x-1/2 w-[30%] h-[4%] bg-black rounded-b-3xl flex items-center justify-center">
-              <div className="w-[30%] h-[60%] bg-black rounded-lg"></div>
+          <div className="relative w-[200px] h-[400px] bg-black rounded-[3rem] p-4 shadow-xl">
+            {/* 노치 디자인 */}
+            <div className="absolute z-20 top-4 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-black rounded-b-3xl flex items-center justify-center">
+              <div className="w-10 h-4 bg-black rounded-lg"></div>
             </div>
-            {/* 모바일 스크린 - 반응형으로 수정 */}
+            {/* 모바일 스크린 */}
             <div className="w-full h-full bg-white rounded-[2rem] overflow-hidden">
-              {/* 상태바 - 반응형으로 수정 */}
-              <div className="h-[5%] min-h-[24px] bg-white border-b flex items-center justify-between px-2 sm:px-4 sticky top-0 z-10">
-                <div className="text-[min(2.5vw,12px)] text-gray-500">9:41</div>
+              {/* 상태바 */}
+              <div className="h-10 bg-white border-b flex items-center justify-between px-4 sticky top-0 z-10">
+                <div className="text-xs text-gray-500">9:41</div>
                 <div className="flex items-center space-x-2">
-                  <div className="text-[min(2.5vw,12px)] text-gray-500">모바일 예시</div>
+                  <div className="text-xs text-gray-500">모바일 예시</div>
                 </div>
               </div>
-              {/* 콘텐츠 영역 - 반응형으로 수정 */}
-              <ScrollArea className="h-[95%] overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-                {/* 배너 영역 - 반응형으로 수정 */}
-                <div className="relative h-[20%] bg-gradient-to-r from-purple-600 to-blue-600">
+              {/* 콘텐츠 영역 */}
+              <ScrollArea className="h-[calc(100%-2.5rem)] overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+                {/* 배너 영역 */}
+                <div className="relative h-32 bg-gradient-to-r from-purple-600 to-blue-600">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <h3 className="text-white text-[min(4vw,20px)] font-bold">Your Mall</h3>
-                      <p className="text-white/80 text-[min(3vw,14px)]">모바일 접속 시 예시입니다</p>
+                      <h3 className="text-white text-xl font-bold">Your Mall</h3>
+                      <p className="text-white/80 text-sm">모바일 접속 시 예시입니다</p>
                     </div>
                   </div>
                 </div>
@@ -286,7 +282,7 @@ const MobileFeedSettings = () => {
     <div className="mb-8 bg-gray-50 p-4 rounded-lg">
       <Skeleton className="h-4 w-3/4 mb-4" />
       <div className="flex justify-center">
-        <Skeleton className="w-[320px] h-[640px] rounded-[3rem]" />
+        <Skeleton className="w-[200px] h-[400px] rounded-[3rem]" />
       </div>
     </div>
   );
