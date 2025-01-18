@@ -1,5 +1,6 @@
 'use client';
 
+import { Analytics } from "@vercel/analytics/react"
 import { useEffect } from "react";
 import { differenceInSeconds } from 'date-fns';
 import { useCafe24Store } from "@/store/cafe24Store";
@@ -96,6 +97,7 @@ export function RootLayoutClient({
             <SidebarTrigger />
             {children}
           </main>
+          <Analytics />
         </SidebarInset>
       </SidebarProvider>
     </AuthDialogProvider>
