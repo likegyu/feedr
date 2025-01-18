@@ -109,7 +109,9 @@ export async function GET(req: NextRequest) {
       };
 
       Object.entries(cookieData).forEach(([name, value]) => {
-        cookieStore.set(name, value);
+        cookieStore.set(name, value, {
+          maxAge: 2 * 60 * 60, // 초 단위
+        });
       });
 
     } catch (error) {

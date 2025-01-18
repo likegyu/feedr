@@ -276,36 +276,47 @@ const MobileFeedSettings = () => {
     );
   };
 
-  const PreviewSkeleton = () => (
-    <div className="mb-8 lg:mb-0 bg-gray-50 p-4 lg:p-8 rounded-lg">
-      <Skeleton className="h-4 w-3/4 mb-4" />
-      <div className="flex justify-center">
+const PreviewSkeleton = () => (
+  <div className="mb-8 lg:mb-0 bg-gray-50 p-4 lg:p-8 rounded-lg">
+    <Skeleton className="h-4 w-3/4 mb-4" />
+    <div className="flex justify-center">
+      <div className="relative">
         <Skeleton className="w-[240px] lg:w-[320px] h-[480px] lg:h-[640px] rounded-[3rem]" />
+        {/* 노치 스켈레톤 */}
+        <Skeleton className="absolute w-[80px] lg:w-[120px] h-[20px] lg:h-[30px] top-2 left-1/2 transform -translate-x-1/2 rounded-b-3xl" />
       </div>
     </div>
-  );
+  </div>
+);
 
-  const SettingsSkeleton = () => (
-    <div className="bg-white p-6 rounded-lg shadow space-y-6">
-      {Array(5).fill(0).map((_, i) => (
-        <div key={i} className="space-y-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-      ))}
+const SettingsSkeleton = () => (
+  <div className="bg-white p-6 rounded-lg shadow space-y-6">
+    {Array(5).fill(0).map((_, i) => (
+      <div key={i} className="space-y-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    ))}
+    <div className="pt-4 border-t">
+      <Skeleton className="h-10 w-full" />
     </div>
-  );
+  </div>
+);
 
-  // Preview 및 설정 UI 렌더링 조건부 처리
-  if (isLoading || !mobileLayoutSettings) {
-    return (
-      <div>
-        <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
-        <PreviewSkeleton />
+// 로딩 상태 UI 수정
+if (isLoading || !mobileLayoutSettings) {
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
+      <div className="lg:grid lg:grid-cols-2 lg:gap-8">
+        <div className="lg:sticky lg:top-4">
+          <PreviewSkeleton />
+        </div>
         <SettingsSkeleton />
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div>
