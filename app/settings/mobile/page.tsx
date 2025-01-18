@@ -244,9 +244,9 @@ const MobileFeedSettings = () => {
           }
         </p>
         <div className="flex justify-center">
-          <div className="relative w-[280px] lg:w-[320px] h-[560px] lg:h-[640px] bg-black rounded-[3rem] p-4 shadow-xl">
+          <div className="relative w-[240px] lg:w-[320px] h-[480px] lg:h-[640px] bg-black rounded-[3rem] p-4 shadow-xl">
             {/* 노치 디자인 */}
-            <div className="absolute w-[120px] lg:w-[80px] h-[60px] lg:h-[40px] top-1 left-1/2 transform -translate-x-1/2 bg-black rounded-b-3xl flex items-center justify-center">
+            <div className="absolute w-[80px] lg:w-[120px] h-[20px] lg:h-[40px] top-1 left-1/2 transform -translate-x-1/2 bg-black rounded-b-3xl flex items-center justify-center">
               <div className="w-20 h-4 bg-black rounded-lg"></div>
             </div>
             {/* 모바일 스크린 */}
