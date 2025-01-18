@@ -2,13 +2,14 @@
 
 import { ChevronRight, type LucideIcon } from "lucide-react"
 import Link from "next/link"
-
+import { useIsMobile } from "@/hooks/use-mobile"
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import {
+  useSidebar,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
@@ -34,6 +35,15 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const { toggleSidebar } = useSidebar()
+  const isMobile = useIsMobile()
+
+  const handleClick = () => {
+    if (isMobile) {
+      toggleSidebar()
+    }
+  }
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Feedr</SidebarGroupLabel>
@@ -46,8 +56,10 @@ export function NavMain({
                 <SidebarMenuButton asChild tooltip={item.title}>
                   <Link
                   href={item.url || "#"}
-                  onClick={(e) => !item.url && e.preventDefault()
-                  }>
+                  onClick={(e) => {
+                    if (!item.url) e.preventDefault()
+                    handleClick()
+                  }}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                   </Link>
@@ -77,7 +89,10 @@ export function NavMain({
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <Link href={subItem.url}>
+                          <Link 
+                            href={subItem.url}
+                            onClick={handleClick}
+                          >
                            {subItem.icon && <subItem.icon />}
                            <span>{subItem.title}</span>
                           </Link>
