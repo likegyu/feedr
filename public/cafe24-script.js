@@ -1,6 +1,6 @@
 (function() {
   const MOBILE_BREAKPOINT = 768;
-  const CACHE_DURATION = 1000 * 60 * 30;
+  const CACHE_DURATION = 1000 * 60 * 1;
   const EMBLA_CDN = 'https://unpkg.com/embla-carousel/embla-carousel.umd.js';
   const RESIZE_THROTTLE = 250;
 
