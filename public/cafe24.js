@@ -53,6 +53,21 @@
       VIDEO: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-play"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg>`
     };
   
+    // DNS 프리페칭 추가 (head에 삽입)
+    function addDnsPrefetch() {
+      const links = [
+        'https://cithmb.vercel.app',
+        'https://graph.instagram.com'
+      ];
+      
+      links.forEach(url => {
+        const link = document.createElement('link');
+        link.rel = 'dns-prefetch';
+        link.href = url;
+        document.head.appendChild(link);
+      });
+    }
+  
     class InstagramFeed {
       constructor(mallId) {
         this.mallId = mallId;
@@ -65,6 +80,8 @@
         this.currentLayout = null;
         this.handleResize = throttle(this.handleResize.bind(this), RESIZE_THROTTLE);
         this.insertType = null; // 'auto' | 'manual'
+        this.apiCache = new Map();
+        addDnsPrefetch();
         this.init();
       }
   
@@ -202,64 +219,85 @@
   
       async loadFreshData() {
         try {
-          const response = await fetch(`${this.apiEndpoint}?mallId=${this.mallId}`);
-          if (!response.ok) throw new Error('API 응답 실패');
+          // 병렬 요청 구현
+          const [settingsPromise, tokenPromise] = await Promise.all([
+            this.fetchSettings(),
+            this.fetchToken()
+          ]);
+    
+          const [settings, token] = await Promise.all([
+            settingsPromise,
+            tokenPromise
+          ]);
+    
+          // 설정 적용
+          this.insertType = settings.insert_type || 'auto';
+          this.pcSettings = settings.pc_feed_settings;
+          this.mobileSettings = settings.mobile_feed_settings;
+          this.feedFilter = settings.feed_filter || 'all';
+    
+          // 미디어 데이터 요청
+          if (token) {
+            this.mediaItems = await this.fetchInstagramMedia(token);
+          }
+    
+          // 캐시 저장
+          this.updateCache();
           
-          const data = await response.json();
-          
-          // 삽입 타입 설정 추가
-          this.insertType = data.insert_type || 'auto';
-  
-          // PC/모바일 레이아웃 설정 검증
-          if (!this.validateSettings(data.pc_feed_settings) || 
-              !this.validateSettings(data.mobile_feed_settings)) {
-            throw new Error('설정 포맷 오류');
-          }
-          this.pcSettings = data.pc_feed_settings;
-          this.mobileSettings = data.mobile_feed_settings;
-  
-          // feed_filter(예: 'all', 'image', 'video') 받기. 없으면 'all'로 기본값
-          if (data.feed_filter) {
-            this.feedFilter = data.feed_filter;
-          }
-  
-          // 인스타그램 미디어
-          if (data.instagram_access_token) {
-            const mediaResponse = await this.fetchInstagramMedia(data.instagram_access_token);
-            this.mediaItems = (mediaResponse.data || []).filter(item => !!item.media_url);
-          }
-  
-          // 캐시에 저장
-          this.setCache('pc', {
-            settings: this.pcSettings,
-            mediaItems: this.mediaItems,
-            feedFilter: this.feedFilter
-          });
-          this.setCache('mobile', {
-            settings: this.mobileSettings,
-            mediaItems: this.mediaItems,
-            feedFilter: this.feedFilter
-          });
-  
-          // 캐러셀이 필요한지 확인 후 로드
-          await this.loadEmblaIfNeeded();
-          this.render();
         } catch (error) {
-          console.debug('Data Load Error:', error);
-  
-          // 폴백: 캐시 사용
-          const cached = {
-            pc: this.getCache('pc'),
-            mobile: this.getCache('mobile')
-          };
-          if (cached.pc && cached.mobile) {
-            this.pcSettings = cached.pc.settings;
-            this.mobileSettings = cached.mobile.settings;
-            this.mediaItems = cached.pc.mediaItems;
-            this.feedFilter = cached.pc.feedFilter || 'all';
-            this.render();
-          }
+          console.error('Data loading failed:', error);
+          this.loadFromCache();
         }
+      }
+  
+      // 요청 분리 및 캐싱
+      async fetchSettings() {
+        const cacheKey = `settings_${this.mallId}`;
+        
+        if (this.apiCache.has(cacheKey)) {
+          return this.apiCache.get(cacheKey);
+        }
+    
+        const response = await fetch(
+          `${this.apiEndpoint}/settings?mallId=${this.mallId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Cache-Control': 'max-age=300'
+            }
+          }
+        );
+    
+        const data = await response.json();
+        this.apiCache.set(cacheKey, data);
+        
+        return data;
+      }
+  
+      async fetchToken() {
+        const response = await fetch(`${this.apiEndpoint}?mallId=${this.mallId}`);
+        if (!response.ok) throw new Error('API 응답 실패');
+        
+        const data = await response.json();
+        return data.instagram_access_token;
+      }
+  
+      // 캐시 관리 개선
+      updateCache() {
+        const cache = {
+          timestamp: Date.now(),
+          settings: {
+            pc: this.pcSettings,
+            mobile: this.mobileSettings
+          },
+          mediaItems: this.mediaItems,
+          feedFilter: this.feedFilter
+        };
+    
+        localStorage.setItem(
+          getCacheKey(this.mallId),
+          JSON.stringify(cache)
+        );
       }
   
       // Embla 캐러셀 외부 스크립트 로드
