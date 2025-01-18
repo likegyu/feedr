@@ -512,7 +512,7 @@
             align: 'center',
             containScroll: 'keepSnaps',
             dragFree: false,
-            loop: false,
+            loop: true,
             skipSnaps: true,
             direction: 'ltr',
             inViewThreshold: 0.7
