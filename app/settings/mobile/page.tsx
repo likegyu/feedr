@@ -19,6 +19,8 @@ import { ImageIcon, PlayCircleIcon, Info } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FeedSettings } from '@/types/settings';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const MobileFeedSettings = () => {
   const { toast } = useToast();
@@ -318,14 +320,28 @@ if (isLoading || !mobileLayoutSettings) {
   );
 }
 
+if (!isInstagramConnected) {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
-      {isInstagramConnected === false && (
-        <div className="flex gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
-          <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
-        </div>
-      )}
+      <Card>
+        <CardContent className='p-6 pt-6'>
+          <Alert>
+            <AlertDescription className="flex items-center gap-2">
+              <Info className="h-4 w-4" />
+              레이아웃 설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
+      {renderMobilePreview()}
       <div className="lg:grid lg:grid-cols-2 lg:gap-8">
         <div className="lg:sticky lg:top-4">
           {renderMobilePreview()}
