@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     let body;
     try {
       body = await req.json();
-    } catch (_) {
+    } catch {
       return NextResponse.json(
         { error: '잘못된 요청 형식입니다.' },
         { status: 400 }
@@ -39,12 +39,6 @@ export async function POST(req: NextRequest) {
 
     // Start transaction
     await client.query('BEGIN');
-
-    // 현재 설정된 insert_type 확인
-    const currentSetting = await client.query(
-      'SELECT insert_type FROM tokens WHERE cafe24_mall_id = $1',
-      [mallId]
-    );
 
     // 단순히 insert_type만 업데이트
     await client.query(

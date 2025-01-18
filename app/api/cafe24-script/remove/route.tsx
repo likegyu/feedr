@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { Pool } from 'pg';
 import { db } from '@/lib/db';
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   const client = await (db as Pool).connect();
   
   try {
