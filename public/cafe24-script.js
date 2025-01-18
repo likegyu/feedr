@@ -355,7 +355,7 @@
         .embla-container-${type}-${this.mallId} {
           display: flex;
           gap: ${settings.gap}px;
-          padding: 0 ${settings.gap}px;
+          padding: 0 ${settings.gap * (settings.columns - 1)}px;
           transform: translate3d(0,0,0);
           will-change: transform;
           user-select: none;

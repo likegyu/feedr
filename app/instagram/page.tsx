@@ -296,12 +296,12 @@ const InstagramConnect = () => {
 
       {/* 수정된 피드 배포 카드 */}
       {status?.isConnected && (
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Instagram 피드 배포</h3>
-            <div className="space-y-4">
+        <Card className="w-full">
+          <CardContent className="p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Instagram 피드 배포</h3>
+            <div className="space-y-3 sm:space-y-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-medium mb-1 sm:mb-2">
                   배포 방식
                 </label>
                 <Select
@@ -309,7 +309,7 @@ const InstagramConnect = () => {
                   onValueChange={(value: 'auto' | 'manual') => setTempDeployType(value)}
                   disabled={isUpdatingType}
                 >
-                  <SelectTrigger className="w-[200px]">
+                  <SelectTrigger className="w-full sm:w-[200px]">
                     <SelectValue placeholder="배포 방식 선택" />
                   </SelectTrigger>
                   <SelectContent>
@@ -318,10 +318,11 @@ const InstagramConnect = () => {
                   </SelectContent>
                 </Select>
                 {tempDeployType !== deployType && (
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-2">
                     <Button
                       variant="default"
                       size="sm"
+                      className="w-full sm:w-auto"
                       onClick={() => updateInsertType(tempDeployType)}
                       disabled={isUpdatingType || tempDeployType === status?.insertType}
                     >
@@ -330,6 +331,7 @@ const InstagramConnect = () => {
                     <Button
                       variant="outline"
                       size="sm"
+                      className="w-full sm:w-auto"
                       onClick={() => setTempDeployType(deployType)}
                       disabled={isUpdatingType}
                     >
@@ -341,7 +343,7 @@ const InstagramConnect = () => {
 
               {tempDeployType === 'auto' ? (
                 <>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs sm:text-sm text-gray-500">
                     자동 배포를 선택하면 쇼핑몰 메인 페이지 하단에 Instagram 피드가 자동으로 삽입됩니다.
                     {status.hasScriptTag && (
                       <span className="text-green-600 ml-2">
@@ -353,22 +355,24 @@ const InstagramConnect = () => {
                     variant={status.hasScriptTag ? "secondary" : "default"}
                     onClick={deployInstagramFeed}
                     disabled={isDeploying || showTokenAlert}
+                    className="w-full sm:w-auto"
                   >
                     {isDeploying ? "배포 중..." : (status.hasScriptTag ? "다시 배포하기" : "피드 배포하기")}
                   </Button>
                 </>
               ) : (
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-500">
+                <div className="space-y-3 sm:space-y-4">
+                  <p className="text-xs sm:text-sm text-gray-500">
                     수동 배포의 경우 아래 코드를 원하는 위치에 직접 삽입하세요.
                   </p>
                   {status.hasScriptTag && (
                     <Alert>
-                      <AlertDescription className="flex items-center justify-between">
-                        <span>현재 자동 배포된 스크립트가 남아있습니다.</span>
+                      <AlertDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <span className="text-xs sm:text-sm">현재 자동 배포된 스크립트가 남아있습니다.</span>
                         <Button
                           variant="outline"
                           size="sm"
+                          className="w-full sm:w-auto"
                           onClick={removeScriptTag}
                           disabled={isDeploying}
                         >
@@ -378,8 +382,8 @@ const InstagramConnect = () => {
                     </Alert>
                   )}
                   <div className="relative">
-                    <ScrollArea className="h-[100px] w-full rounded-md border p-4">
-                      <pre className="text-sm">{manualCode}</pre>
+                    <ScrollArea className="h-[100px] w-full rounded-md border p-2 sm:p-4">
+                      <pre className="text-xs sm:text-sm">{manualCode}</pre>
                     </ScrollArea>
                     <Button
                       variant="outline"
@@ -387,7 +391,7 @@ const InstagramConnect = () => {
                       className="absolute top-2 right-2"
                       onClick={copyToClipboard}
                     >
-                      <Copy className="h-4 w-4 mr-1" />
+                      <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                       {copied ? "복사됨" : "복사"}
                     </Button>
                   </div>
