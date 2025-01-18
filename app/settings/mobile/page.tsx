@@ -31,7 +31,7 @@ const MobileFeedSettings = () => {
     align: 'center',
     containScroll: 'keepSnaps',
     dragFree: false,
-    loop: true,
+    loop: false,
     skipSnaps: true,
     direction: 'ltr',
     inViewThreshold: 0.7,

@@ -30,7 +30,7 @@ const FeedSettings = () => {
     align: 'center',
     containScroll: 'keepSnaps',
     dragFree: false,           // 스냅 효과를 위해 false로 설정
-    loop: true,
+    loop: false,
     skipSnaps: true,         // 정확한 스냅 위치 유지
     direction: 'ltr',
     inViewThreshold: 0.7,    // 성능 최적화를 위한 임계값
