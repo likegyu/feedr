@@ -15,6 +15,29 @@ export async function PUT() {
       );
     }
 
+    // PC 테마 정보 조회
+    const themeResponse = await fetch(
+      `https://${mallId}.cafe24api.com/api/v2/admin/themes?type=pc&fields=skin_no`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'X-Cafe24-Api-Version': '2024-12-01'
+        }
+      }
+    );
+
+    if (!themeResponse.ok) {
+      return NextResponse.json(
+        { error: '테마 정보 조회 실패' },
+        { status: themeResponse.status }
+      );
+    }
+
+    const themeData = await themeResponse.json();
+    const currentSkinNo = themeData.themes[0].skin_no;
+
     // DB에서 script_no 조회
     const { rows } = await db.query(
       'SELECT script_tag_no FROM tokens WHERE cafe24_mall_id = $1',
@@ -35,7 +58,7 @@ export async function PUT() {
       request: {
         display_location: ['MAIN'],
         src: 'https://cithmb.vercel.app/cafe24-script.js',
-        skin_no: [1]
+        skin_no: [currentSkinNo] // 현재 사용중인 스킨만 적용
       }
     };
 
@@ -55,15 +78,16 @@ export async function PUT() {
     if (!response.ok) {
       const error = await response.json();
       return NextResponse.json(
-        { error: '스크립트 태그 업데이트 실패', details: error },
+        { error: '스크립트 태그 수정 실패', details: error },
         { status: response.status }
       );
     }
 
-    return NextResponse.json(await response.json());
+    const result = await response.json();
+    return NextResponse.json(result);
 
   } catch (error) {
-    console.error('스크립트 태그 업데이트 에러:', error);
+    console.error('스크립트 태그 API 에러:', error);
     return NextResponse.json(
       { error: '서버 에러가 발생했습니다.' },
       { status: 500 }
