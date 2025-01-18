@@ -85,7 +85,7 @@
 
         this.container.style.cssText = `
           width: 100%;
-          margin: 0 auto 40px;
+          margin: 40px 0 40px 0;
         `;
 
         window.addEventListener('resize', this.handleResize);
@@ -105,7 +105,7 @@
       this.container.id = 'instagram-feed';
       this.container.style.cssText = `
         width: 100%;
-        margin: 0 auto 40px;
+        margin: 40px 0 40px 0;
       `;
 
       footer.parentNode.insertBefore(this.container, footer);
@@ -470,7 +470,7 @@
               src="${mediaType === 'VIDEO' ? item.thumbnail_url : item.media_url}" 
               alt="${item.caption || ''}"
               loading="lazy"
-              style="width: 100%; height: 100%; object-fit: cover;"
+              style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1;"
             >
             ${settings.showMediaType ? `
               <div class="media-type-icon-${type}-${this.mallId}">
