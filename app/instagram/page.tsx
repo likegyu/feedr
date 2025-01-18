@@ -143,7 +143,10 @@ const InstagramConnect = () => {
       
       if (response.ok) {
         setDeployType(newType);
-        await checkInstagramStatus(); // 상태 새로고침
+        // auto로 변경 시 hasScriptTag를 false로 설정하여 배포 버튼 활성화
+        if (newType === 'auto') {
+          setStatus(prev => ({ ...prev!, hasScriptTag: false }));
+        }
       } else {
         setError(data.error || '배포 방식 변경에 실패했습니다.');
       }
@@ -152,6 +155,28 @@ const InstagramConnect = () => {
       console.error('배포 방식 변경 중 오류:', error);
     } finally {
       setIsUpdatingType(false);
+    }
+  };
+
+  const removeScriptTag = async () => {
+    try {
+      setIsDeploying(true);
+      setError(null);
+      const response = await fetch('/api/cafe24-script/remove', {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        await checkInstagramStatus();
+      } else {
+        const data = await response.json();
+        setError(data.error || '스크립트 제거에 실패했습니다.');
+      }
+    } catch (error) {
+      setError('스크립트 제거 중 오류가 발생했습니다.');
+      console.error('스크립트 제거 중 오류:', error);
+    } finally {
+      setIsDeploying(false);
     }
   };
 
@@ -303,6 +328,21 @@ const InstagramConnect = () => {
                   <p className="text-sm text-gray-500">
                     수동 배포의 경우 아래 코드를 원하는 위치에 직접 삽입하세요.
                   </p>
+                  {status.hasScriptTag && (
+                    <Alert>
+                      <AlertDescription className="flex items-center justify-between">
+                        <span>현재 자동 배포된 스크립트가 남아있습니다.</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={removeScriptTag}
+                          disabled={isDeploying}
+                        >
+                          {isDeploying ? "제거 중..." : "스크립트 제거"}
+                        </Button>
+                      </AlertDescription>
+                    </Alert>
+                  )}
                   <div className="relative">
                     <ScrollArea className="h-[100px] w-full rounded-md border p-4">
                       <pre className="text-sm">{manualCode}</pre>

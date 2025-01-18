@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     let body;
     try {
       body = await req.json();
-    } catch (error) {
+    } catch (_) {
       return NextResponse.json(
         { error: '잘못된 요청 형식입니다.' },
         { status: 400 }
@@ -42,82 +42,14 @@ export async function POST(req: NextRequest) {
 
     // 현재 설정된 insert_type 확인
     const currentSetting = await client.query(
-      'SELECT insert_type, script_tag_no FROM tokens WHERE cafe24_mall_id = $1',
+      'SELECT insert_type FROM tokens WHERE cafe24_mall_id = $1',
       [mallId]
     );
 
-    if (insertType === 'manual' && 
-        currentSetting.rows[0]?.insert_type === 'auto' && 
-        currentSetting.rows[0]?.script_tag_no) {
-      // auto -> manual 전환 시 스크립트 삭제
-      try {
-        const deleteResponse = await fetch(
-          `https://${mallId}.cafe24api.com/api/v2/admin/scripttags/${currentSetting.rows[0].script_tag_no}`,
-          {
-            method: 'DELETE',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-              'X-Cafe24-Api-Version': '2024-12-01'
-            }
-          }
-        );
-
-        if (!deleteResponse.ok) {
-          throw new Error('Failed to delete script tag');
-        }
-      } catch (error) {
-        console.error('스크립트 태그 삭제 실패:', error);
-        // Continue even if script tag deletion fails
-      }
-    } else if (insertType === 'auto' && 
-              currentSetting.rows[0]?.insert_type === 'manual') {
-      // manual -> auto 전환 시 스크립트 재배포
-      try {
-        const deployResponse = await fetch(
-          `https://${mallId}.cafe24api.com/api/v2/admin/scripttags`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-              'X-Cafe24-Api-Version': '2024-12-01'
-            },
-            body: JSON.stringify({
-              shop_no: 1,
-              request: {
-                script_tag: {
-                  src: 'https://cithmb.vercel.app/cafe24-script.js',
-                  display_location: 'all',
-                  enabled: 'T'
-                }
-              }
-            })
-          }
-        );
-
-        if (!deployResponse.ok) {
-          throw new Error('Failed to deploy script tag');
-        }
-
-        const deployData = await deployResponse.json();
-        const scriptTagNo = deployData.response.script_tag.script_no;
-
-        // 스크립트 태그 번호 업데이트
-        await client.query(
-          'UPDATE tokens SET script_tag_no = $1 WHERE cafe24_mall_id = $2',
-          [scriptTagNo, mallId]
-        );
-      } catch (error) {
-        console.error('스크립트 태그 배포 실패:', error);
-        throw error;
-      }
-    }
-
+    // 단순히 insert_type만 업데이트
     await client.query(
       `UPDATE tokens 
-       SET insert_type = $1,
-           script_tag_no = CASE WHEN $1 = 'manual' THEN NULL ELSE script_tag_no END
+       SET insert_type = $1
        WHERE cafe24_mall_id = $2`,
       [insertType, mallId]
     );
