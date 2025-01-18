@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { Pool } from 'pg';
 import { db } from '@/lib/db';
 
 interface UpdateTypeRequest {
@@ -8,8 +7,6 @@ interface UpdateTypeRequest {
 }
 
 export async function POST(req: NextRequest) {
-  const client = await (db as Pool).connect();
-  
   try {
     const cookieStore = await cookies();
     const mallId = cookieStore.get('cafe24_mall_id')?.value;
@@ -39,9 +36,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await client.query('BEGIN');
+    await db.query('BEGIN');
 
-    const result = await client.query(
+    const result = await db.query(
       `UPDATE tokens 
        SET insert_type = $1
        WHERE cafe24_mall_id = $2
@@ -53,7 +50,7 @@ export async function POST(req: NextRequest) {
       throw new Error('데이터베이스 업데이트 실패');
     }
 
-    await client.query('COMMIT');
+    await db.query('COMMIT');
 
     return NextResponse.json({ 
       success: true,
@@ -64,13 +61,11 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    await client.query('ROLLBACK');
+    await db.query('ROLLBACK');
     console.error('Database operation failed:', error);
     return NextResponse.json(
       { success: false, error: '데이터베이스 작업 중 오류가 발생했습니다.' },
       { status: 500 }
     );
-  } finally {
-    client.release();
   }
 }

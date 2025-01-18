@@ -33,6 +33,12 @@ const InstagramConnect = () => {
   const [deployType, setDeployType] = useState<'auto' | 'manual'>('auto');
   const [copied, setCopied] = useState(false);
   const [isUpdatingType, setIsUpdatingType] = useState(false);
+  const [tempDeployType, setTempDeployType] = useState<'auto' | 'manual'>('auto');
+
+  useEffect(() => {
+    // 초기 deployType 설정
+    setTempDeployType(deployType);
+  }, [deployType]);
 
   const manualCode = `<div id="instagram-feed"></div>
 <script src="https://cithmb.vercel.app/cafe24-script.js"></script>`;
@@ -285,13 +291,13 @@ const InstagramConnect = () => {
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">Instagram 피드 배포</h3>
             <div className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <label className="block text-sm font-medium mb-2">
                   배포 방식
                 </label>
                 <Select
-                  value={deployType}
-                  onValueChange={(value: 'auto' | 'manual') => updateInsertType(value)}
+                  value={tempDeployType}
+                  onValueChange={(value: 'auto' | 'manual') => setTempDeployType(value)}
                   disabled={isUpdatingType}
                 >
                   <SelectTrigger className="w-[200px]">
@@ -302,9 +308,29 @@ const InstagramConnect = () => {
                     <SelectItem value="manual">수동 배포</SelectItem>
                   </SelectContent>
                 </Select>
+                {tempDeployType !== deployType && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => updateInsertType(tempDeployType)}
+                      disabled={isUpdatingType}
+                    >
+                      {isUpdatingType ? "변경 중..." : "변경 적용"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setTempDeployType(deployType)}
+                      disabled={isUpdatingType}
+                    >
+                      취소
+                    </Button>
+                  </div>
+                )}
               </div>
 
-              {deployType === 'auto' ? (
+              {tempDeployType === 'auto' ? (
                 <>
                   <p className="text-sm text-gray-500">
                     자동 배포를 선택하면 쇼핑몰 메인 페이지 하단에 Instagram 피드가 자동으로 삽입됩니다.

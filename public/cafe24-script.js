@@ -72,28 +72,38 @@
     // 초기화
     async init() {
       try {
-        // 설정 및 필터 로드
+        console.debug('Init start');
         await this.loadSettings();
+        console.debug('Settings loaded:', {
+          insertType: this.insertType,
+          pcSettings: !!this.pcSettings,
+          mobileSettings: !!this.mobileSettings
+        });
         
-        // 설정 로드 후 컨테이너 생성 또는 찾기
         if (this.insertType === 'manual') {
           this.container = document.getElementById('instagram-feed');
+          console.debug('Manual mode container:', !!this.container);
         } else {
           this.createContainer();
         }
         
-        if (!this.container) return;
+        if (!this.container) {
+          console.debug('Container not found, stopping init');
+          return;
+        }
+
         this.container.style.cssText = `
-        width: 100%;
-        margin: 0 auto 40px;
-        padding: 0 20px;
-      `;
-        // 윈도우 리사이즈 이벤트 등록
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto 40px;
+          padding: 0 20px;
+        `;
+
         window.addEventListener('resize', this.handleResize);
         this.handleResize();
-        this.render(); // 명시적 초기 렌더링 호출
+        await this.render(); // await 추가
       } catch (error) {
-        console.debug('Instagram Feed Error:', error);
+        console.error('Instagram Feed Error:', error);
       }
     }
 
@@ -318,10 +328,22 @@
     }
 
     // 뷰포트에 따라 PC/모바일 레이아웃 렌더
-    render() {
-      if (!this.container || !this.pcSettings || !this.mobileSettings) return;
-      
+    async render() {
+      console.debug('Render start', {
+        container: !!this.container,
+        pcSettings: !!this.pcSettings,
+        mobileSettings: !!this.mobileSettings,
+        mediaItems: this.mediaItems.length
+      });
+
+      if (!this.container || !this.pcSettings || !this.mobileSettings) {
+        console.debug('Render requirements not met');
+        return;
+      }
+
+      await this.loadEmblaIfNeeded();
       this.injectStyles();
+      
       this.container.innerHTML = `
         <div id="instagram-feed-pc-${this.mallId}">
           ${this.renderLayout('pc')}

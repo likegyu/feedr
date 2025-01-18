@@ -1,11 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { Pool } from 'pg';
 import { db } from '@/lib/db';
 
 export async function POST() {
-  const client = await (db as Pool).connect();
-  
   try {
     const cookieStore = await cookies();
     const mallId = cookieStore.get('cafe24_mall_id')?.value;
@@ -18,9 +15,9 @@ export async function POST() {
       );
     }
 
-    await client.query('BEGIN');
+    await db.query('BEGIN');
 
-    const currentSetting = await client.query(
+    const currentSetting = await db.query(
       'SELECT script_tag_no FROM tokens WHERE cafe24_mall_id = $1',
       [mallId]
     );
@@ -42,26 +39,24 @@ export async function POST() {
         throw new Error('Failed to delete script tag');
       }
 
-      await client.query(
+      await db.query(
         'UPDATE tokens SET script_tag_no = NULL WHERE cafe24_mall_id = $1',
         [mallId]
       );
     }
 
-    await client.query('COMMIT');
+    await db.query('COMMIT');
     return NextResponse.json({ 
       success: true,
       message: '스크립트가 성공적으로 제거되었습니다.'
     });
 
   } catch (error) {
-    await client.query('ROLLBACK');
+    await db.query('ROLLBACK');
     console.error('Script removal failed:', error);
     return NextResponse.json(
       { error: '스크립트 제거 중 오류가 발생했습니다.' },
       { status: 500 }
     );
-  } finally {
-    client.release();
   }
 }
