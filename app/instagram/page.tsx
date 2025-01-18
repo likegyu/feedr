@@ -141,17 +141,16 @@ const InstagramConnect = () => {
       
       const data = await response.json();
       
-      if (response.ok) {
+      if (response.ok && data.success) {
         setDeployType(newType);
-        // auto로 변경 시 hasScriptTag를 false로 설정하여 배포 버튼 활성화
         if (newType === 'auto') {
-          setStatus(prev => ({ ...prev!, hasScriptTag: false }));
+          setStatus(prev => prev ? { ...prev, hasScriptTag: false } : null);
         }
       } else {
-        setError(data.error || '배포 방식 변경에 실패했습니다.');
+        throw new Error(data.error || '배포 방식 변경에 실패했습니다.');
       }
     } catch (error) {
-      setError('배포 방식 변경 중 오류가 발생했습니다.');
+      setError(error instanceof Error ? error.message : '배포 방식 변경 중 오류가 발생했습니다.');
       console.error('배포 방식 변경 중 오류:', error);
     } finally {
       setIsUpdatingType(false);
