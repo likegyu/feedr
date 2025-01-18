@@ -19,10 +19,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FeedSettings as FeedSettingsType } from '@/types/settings';
 import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const FeedSettings = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [isCafe24LoggedIn, setIsCafe24LoggedIn] = useState<boolean | null>(null);
   const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
   const [initialSettings, setInitialSettings] = useState<FeedSettingsType | null>(null);
   const [layoutSettings, setLayoutSettings] = useState<FeedSettingsType | null>(null);
@@ -39,18 +41,25 @@ const FeedSettings = () => {
 
   // Instagram 연동 상태 확인
   useEffect(() => {
-    const checkInstagramStatus = async () => {
+    const checkAuthStatus = async () => {
       try {
-        const response = await fetch('/api/auth/instagram/status');
-        const data = await response.json();
-        setIsInstagramConnected(data.isConnected);
+        // Cafe24 로그인 상태 체크
+        const cafe24Response = await fetch('/api/auth/cafe24/status');
+        const cafe24Data = await cafe24Response.json();
+        setIsCafe24LoggedIn(cafe24Data.isLoggedIn);
+
+        // Instagram 연동 상태 체크
+        const instaResponse = await fetch('/api/auth/instagram/status');
+        const instaData = await instaResponse.json();
+        setIsInstagramConnected(instaData.isConnected);
       } catch (error) {
-        console.error('인스타그램 상태 확인 중 오류:', error);
+        console.error('인증 상태 확인 중 오류:', error);
+        setIsCafe24LoggedIn(false);
         setIsInstagramConnected(false);
       }
     };
 
-    checkInstagramStatus();
+    checkAuthStatus();
   }, []);
 
   // 설정 로드 수정
@@ -279,16 +288,54 @@ const FeedSettings = () => {
     );
   }
 
+  if (!isCafe24LoggedIn) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
+        <Card>
+          <CardContent className='p-6 pt-6'>
+            <Alert variant="destructive">
+              <AlertDescription className="flex items-center gap-2">
+                <Info className="h-4 w-4" />
+                설정을 사용하기 위해서는 먼저 Cafe24에 로그인해주세요.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (!layoutSettings) {
     return (
       <div>
         <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
         <Card>
-          <CardContent className="p-6">
-            <div className="flex gap-2 items-center">
-              <Info className="h-4 w-4"/>
-              <p>설정을 불러오는 중에 문제가 발생했습니다.</p>
-            </div>
+          <CardContent className='p-6 pt-6'>
+            <Alert variant="destructive">
+              <AlertDescription className="flex items-center gap-2">
+                <Info className="h-4 w-4" />
+                설정을 불러오는 중에 문제가 발생했습니다. 새로고침 후 다시 시도해주세요.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isInstagramConnected) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
+        <Card>
+          <CardContent className='p-6 pt-6'>
+            <Alert>
+              <AlertDescription className="flex items-center gap-2">
+                <Info className="h-4 w-4" />
+                레이아웃 설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.
+              </AlertDescription>
+            </Alert>
           </CardContent>
         </Card>
       </div>
@@ -298,11 +345,6 @@ const FeedSettings = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
-      {isInstagramConnected === false && (
-        <div className="flex gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
-          <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
-        </div>
-      )}
       <Card className="mb-8">
         <CardContent className="p-6">
           {renderPreview()}
