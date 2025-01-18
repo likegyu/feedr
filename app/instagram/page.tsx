@@ -32,6 +32,7 @@ const InstagramConnect = () => {
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployType, setDeployType] = useState<'auto' | 'manual'>('auto');
   const [copied, setCopied] = useState(false);
+  const [isUpdatingType, setIsUpdatingType] = useState(false);
 
   const manualCode = `<div id="instagram-feed"></div>
 <script src="https://cithmb.vercel.app/cafe24-script.js"></script>`;
@@ -123,6 +124,34 @@ const InstagramConnect = () => {
       console.error('인스타그램 피드 배포 중 오류:', error);
     } finally {
       setIsDeploying(false);
+    }
+  };
+
+  const updateInsertType = async (newType: 'auto' | 'manual') => {
+    try {
+      setIsUpdatingType(true);
+      setError(null);
+      const response = await fetch('/api/cafe24-script/update-type', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ insertType: newType }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setDeployType(newType);
+        await checkInstagramStatus(); // 상태 새로고침
+      } else {
+        setError(data.error || '배포 방식 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      setError('배포 방식 변경 중 오류가 발생했습니다.');
+      console.error('배포 방식 변경 중 오류:', error);
+    } finally {
+      setIsUpdatingType(false);
     }
   };
 
@@ -238,7 +267,8 @@ const InstagramConnect = () => {
                 </label>
                 <Select
                   value={deployType}
-                  onValueChange={(value: 'auto' | 'manual') => setDeployType(value)}
+                  onValueChange={(value: 'auto' | 'manual') => updateInsertType(value)}
+                  disabled={isUpdatingType}
                 >
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="배포 방식 선택" />

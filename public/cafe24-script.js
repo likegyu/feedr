@@ -166,6 +166,9 @@
         
         const data = await response.json();
         
+        // 삽입 타입 설정 추가
+        this.insertType = data.insert_type || 'auto';
+
         // PC/모바일 레이아웃 설정 검증
         if (!this.validateSettings(data.pc_feed_settings) || 
             !this.validateSettings(data.mobile_feed_settings)) {

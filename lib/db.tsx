@@ -22,6 +22,7 @@ type Token = {
   mobile_feed_settings?: string; // JSON 문자열로 저장, optional
   instagram_issued_at?: number; // UNIX timestamp로 저장
   script_tag_no?: number;
+  insert_type: 'auto' | 'manual';
 };
 
 const pool = new Pool({
