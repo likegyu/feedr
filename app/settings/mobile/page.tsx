@@ -244,7 +244,7 @@ const MobileFeedSettings = () => {
           }
         </p>
         <div className="flex justify-center">
-          <div className="relative w-[200px] h-[400px] bg-black rounded-[3rem] p-4 shadow-xl">
+          <div className="relative w-[320px] h-[640px] bg-black rounded-[3rem] p-4 shadow-xl">
             {/* 노치 디자인 */}
             <div className="absolute z-20 top-4 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-black rounded-b-3xl flex items-center justify-center">
               <div className="w-10 h-4 bg-black rounded-lg"></div>
@@ -282,7 +282,7 @@ const MobileFeedSettings = () => {
     <div className="mb-8 bg-gray-50 p-4 rounded-lg">
       <Skeleton className="h-4 w-3/4 mb-4" />
       <div className="flex justify-center">
-        <Skeleton className="w-[200px] h-[400px] rounded-[3rem]" />
+        <Skeleton className="w-[320px] h-[640px] rounded-[3rem]" />
       </div>
     </div>
   );
