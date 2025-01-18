@@ -301,7 +301,7 @@
     generateStyles(type) {
       const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
       if (!settings) return '';
-
+    
       return `
         #instagram-feed-${type}-${this.mallId} {
           width: 100%;
@@ -317,15 +317,21 @@
           aspect-ratio: 1;
           border-radius: ${settings.borderRadius}px;
           overflow: hidden;
+          width: 100%;
         }
         .embla-${type}-${this.mallId} {
           overflow: hidden;
           position: relative;
+          width: 100%;
         }
         .embla-container-${type}-${this.mallId} {
           display: flex;
           gap: ${settings.gap}px;
           user-select: none;
+        }
+        .embla-container-${type}-${this.mallId} .feed-item-${type}-${this.mallId} {
+          flex: 0 0 ${100 / settings.columns}%;
+          min-width: 0;
         }
       `;
     }
