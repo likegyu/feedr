@@ -19,8 +19,7 @@ import { ImageIcon, PlayCircleIcon, Info } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FeedSettings } from '@/types/settings';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
 
 const MobileFeedSettings = () => {
   const { toast } = useToast();
@@ -278,79 +277,67 @@ const MobileFeedSettings = () => {
     );
   };
 
-const PreviewSkeleton = () => (
-  <div className="mb-8 lg:mb-0 bg-gray-50 p-4 lg:p-8 rounded-lg">
-    <Skeleton className="h-4 w-3/4 mb-4" />
-    <div className="flex justify-center">
-      <div className="relative">
+  const PreviewSkeleton = () => (
+    <div className="mb-8 lg:mb-0 bg-gray-50 p-4 lg:p-8 rounded-lg">
+      <Skeleton className="h-4 w-3/4 mb-4" />
+      <div className="flex justify-center">
         <Skeleton className="w-[240px] lg:w-[320px] h-[480px] lg:h-[640px] rounded-[3rem]" />
-        {/* 노치 스켈레톤 */}
-        <Skeleton className="absolute w-[80px] lg:w-[120px] h-[20px] lg:h-[30px] top-2 left-1/2 transform -translate-x-1/2 rounded-b-3xl" />
       </div>
     </div>
-  </div>
-);
+  );
 
-const SettingsSkeleton = () => (
-  <div className="bg-white p-6 rounded-lg shadow space-y-6">
-    {Array(5).fill(0).map((_, i) => (
-      <div key={i} className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-    ))}
-    <div className="pt-4 border-t">
-      <Skeleton className="h-10 w-full" />
-    </div>
-  </div>
-);
-
-// 로딩 상태 UI 수정
-if (isLoading || !mobileLayoutSettings) {
-  return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
-      <div className="lg:grid lg:grid-cols-2 lg:gap-8">
-        <div className="lg:sticky lg:top-4">
-          <PreviewSkeleton />
+  const SettingsSkeleton = () => (
+    <div className="bg-white p-6 rounded-lg shadow space-y-6">
+      {Array(5).fill(0).map((_, i) => (
+        <div key={i} className="space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-10 w-full" />
         </div>
-        <SettingsSkeleton />
+      ))}
+    </div>
+  );
+
+  // Preview 및 설정 UI 렌더링 조건부 처리
+  if (isLoading) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
+        <div className="lg:grid lg:grid-cols-2 lg:gap-8">
+          <PreviewSkeleton />
+          <SettingsSkeleton />
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-if (!isInstagramConnected) {
-  return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
-      <Card>
-        <CardContent className='p-6 pt-6'>
-          <Alert>
-            <AlertDescription className="flex items-center gap-2">
-              <Info className="h-4 w-4" />
-              레이아웃 설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+  if (!mobileLayoutSettings) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex gap-2 items-center">
+              <Info className="h-4 w-4"/>
+              <p>설정을 불러오는 중에 문제가 발생했습니다.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
+      {isInstagramConnected === false && (
+        <div className="flex gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
+          <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
+        </div>
+      )}
       <div className="lg:grid lg:grid-cols-2 lg:gap-8">
         <div className="lg:sticky lg:top-4">
           <Card>
             <CardContent className="p-6">
-              <p className="text-sm text-gray-500 mb-4">
-                {mobileLayoutSettings.layout === 'carousel' 
-                  ? '👉 옆으로 스크롤하여 더 많은 이미지를 확인해보세요' 
-                  : '👉 화면의 가로 길이가 768px 이하가 되면 피드가 모바일 레이아웃으로 보여요'
-                }
-              </p>
               {renderMobilePreview()}
             </CardContent>
           </Card>
@@ -448,20 +435,22 @@ if (!isInstagramConnected) {
                 />
               </div>
             </div>
+
+            {/* 저장 버튼 수정 */}
+            <div className="pt-4 border-t">
+              <Button 
+                className="w-full"
+                onClick={handleSaveSettings}
+                disabled={!isInstagramConnected || !hasSettingsChanged()}
+              >
+                {!isInstagramConnected 
+                  ? "인스타그램 연동 필요"
+                  : !hasSettingsChanged()
+                  ? "변경사항 없음"
+                  : "설정 저장하기"}
+              </Button>
+            </div>
           </CardContent>
-          <CardFooter className="border-t p-6">
-            <Button 
-              className="w-full"
-              onClick={handleSaveSettings}
-              disabled={!isInstagramConnected || !hasSettingsChanged()}
-            >
-              {!isInstagramConnected 
-                ? "인스타그램 연동 필요"
-                : !hasSettingsChanged()
-                ? "변경사항 없음"
-                : "설정 저장하기"}
-            </Button>
-          </CardFooter>
         </Card>
       </div>
       <Toaster />

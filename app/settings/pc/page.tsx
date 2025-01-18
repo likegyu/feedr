@@ -18,8 +18,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FeedSettings as FeedSettingsType } from '@/types/settings';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from '@/components/ui/card';
 
 const FeedSettings = () => {
   const { toast } = useToast();
@@ -269,26 +268,46 @@ const FeedSettings = () => {
     </div>
   );
 
-  if (!layoutSettings) {
-    return <SettingsSkeleton />;
+  // Preview 및 설정 UI 렌더링 조건부 처리
+  if (isLoading) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
+        <PreviewSkeleton />
+        <SettingsSkeleton />
+      </div>
+    );
   }
 
-  // Preview 및 설정 UI 렌더링
+  if (!layoutSettings) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex gap-2 items-center">
+              <Info className="h-4 w-4"/>
+              <p>설정을 불러오는 중에 문제가 발생했습니다.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
+      {isInstagramConnected === false && (
+        <div className="flex gap-2 items-center mb-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg">
+          <Info className="h-4 w-4"/> 설정을 저장하려면 먼저 인스타그램 계정을 연동해주세요.
+        </div>
+      )}
       <Card className="mb-8">
         <CardContent className="p-6">
-          <p className="text-sm text-gray-500 mb-4">
-            {layoutSettings.layout === 'carousel' 
-              ? '👉 옆으로 스크롤하여 더 많은 이미지를 확인해보세요' 
-              : '👉 화면의 가로 길이가 768px 이상이 되면 피드가 PC 레이아웃으로 보여요'
-            }
-          </p>
           {renderPreview()}
         </CardContent>
       </Card>
-
       <Card>
         <CardContent className="p-6 space-y-6">
           <div className="space-y-4">
@@ -382,21 +401,23 @@ const FeedSettings = () => {
                 }
               />
             </div>
+
+            {/* 저장 버튼 추가 */}
+            <div className="pt-4 border-t">
+              <Button 
+                className="w-full"
+                onClick={handleSaveSettings}
+                disabled={!isInstagramConnected || !hasSettingsChanged()}
+              >
+                {!isInstagramConnected 
+                  ? "인스타그램 연동 필요"
+                  : !hasSettingsChanged()
+                  ? "변경사항 없음"
+                  : "설정 저장하기"}
+              </Button>
+            </div>
           </div>
         </CardContent>
-        <CardFooter className="border-t p-6">
-          <Button 
-            className="w-full"
-            onClick={handleSaveSettings}
-            disabled={!isInstagramConnected || !hasSettingsChanged()}
-          >
-            {!isInstagramConnected 
-              ? "인스타그램 연동 필요"
-              : !hasSettingsChanged()
-              ? "변경사항 없음"
-              : "설정 저장하기"}
-          </Button>
-        </CardFooter>
       </Card>
       <Toaster />
     </div>
