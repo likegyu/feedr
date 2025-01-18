@@ -376,9 +376,11 @@
     // 필터 적용 후 격자 표시
     renderGrid(type) {
       const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
+      const maxItems = settings.columns * settings.rows; // 설정된 컬럼 * 로우
+      
       const filtered = this.mediaItems
         .filter(item => this.matchesFilter(item))
-        .slice(0, settings.columns * settings.rows);
+        .slice(0, maxItems);
 
       const itemsHtml = filtered
         .map(item => this.renderItem(item, type))
@@ -389,12 +391,14 @@
 
     // 필터 적용 후 캐러셀 표시
     renderCarousel(type) {
+      const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
+      const maxItems = settings.columns * 3; // 설정된 컬럼 수의 3배
+      
       const filtered = this.mediaItems
-        .filter(item => this.matchesFilter(item));
+        .filter(item => this.matchesFilter(item))
+        .slice(0, maxItems);
 
-      const itemsHtml = filtered
-        .map(item => this.renderItem(item, type))
-        .join('');
+      const itemsHtml = filtered.map(item => this.renderItem(item, type)).join('');
 
       return `
         <div class="embla-${type}-${this.mallId}">
