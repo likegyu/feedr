@@ -83,10 +83,15 @@
         }
         
         if (!this.container) return;
-
+        this.container.style.cssText = `
+        width: 100%;
+        margin: 0 auto 40px;
+        padding: 0 20px;
+      `;
         // 윈도우 리사이즈 이벤트 등록
         window.addEventListener('resize', this.handleResize);
         this.handleResize();
+        this.render(); // 명시적 초기 렌더링 호출
       } catch (error) {
         console.debug('Instagram Feed Error:', error);
       }
