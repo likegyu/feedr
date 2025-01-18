@@ -37,8 +37,8 @@
   }
 
   const MEDIA_ICONS = {
-    IMAGE: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`,
-    VIDEO: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-play"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg>`
+    IMAGE: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`,
+    VIDEO: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-play"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg>`
   };
 
   class InstagramFeed {
@@ -347,10 +347,17 @@
           overflow: hidden;
           position: relative;
           width: 100%;
+          will-change: transform;
+          -webkit-backface-visibility: hidden;
+          -webkit-perspective: 1000;
+          -webkit-transform: translate3d(0,0,0);
         }
         .embla-container-${type}-${this.mallId} {
           display: flex;
           gap: ${settings.gap}px;
+          padding: 0 ${settings.gap}px;
+          transform: translate3d(0,0,0);
+          will-change: transform;
           user-select: none;
         }
         .embla-container-${type}-${this.mallId} .feed-item-${type}-${this.mallId} {
