@@ -36,6 +36,11 @@
     });
   }
 
+  const MEDIA_ICONS = {
+    IMAGE: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="white"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>`,
+    VIDEO: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>`
+  };
+
   class InstagramFeed {
     constructor(mallId) {
       this.mallId = mallId;
@@ -114,15 +119,21 @@
       const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
       const newLayout = isMobile ? 'mobile' : 'pc';
       
+      // 레이아웃이 이미 렌더링되어 있지 않은 경우에만 최초 렌더링
+      if (!this.container.querySelector(`#instagram-feed-${newLayout}-${this.mallId}`)) {
+        this.render();
+        return;
+      }
+
+      // 레이아웃 전환은 CSS로만 처리
       if (this.currentLayout !== newLayout) {
         this.currentLayout = newLayout;
-        this.render();
       }
     }
 
     validateSettings(settings) {
       if (!settings) return false;
-      const required = ['layout', 'columns', 'rows', 'gap', 'borderRadius'];
+      const required = ['layout', 'columns', 'rows', 'gap', 'borderRadius', 'showMediaType'];
       return required.every(prop => settings.hasOwnProperty(prop));
     }
 
@@ -294,10 +305,20 @@
         ${this.generateStyles('pc')}
         ${this.generateStyles('mobile')}
         @media (max-width: ${MOBILE_BREAKPOINT - 1}px) {
-          #instagram-feed-pc-${this.mallId} { display: none; }
+          #instagram-feed-pc-${this.mallId} { 
+            display: none !important;
+          }
+          #instagram-feed-mobile-${this.mallId} {
+            display: block !important;
+          }
         }
         @media (min-width: ${MOBILE_BREAKPOINT}px) {
-          #instagram-feed-mobile-${this.mallId} { display: none; }
+          #instagram-feed-pc-${this.mallId} { 
+            display: block !important;
+          }
+          #instagram-feed-mobile-${this.mallId} {
+            display: none !important;
+          }
         }
       `;
     }
@@ -336,6 +357,15 @@
         .embla-container-${type}-${this.mallId} .feed-item-${type}-${this.mallId} {
           flex: 0 0 ${100 / settings.columns}%;
           min-width: 0;
+        }
+        .media-type-icon-${type}-${this.mallId} {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: rgba(0, 0, 0, 0.5);
+          border-radius: 4px;
+          padding: 4px;
+          z-index: 2;
         }
       `;
     }
@@ -429,20 +459,23 @@
 
     // 미디어 단위 렌더링
     renderItem(item, type) {
+      const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
+      const mediaType = item.media_type === 'VIDEO' ? 'VIDEO' : 'IMAGE';
+      
       return `
         <div class="feed-item-${type}-${this.mallId}">
-          <a 
-            href="${item.permalink}" 
-            target="_blank"
-            rel="noopener noreferrer"
-            style="display: block; width: 100%; height: 100%;"
-          >
+          <a href="${item.permalink}" target="_blank" rel="noopener noreferrer">
             <img 
-              src="${item.display_url}" 
+              src="${mediaType === 'VIDEO' ? item.thumbnail_url : item.media_url}" 
               alt="${item.caption || ''}"
               loading="lazy"
               style="width: 100%; height: 100%; object-fit: cover;"
             >
+            ${settings.showMediaType ? `
+              <div class="media-type-icon-${type}-${this.mallId}">
+                ${MEDIA_ICONS[mediaType]}
+              </div>
+            ` : ''}
           </a>
         </div>
       `;
