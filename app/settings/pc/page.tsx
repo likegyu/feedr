@@ -269,148 +269,135 @@ const FeedSettings = () => {
     </div>
   );
 
-  // Preview 및 설정 UI 렌더링 조건부 처리
-  if (isLoading || !layoutSettings) {
-    return (
-      <div>
-        <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
-        <PreviewSkeleton />
-        <SettingsSkeleton />
-      </div>
-    );
+  if (!layoutSettings) {
+    return <SettingsSkeleton />;
   }
 
-  if (!isInstagramConnected) {
-    return (
-      <div>
-        <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
-        <Card>
-          <CardContent className='p-6 pt-6'>
-            <Alert>
-              <AlertDescription className="flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                레이아웃 설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
+  // Preview 및 설정 UI 렌더링
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
-      {renderPreview()}
-      <div className="bg-white p-6 rounded-lg shadow space-y-6">
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="layout">레이아웃 스타일</Label>
-            <Select
-              value={layoutSettings.layout}
-              onValueChange={(value) => handleSettingChange('layout', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="레이아웃 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="grid">그리드</SelectItem>
-                <SelectItem value="carousel">캐러셀</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      <Card className="mb-8">
+        <CardContent className="p-6">
+          <p className="text-sm text-gray-500 mb-4">
+            {layoutSettings.layout === 'carousel' 
+              ? '👉 옆으로 스크롤하여 더 많은 이미지를 확인해보세요' 
+              : '👉 화면의 가로 길이가 768px 이상이 되면 피드가 PC 레이아웃으로 보여요'
+            }
+          </p>
+          {renderPreview()}
+        </CardContent>
+      </Card>
 
-          <div>
-            <Label>컬럼 수</Label>
-            <Slider
-              value={[layoutSettings.columns]}
-              min={1}
-              max={6}
-              step={1}
-              onValueChange={([value]) => handleSettingChange('columns', value)}
-            />
-            <span className="text-sm text-gray-500">
-              {layoutSettings.columns}개
-            </span>
-          </div>
-
-          {/* 그리드 레이아웃일 때만 로우 수 설정 표시 */}
-          {layoutSettings.layout === 'grid' && (
+      <Card>
+        <CardContent className="p-6 space-y-6">
+          <div className="space-y-4">
             <div>
-              <Label>로우 수</Label>
+              <Label htmlFor="layout">레이아웃 스타일</Label>
+              <Select
+                value={layoutSettings.layout}
+                onValueChange={(value) => handleSettingChange('layout', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="레이아웃 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="grid">그리드</SelectItem>
+                  <SelectItem value="carousel">캐러셀</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label>컬럼 수</Label>
               <Slider
-                value={[layoutSettings.rows]}
+                value={[layoutSettings.columns]}
                 min={1}
-                max={4}
+                max={6}
                 step={1}
-                onValueChange={([value]) => handleSettingChange('rows', value)}
+                onValueChange={([value]) => handleSettingChange('columns', value)}
               />
               <span className="text-sm text-gray-500">
-                {layoutSettings.rows}줄
+                {layoutSettings.columns}개
               </span>
             </div>
-          )}
 
-          <div>
-            <Label>이미지 간격</Label>
-            <Slider
-              value={[layoutSettings.gap]}
-              min={0}
-              max={40}
-              step={4}
-              onValueChange={([value]) => handleSettingChange('gap', value)}
-            />
-            <span className="text-sm text-gray-500">
-              {layoutSettings.gap}px
-            </span>
-          </div>
-
-          <div>
-            <Label>모서리 둥글기</Label>
-            <Slider
-              value={[layoutSettings.borderRadius]}
-              min={0}
-              max={24}
-              step={2}
-              onValueChange={([value]) => handleSettingChange('borderRadius', value)}
-            />
-            <span className="text-sm text-gray-500">
-              {layoutSettings.borderRadius}px
-            </span>
-          </div>
-
-          {/* 미디어 타입 표시 설정 추가 */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>미디어 타입 표시</Label>
-              <div className="text-sm text-gray-500">
-                사진/영상 아이콘을 썸네일에 표시합니다
+            {/* 그리드 레이아웃일 때만 로우 수 설정 표시 */}
+            {layoutSettings.layout === 'grid' && (
+              <div>
+                <Label>로우 수</Label>
+                <Slider
+                  value={[layoutSettings.rows]}
+                  min={1}
+                  max={4}
+                  step={1}
+                  onValueChange={([value]) => handleSettingChange('rows', value)}
+                />
+                <span className="text-sm text-gray-500">
+                  {layoutSettings.rows}줄
+                </span>
               </div>
-            </div>
-            <Switch
-              checked={layoutSettings.showMediaType}
-              onCheckedChange={(checked) => 
-                handleSettingChange('showMediaType', checked)
-              }
-            />
-          </div>
+            )}
 
-          {/* 저장 버튼 추가 */}
-          <div className="pt-4 border-t">
-            <Button 
-              className="w-full"
-              onClick={handleSaveSettings}
-              disabled={!isInstagramConnected || !hasSettingsChanged()}
-            >
-              {!isInstagramConnected 
-                ? "인스타그램 연동 필요"
-                : !hasSettingsChanged()
-                ? "변경사항 없음"
-                : "설정 저장하기"}
-            </Button>
+            <div>
+              <Label>이미지 간격</Label>
+              <Slider
+                value={[layoutSettings.gap]}
+                min={0}
+                max={40}
+                step={4}
+                onValueChange={([value]) => handleSettingChange('gap', value)}
+              />
+              <span className="text-sm text-gray-500">
+                {layoutSettings.gap}px
+              </span>
+            </div>
+
+            <div>
+              <Label>모서리 둥글기</Label>
+              <Slider
+                value={[layoutSettings.borderRadius]}
+                min={0}
+                max={24}
+                step={2}
+                onValueChange={([value]) => handleSettingChange('borderRadius', value)}
+              />
+              <span className="text-sm text-gray-500">
+                {layoutSettings.borderRadius}px
+              </span>
+            </div>
+
+            {/* 미디어 타입 표시 설정 추가 */}
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>미디어 타입 표시</Label>
+                <div className="text-sm text-gray-500">
+                  사진/영상 아이콘을 썸네일에 표시합니다
+                </div>
+              </div>
+              <Switch
+                checked={layoutSettings.showMediaType}
+                onCheckedChange={(checked) => 
+                  handleSettingChange('showMediaType', checked)
+                }
+              />
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+        <CardFooter className="border-t p-6">
+          <Button 
+            className="w-full"
+            onClick={handleSaveSettings}
+            disabled={!isInstagramConnected || !hasSettingsChanged()}
+          >
+            {!isInstagramConnected 
+              ? "인스타그램 연동 필요"
+              : !hasSettingsChanged()
+              ? "변경사항 없음"
+              : "설정 저장하기"}
+          </Button>
+        </CardFooter>
+      </Card>
       <Toaster />
     </div>
   );
