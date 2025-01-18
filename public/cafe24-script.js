@@ -1,318 +1,13 @@
-(function() {
-  const MOBILE_BREAKPOINT = 768;
-  const CACHE_DURATION = 1000 * 60 * 1;
-  const EMBLA_CDN = 'https://unpkg.com/embla-carousel/embla-carousel.umd.js';
-  const RESIZE_THROTTLE = 250;
-
-  // resize 함수 스로틀링
-  function throttle(func, limit) {
-    let inThrottle;
-    return function(...args) {
-      if (!inThrottle) {
-        func.apply(this, args);
-        inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
-      }
-    }
-  }
-
-  // 캐시 키 생성
-  const getCacheKey = (mallId, type) => `instagram_feed_cache_${mallId}_${type}`;
-
-  // CAFE24API 로드 최적화
-  function waitForCAFE24API(timeout = 5000) {
-    return new Promise((resolve, reject) => {
-      // 이미 로드된 경우
-      if (window.CAFE24API) {
-        return resolve(window.CAFE24API);
-      }
-
-      // 스크립트 로드 실패 처리
-      const timeoutId = setTimeout(() => {
-        reject(new Error('CAFE24API 로드 타임아웃'));
-      }, timeout);
-
-      // CAFE24API 로드 감지
-      const observer = new MutationObserver((mutations, obs) => {
-        if (window.CAFE24API) {
-          clearTimeout(timeoutId);
-          obs.disconnect();
-          resolve(window.CAFE24API);
-        }
-      });
-
-      observer.observe(document, {
-        childList: true,
-        subtree: true
-      });
-    });
-  }
-
-  const MEDIA_ICONS = {
-    IMAGE: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`,
-    VIDEO: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-play"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg>`
-  };
-
-  class InstagramFeed {
-    constructor(mallId) {
-      this.mallId = mallId;
-      this.apiEndpoint = 'https://cithmb.vercel.app/api/cafe24-script/get';
-      this.container = null;
-      this.pcSettings = null;
-      this.mobileSettings = null;
-      this.mediaItems = [];
-      this.feedFilter = 'all';
-      this.currentLayout = null;
-      this.handleResize = throttle(this.handleResize.bind(this), RESIZE_THROTTLE);
-      this.insertType = null; // 'auto' | 'manual'
-      this.init();
-    }
-
-    // 초기화
-    async init() {
-      try {
-        console.debug('Init start');
-        await this.loadSettings();
-        console.debug('Settings loaded:', {
-          insertType: this.insertType,
-          pcSettings: !!this.pcSettings,
-          mobileSettings: !!this.mobileSettings
-        });
-
-        // manual 모드일 때는 div#instagram-feed를 찾아서 없으면 종료
-        if (this.insertType === 'manual') {
-          this.container = document.getElementById('instagram-feed');
-          if (!this.container) {
-            console.debug('Manual mode: Container not found, stopping init');
-            return;
-          }
-        } else {
-          // auto 모드일 때만 container 생성
-          this.createContainer();
-          if (!this.container) {
-            console.debug('Auto mode: Container creation failed, stopping init');
-            return;
-          }
-        }
-
-        this.container.style.cssText = `
+!function(){let e=(e,t)=>`instagram_feed_cache_${e}_${t}`,t={IMAGE:'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>',VIDEO:'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-play"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg>'};class i{constructor(e){var t;this.mallId=e,this.apiEndpoint="https://cithmb.vercel.app/api/cafe24-script/get",this.container=null,this.pcSettings=null,this.mobileSettings=null,this.mediaItems=[],this.feedFilter="all",this.currentLayout=null;let i;this.handleResize=(t=this.handleResize.bind(this),function(...e){i||(t.apply(this,e),i=!0,setTimeout(()=>i=!1,250))}),this.insertType=null,this.init()}async init(){try{if(console.debug("Init start"),await this.loadSettings(),console.debug("Settings loaded:",{insertType:this.insertType,pcSettings:!!this.pcSettings,mobileSettings:!!this.mobileSettings}),"manual"===this.insertType){if(this.container=document.getElementById("instagram-feed"),!this.container){console.debug("Manual mode: Container not found, stopping init");return}}else if(this.createContainer(),!this.container){console.debug("Auto mode: Container creation failed, stopping init");return}this.container.style.cssText=`
           width: 100%;
           margin: 40px 0 40px 0;
-        `;
-
-        window.addEventListener('resize', this.handleResize);
-        this.handleResize();
-        await this.render(); // await 추가
-      } catch (error) {
-        console.error('Instagram Feed Error:', error);
-      }
-    }
-
-    createContainer() {
-      // insertType 체크 제거 (이미 init에서 체크함)
-      const footer = document.querySelector('#footer');
-      if (!footer) return;
-
-      this.container = document.createElement('div');
-      this.container.id = 'instagram-feed';
-      this.container.style.cssText = `
+        `,window.addEventListener("resize",this.handleResize),this.handleResize(),await this.render()}catch(e){console.error("Instagram Feed Error:",e)}}createContainer(){let e=document.querySelector("#footer");e&&(this.container=document.createElement("div"),this.container.id="instagram-feed",this.container.style.cssText=`
         width: 100%;
         margin: 40px 0 40px 0;
-      `;
-
-      footer.parentNode.insertBefore(this.container, footer);
-    }
-
-    handleResize() {
-      const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
-      const newLayout = isMobile ? 'mobile' : 'pc';
-      
-      // 레이아웃이 이미 렌더링되어 있지 않은 경우에만 최초 렌더링
-      if (!this.container.querySelector(`#instagram-feed-${newLayout}-${this.mallId}`)) {
-        this.render();
-        return;
-      }
-
-      // 레이아웃 전환은 CSS로만 처리
-      if (this.currentLayout !== newLayout) {
-        this.currentLayout = newLayout;
-      }
-    }
-
-    validateSettings(settings) {
-      if (!settings) return false;
-      const required = ['layout', 'columns', 'rows', 'gap', 'borderRadius', 'showMediaType'];
-      return required.every(prop => settings.hasOwnProperty(prop));
-    }
-
-    getCache(type) {
-      try {
-        const cached = localStorage.getItem(getCacheKey(this.mallId, type));
-        if (!cached) return null;
-
-        const { timestamp, data } = JSON.parse(cached);
-        if (!data || !this.validateSettings(data.settings)) {
-          localStorage.removeItem(getCacheKey(this.mallId, type));
-          return null;
-        }
-        if (Date.now() - timestamp > CACHE_DURATION) {
-          localStorage.removeItem(getCacheKey(this.mallId, type));
-          return null;
-        }
-        return data;
-      } catch (error) {
-        console.debug('Cache read error:', error);
-        return null;
-      }
-    }
-
-    setCache(type, data) {
-      localStorage.setItem(getCacheKey(this.mallId, type), JSON.stringify({
-        timestamp: Date.now(),
-        data: {
-          ...data,
-          insertType: this.insertType // insertType 추가
-        }
-      }));
-    }
-
-    // PC/모바일 설정 및 미디어 필터 로드
-    async loadSettings() {
-      const cached = {
-        pc: this.getCache('pc'),
-        mobile: this.getCache('mobile')
-      };
-
-      // 캐시에 PC/모바일 설정 있으면
-      if (cached.pc && cached.mobile) {
-        this.pcSettings = cached.pc.settings;
-        this.mobileSettings = cached.mobile.settings;
-        this.mediaItems = cached.pc.mediaItems;
-        this.insertType = cached.pc.insertType; // insertType 불러오기
-        if (cached.pc.feedFilter) {
-          this.feedFilter = cached.pc.feedFilter;
-        }
-        await this.loadEmblaIfNeeded();
-        return;
-      }
-
-      // 없으면 새로 요청
-      await this.loadFreshData();
-    }
-
-    async loadFreshData() {
-      try {
-        const response = await fetch(`${this.apiEndpoint}?mallId=${this.mallId}`);
-        if (!response.ok) throw new Error('API 응답 실패');
-        
-        const data = await response.json();
-        
-        // 삽입 타입 설정 추가
-        this.insertType = data.insert_type || 'auto';
-
-        // PC/모바일 레이아웃 설정 검증
-        if (!this.validateSettings(data.pc_feed_settings) || 
-            !this.validateSettings(data.mobile_feed_settings)) {
-          throw new Error('설정 포맷 오류');
-        }
-        this.pcSettings = data.pc_feed_settings;
-        this.mobileSettings = data.mobile_feed_settings;
-
-        // feed_filter(예: 'all', 'image', 'video') 받기. 없으면 'all'로 기본값
-        if (data.feed_filter) {
-          this.feedFilter = data.feed_filter;
-        }
-
-        // 인스타그램 미디어
-        if (data.instagram_access_token) {
-          const mediaResponse = await this.fetchInstagramMedia(data.instagram_access_token);
-          this.mediaItems = (mediaResponse.data || []).filter(item => !!item.media_url);
-        }
-
-        // 캐시에 저장
-        this.setCache('pc', {
-          settings: this.pcSettings,
-          mediaItems: this.mediaItems,
-          feedFilter: this.feedFilter
-        });
-        this.setCache('mobile', {
-          settings: this.mobileSettings,
-          mediaItems: this.mediaItems,
-          feedFilter: this.feedFilter
-        });
-
-        // 캐러셀이 필요한지 확인 후 로드
-        await this.loadEmblaIfNeeded();
-        this.render();
-      } catch (error) {
-        console.debug('Data Load Error:', error);
-
-        // 폴백: 캐시 사용
-        const cached = {
-          pc: this.getCache('pc'),
-          mobile: this.getCache('mobile')
-        };
-        if (cached.pc && cached.mobile) {
-          this.pcSettings = cached.pc.settings;
-          this.mobileSettings = cached.mobile.settings;
-          this.mediaItems = cached.pc.mediaItems;
-          this.feedFilter = cached.pc.feedFilter || 'all';
-          this.render();
-        }
-      }
-    }
-
-    // Embla 캐러셀 외부 스크립트 로드
-    async loadEmblaIfNeeded() {
-      if (this.pcSettings?.layout === 'carousel' || 
-          this.mobileSettings?.layout === 'carousel') {
-        return new Promise((resolve, reject) => {
-          if (window.EmblaCarousel) return resolve();
-          
-          const script = document.createElement('script');
-          script.src = EMBLA_CDN;
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
-    }
-
-    // 인스타그램 미디어 API
-    async fetchInstagramMedia(token) {
-      const endpoint = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}`;
-      try {
-        const response = await fetch(endpoint);
-        if (!response.ok) throw new Error('Instagram API 요청 실패');
-        const data = await response.json();
-        return {
-          ...data,
-          data: data.data.map(item => ({
-            ...item,
-            display_url: item.thumbnail_url || item.media_url
-          }))
-        };
-      } catch (error) {
-        console.debug('Instagram API Error:', error);
-        return { data: [] };
-      }
-    }
-
-    // PC/모바일 각각 스타일 삽입
-    injectStyles() {
-      const styleId = `instagram-feed-styles-${this.mallId}`;
-      let styleTag = document.getElementById(styleId);
-      
-      if (!styleTag) {
-        styleTag = document.createElement('style');
-        styleTag.id = styleId;
-        document.head.appendChild(styleTag);
-      }
-
-      styleTag.textContent = `
-        ${this.generateStyles('pc')}
-        ${this.generateStyles('mobile')}
-        @media (max-width: ${MOBILE_BREAKPOINT - 1}px) {
+      `,e.parentNode.insertBefore(this.container,e))}handleResize(){let e=window.innerWidth<768,t=e?"mobile":"pc";if(!this.container.querySelector(`#instagram-feed-${t}-${this.mallId}`)){this.render();return}this.currentLayout!==t&&(this.currentLayout=t)}validateSettings(e){return!!e&&["layout","columns","rows","gap","borderRadius","showMediaType"].every(t=>e.hasOwnProperty(t))}getCache(t){try{let i=localStorage.getItem(e(this.mallId,t));if(!i)return null;let{timestamp:s,data:a}=JSON.parse(i);if(!a||!this.validateSettings(a.settings)||Date.now()-s>6e4)return localStorage.removeItem(e(this.mallId,t)),null;return a}catch(r){return console.debug("Cache read error:",r),null}}setCache(t,i){localStorage.setItem(e(this.mallId,t),JSON.stringify({timestamp:Date.now(),data:{...i,insertType:this.insertType}}))}async loadSettings(){let e={pc:this.getCache("pc"),mobile:this.getCache("mobile")};if(e.pc&&e.mobile){this.pcSettings=e.pc.settings,this.mobileSettings=e.mobile.settings,this.mediaItems=e.pc.mediaItems,this.insertType=e.pc.insertType,e.pc.feedFilter&&(this.feedFilter=e.pc.feedFilter),await this.loadEmblaIfNeeded();return}await this.loadFreshData()}async loadFreshData(){try{let e=await fetch(`${this.apiEndpoint}?mallId=${this.mallId}`);if(!e.ok)throw Error("API 응답 실패");let t=await e.json();if(this.insertType=t.insert_type||"auto",!this.validateSettings(t.pc_feed_settings)||!this.validateSettings(t.mobile_feed_settings))throw Error("설정 포맷 오류");if(this.pcSettings=t.pc_feed_settings,this.mobileSettings=t.mobile_feed_settings,t.feed_filter&&(this.feedFilter=t.feed_filter),t.instagram_access_token){let i=await this.fetchInstagramMedia(t.instagram_access_token);this.mediaItems=(i.data||[]).filter(e=>!!e.media_url)}this.setCache("pc",{settings:this.pcSettings,mediaItems:this.mediaItems,feedFilter:this.feedFilter}),this.setCache("mobile",{settings:this.mobileSettings,mediaItems:this.mediaItems,feedFilter:this.feedFilter}),await this.loadEmblaIfNeeded(),this.render()}catch(s){console.debug("Data Load Error:",s);let a={pc:this.getCache("pc"),mobile:this.getCache("mobile")};a.pc&&a.mobile&&(this.pcSettings=a.pc.settings,this.mobileSettings=a.mobile.settings,this.mediaItems=a.pc.mediaItems,this.feedFilter=a.pc.feedFilter||"all",this.render())}}async loadEmblaIfNeeded(){if(this.pcSettings?.layout==="carousel"||this.mobileSettings?.layout==="carousel")return new Promise((e,t)=>{if(window.EmblaCarousel)return e();let i=document.createElement("script");i.src="https://unpkg.com/embla-carousel/embla-carousel.umd.js",i.onload=e,i.onerror=t,document.head.appendChild(i)})}async fetchInstagramMedia(e){let t=`https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${e}`;try{let i=await fetch(t);if(!i.ok)throw Error("Instagram API 요청 실패");let s=await i.json();return{...s,data:s.data.map(e=>({...e,display_url:e.thumbnail_url||e.media_url}))}}catch(a){return console.debug("Instagram API Error:",a),{data:[]}}}injectStyles(){let e=`instagram-feed-styles-${this.mallId}`,t=document.getElementById(e);t||((t=document.createElement("style")).id=e,document.head.appendChild(t)),t.textContent=`
+        ${this.generateStyles("pc")}
+        ${this.generateStyles("mobile")}
+        @media (max-width: 767px) {
           #instagram-feed-pc-${this.mallId} { 
             display: none !important;
           }
@@ -320,7 +15,7 @@
             display: block !important;
           }
         }
-        @media (min-width: ${MOBILE_BREAKPOINT}px) {
+        @media (min-width: 768px) {
           #instagram-feed-pc-${this.mallId} { 
             display: block !important;
           }
@@ -328,30 +23,23 @@
             display: none !important;
           }
         }
-      `;
-    }
-
-    generateStyles(type) {
-      const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
-      if (!settings) return '';
-    
-      return `
-        #instagram-feed-${type}-${this.mallId} {
+      `}generateStyles(e){let t="mobile"===e?this.mobileSettings:this.pcSettings;return t?`
+        #instagram-feed-${e}-${this.mallId} {
           width: 100%;
           overflow: hidden;
         }
-        .feed-grid-${type}-${this.mallId} {
+        .feed-grid-${e}-${this.mallId} {
           display: grid;
-          grid-template-columns: repeat(${settings.columns}, 1fr);
-          gap: ${settings.gap}px;
+          grid-template-columns: repeat(${t.columns}, 1fr);
+          gap: ${t.gap}px;
         }
-        .feed-item-${type}-${this.mallId} {
+        .feed-item-${e}-${this.mallId} {
           position: relative;
-          border-radius: ${settings.borderRadius}px;
+          border-radius: ${t.borderRadius}px;
           overflow: hidden;
           width: 100%;
         }
-        .embla-${type}-${this.mallId} {
+        .embla-${e}-${this.mallId} {
           overflow: hidden;
           position: relative;
           width: 100%;
@@ -360,19 +48,19 @@
           -webkit-perspective: 1000;
           -webkit-transform: translate3d(0,0,0);
         }
-        .embla-container-${type}-${this.mallId} {
+        .embla-container-${e}-${this.mallId} {
           display: flex;
-          gap: ${settings.gap}px;
-          padding: 0 ${settings.gap}px;
+          gap: ${t.gap}px;
+          padding: 0 ${t.gap}px;
           transform: translate3d(0,0,0);
           will-change: transform;
           user-select: none;
         }
-        .embla-container-${type}-${this.mallId} .feed-item-${type}-${this.mallId} {
-          width: ${100 / settings.columns}%;
+        .embla-container-${e}-${this.mallId} .feed-item-${e}-${this.mallId} {
+          width: ${100/t.columns}%;
           flex-shrink: 0;
         }
-        .media-type-icon-${type}-${this.mallId} {
+        .media-type-icon-${e}-${this.mallId} {
           position: absolute;
           top: 8px;
           right: 8px;
@@ -380,173 +68,33 @@
           z-index: 2;
           color: black;
         }
-      `;
-    }
-
-    // 뷰포트에 따라 PC/모바일 레이아웃 렌더
-    async render() {
-      console.debug('Render start', {
-        container: !!this.container,
-        pcSettings: !!this.pcSettings,
-        mobileSettings: !!this.mobileSettings,
-        mediaItems: this.mediaItems.length
-      });
-
-      if (!this.container || !this.pcSettings || !this.mobileSettings) {
-        console.debug('Render requirements not met');
-        return;
-      }
-
-      await this.loadEmblaIfNeeded();
-      this.injectStyles();
-      
-      this.container.innerHTML = `
+      `:""}async render(){if(console.debug("Render start",{container:!!this.container,pcSettings:!!this.pcSettings,mobileSettings:!!this.mobileSettings,mediaItems:this.mediaItems.length}),!this.container||!this.pcSettings||!this.mobileSettings){console.debug("Render requirements not met");return}await this.loadEmblaIfNeeded(),this.injectStyles(),this.container.innerHTML=`
         <div id="instagram-feed-pc-${this.mallId}">
-          ${this.renderLayout('pc')}
+          ${this.renderLayout("pc")}
         </div>
         <div id="instagram-feed-mobile-${this.mallId}">
-          ${this.renderLayout('mobile')}
+          ${this.renderLayout("mobile")}
         </div>
-      `;
-
-      this.initCarousels();
-    }
-
-    // PC/모바일 레이아웃 분기
-    renderLayout(type) {
-      const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
-      return settings.layout === 'carousel' 
-        ? this.renderCarousel(type) 
-        : this.renderGrid(type);
-    }
-
-    // 필터 적용 후 격자 표시
-    renderGrid(type) {
-      const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
-      const maxItems = settings.columns * settings.rows; // 설정된 컬럼 * 로우
-      
-      const filtered = this.mediaItems
-        .filter(item => this.matchesFilter(item))
-        .slice(0, maxItems);
-
-      const itemsHtml = filtered
-        .map(item => this.renderItem(item, type))
-        .join('');
-
-      return `<div class="feed-grid-${type}-${this.mallId}">${itemsHtml}</div>`;
-    }
-
-    // 필터 적용 후 캐러셀 표시
-    renderCarousel(type) {
-      const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
-      const maxItems = settings.columns * 3; // 설정된 컬럼 수의 3배
-      
-      const filtered = this.mediaItems
-        .filter(item => this.matchesFilter(item))
-        .slice(0, maxItems);
-
-      const itemsHtml = filtered.map(item => this.renderItem(item, type)).join('');
-
-      return `
-        <div class="embla-${type}-${this.mallId}">
-          <div class="embla-container-${type}-${this.mallId}">
-            ${itemsHtml}
+      `,this.initCarousels()}renderLayout(e){let t="mobile"===e?this.mobileSettings:this.pcSettings;return"carousel"===t.layout?this.renderCarousel(e):this.renderGrid(e)}renderGrid(e){let t="mobile"===e?this.mobileSettings:this.pcSettings,i=t.columns*t.rows,s=this.mediaItems.filter(e=>this.matchesFilter(e)).slice(0,i),a=s.map(t=>this.renderItem(t,e)).join("");return`<div class="feed-grid-${e}-${this.mallId}">${a}</div>`}renderCarousel(e){let t="mobile"===e?this.mobileSettings:this.pcSettings,i=3*t.columns,s=this.mediaItems.filter(e=>this.matchesFilter(e)).slice(0,i),a=s.map(t=>this.renderItem(t,e)).join("");return`
+        <div class="embla-${e}-${this.mallId}">
+          <div class="embla-container-${e}-${this.mallId}">
+            ${a}
           </div>
         </div>
-      `;
-    }
-
-    // 필터 로직
-    matchesFilter(item) {
-      if (this.feedFilter === 'all') {
-        return true;
-      } else if (this.feedFilter === 'image') {
-        // 이미지(CAROUSEL_ALBUM 포함), 동영상은 제외
-        return item.media_type === 'IMAGE' || item.media_type === 'CAROUSEL_ALBUM';
-      } else if (this.feedFilter === 'video') {
-        // 동영상만 표시
-        return item.media_type === 'VIDEO';
-      }
-      return true;
-    }
-
-    // 미디어 단위 렌더링
-    renderItem(item, type) {
-      const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
-      const mediaType = item.media_type === 'VIDEO' ? 'VIDEO' : 'IMAGE';
-      
-      return `
-        <div class="feed-item-${type}-${this.mallId}">
-          <a href="${item.permalink}" target="_blank" rel="noopener noreferrer">
+      `}matchesFilter(e){if("all"===this.feedFilter);else if("image"===this.feedFilter)return"IMAGE"===e.media_type||"CAROUSEL_ALBUM"===e.media_type;else if("video"===this.feedFilter)return"VIDEO"===e.media_type;return!0}renderItem(e,i){let s="mobile"===i?this.mobileSettings:this.pcSettings,a="VIDEO"===e.media_type?"VIDEO":"IMAGE";return`
+        <div class="feed-item-${i}-${this.mallId}">
+          <a href="${e.permalink}" target="_blank" rel="noopener noreferrer">
             <img 
-              src="${mediaType === 'VIDEO' ? item.thumbnail_url : item.media_url}" 
-              alt="${item.caption || ''}"
+              src="${"VIDEO"===a?e.thumbnail_url:e.media_url}" 
+              alt="${e.caption||""}"
               loading="lazy"
               style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1;"
             >
-            ${settings.showMediaType ? `
-              <div class="media-type-icon-${type}-${this.mallId}">
-                ${MEDIA_ICONS[mediaType]}
+            ${s.showMediaType?`
+              <div class="media-type-icon-${i}-${this.mallId}">
+                ${t[a]}
               </div>
-            ` : ''}
+            `:""}
           </a>
         </div>
-      `;
-    }
-
-    // 캐러셀 초기화
-    initCarousels() {
-      // DOM 업데이트를 위한 지연
-      setTimeout(() => {
-        ['pc', 'mobile'].forEach(type => {
-          const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
-          if (settings.layout !== 'carousel') return;
-    
-          const element = this.container.querySelector(`.embla-${type}-${this.mallId}`);
-          if (!element || !window.EmblaCarousel) return;
-    
-          // 기존 캐러셀이 있으면 제거
-          if (element.embla) {
-            element.embla.destroy();
-          }
-    
-          // 캐러셀 초기화 전 스타일 강제 적용
-          const container = element.querySelector(`.embla-container-${type}-${this.mallId}`);
-          if (container) {
-            container.style.display = 'flex';
-          }
-    
-          const embla = new window.EmblaCarousel(element, {
-            align: 'center',
-            containScroll: 'keepSnaps',
-            dragFree: false,
-            loop: true,
-            skipSnaps: true,
-            direction: 'ltr',
-            inViewThreshold: 0.7
-          });
-    
-          element.embla = embla;
-        });
-      }, 100); // 100ms 지연
-    }
-  }
-
-  // 초기화 함수
-  async function initialize() {
-    try {
-      const CAFE24API = await waitForCAFE24API();
-      const mallId = CAFE24API.MALL_ID;
-      new InstagramFeed(mallId);
-    } catch (error) {
-      console.error('초기화 실패:', error);
-    }
-  }
-
-  // DOM 로드 후 실행
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initialize);
-  } else {
-    initialize();
-  }
-})();
+      `}initCarousels(){setTimeout(()=>{["pc","mobile"].forEach(e=>{let t="mobile"===e?this.mobileSettings:this.pcSettings;if("carousel"!==t.layout)return;let i=this.container.querySelector(`.embla-${e}-${this.mallId}`);if(!i||!window.EmblaCarousel)return;i.embla&&i.embla.destroy();let s=i.querySelector(`.embla-container-${e}-${this.mallId}`);s&&(s.style.display="flex");let a=new window.EmblaCarousel(i,{align:"center",containScroll:"keepSnaps",dragFree:!1,loop:!0,skipSnaps:!0,direction:"ltr",inViewThreshold:.7});i.embla=a})},100)}}async function s(){try{let e=await function e(t=5e3){return new Promise((e,i)=>{if(window.CAFE24API)return e(window.CAFE24API);let s=setTimeout(()=>{i(Error("CAFE24API 로드 타임아웃"))},t),a=new MutationObserver((t,i)=>{window.CAFE24API&&(clearTimeout(s),i.disconnect(),e(window.CAFE24API))});a.observe(document,{childList:!0,subtree:!0})})}(),t=e.MALL_ID;new i(t)}catch(s){console.error("초기화 실패:",s)}}"loading"===document.readyState?document.addEventListener("DOMContentLoaded",s):s()}();
