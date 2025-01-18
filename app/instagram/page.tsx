@@ -142,6 +142,7 @@ const InstagramConnect = () => {
     }
   };
 
+  // 배포 타입 변경 시 로직 개선
   const updateInsertType = async (newType: 'auto' | 'manual') => {
     try {
       setIsUpdatingType(true);
@@ -157,20 +158,24 @@ const InstagramConnect = () => {
       const data = await response.json();
       
       if (response.ok && data.success) {
-        // 배포 타입과 상태를 동시에 업데이트
+        // 자동 -> 수동으로 변경 시: 스크립트 상태 유지
+        // 수동 -> 자동으로 변경 시: 스크립트 상태 false로 변경
+        setStatus(prev => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            insertType: newType,
+            hasScriptTag: newType === 'manual' ? prev.hasScriptTag : false
+          };
+        });
         setDeployType(newType);
-        setStatus(prev => prev ? {
-          ...prev,
-          insertType: newType,
-          hasScriptTag: newType === 'auto' ? false : prev.hasScriptTag
-        } : null);
+        setTempDeployType(newType);
       } else {
         throw new Error(data.error || '배포 방식 변경에 실패했습니다.');
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : '배포 방식 변경 중 오류가 발생했습니다.');
       console.error('배포 방식 변경 중 오류:', error);
-      // 에러 발생 시 이전 상태로 복구
       setTempDeployType(deployType);
     } finally {
       setIsUpdatingType(false);
@@ -218,6 +223,23 @@ const InstagramConnect = () => {
     checkInstagramStatus();
   }, [checkInstagramStatus]);
 
+  // 자동 배포 버튼 활성화 조건 함수
+  const canDeployFeed = () => {
+    if (!status?.isConnected) return false;
+    if (isDeploying) return false;
+    if (showTokenAlert) return false;
+    // 배포 방식이 auto가 아닌 경우 배포 불가
+    if (status.insertType !== 'auto') return false;
+    return true;
+  };
+
+  // 피드 배포 버튼 텍스트
+  const getDeployButtonText = () => {
+    if (isDeploying) return "배포 중...";
+    if (status?.insertType !== 'auto') return "자동 배포로 변경 필요";
+    return status?.hasScriptTag ? "다시 배포하기" : "피드 배포하기";
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold mb-4">Instagram 연동</h2>
@@ -262,20 +284,12 @@ const InstagramConnect = () => {
                   </p>
                 </AlertDescription>
               </Alert>
-              <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  onClick={() => checkInstagramStatus()}
-                >
-                  상태 새로고침
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={disconnectInstagram}
-                >
-                  연동 해제
-                </Button>
-              </div>
+              <Button
+                variant="destructive"
+                onClick={disconnectInstagram}
+              >
+                연동 해제
+              </Button>
             </div>
           ) : (
             <>
@@ -322,14 +336,14 @@ const InstagramConnect = () => {
                     <SelectItem value="manual">수동 배포</SelectItem>
                   </SelectContent>
                 </Select>
-                {tempDeployType !== deployType && (
+                {tempDeployType !== status.insertType && (
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-2">
                     <Button
                       variant="default"
                       size="sm"
                       className="w-full sm:w-auto"
                       onClick={() => updateInsertType(tempDeployType)}
-                      disabled={isUpdatingType || tempDeployType === status?.insertType}
+                      disabled={isUpdatingType}
                     >
                       {isUpdatingType ? "변경 중..." : "변경 적용"}
                     </Button>
@@ -337,7 +351,7 @@ const InstagramConnect = () => {
                       variant="outline"
                       size="sm"
                       className="w-full sm:w-auto"
-                      onClick={() => setTempDeployType(deployType)}
+                      onClick={() => setTempDeployType(status.insertType || 'auto')}
                       disabled={isUpdatingType}
                     >
                       취소
@@ -346,7 +360,7 @@ const InstagramConnect = () => {
                 )}
               </div>
 
-              {tempDeployType === 'auto' ? (
+              {status.insertType === 'auto' ? (
                 <>
                   <p className="text-xs sm:text-sm text-gray-500">
                     자동 배포를 선택하면 쇼핑몰 메인 페이지 하단에 Instagram 피드가 자동으로 삽입됩니다.
@@ -359,10 +373,10 @@ const InstagramConnect = () => {
                   <Button
                     variant={status.hasScriptTag ? "secondary" : "default"}
                     onClick={deployInstagramFeed}
-                    disabled={isDeploying || showTokenAlert}
+                    disabled={!canDeployFeed()}
                     className="w-full sm:w-auto"
                   >
-                    {isDeploying ? "배포 중..." : (status.hasScriptTag ? "다시 배포하기" : "피드 배포하기")}
+                    {getDeployButtonText()}
                   </Button>
                 </>
               ) : (
@@ -388,12 +402,16 @@ const InstagramConnect = () => {
                   )}
                   <div className="relative">
                     <ScrollArea className="h-[100px] w-full rounded-md border p-2 sm:p-4">
-                      <pre className="text-xs sm:text-sm">{manualCode}</pre>
+                      <pre className="text-xs sm:text-sm whitespace-pre-wrap break-all">
+                        <code className="inline-block min-w-0 max-w-full">
+                          {manualCode}
+                        </code>
+                      </pre>
                     </ScrollArea>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="absolute top-2 right-2"
+                      className="absolute top-2 right-2 z-10"
                       onClick={copyToClipboard}
                     >
                       <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />

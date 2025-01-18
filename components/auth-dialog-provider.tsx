@@ -57,27 +57,36 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
       }}
     >
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>카페24 로그인</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="sm:max-w-[425px] w-[95%] p-4 sm:p-6">
+          <DialogHeader className="space-y-2 sm:space-y-3">
+            <DialogTitle className="text-lg sm:text-xl">카페24 로그인</DialogTitle>
+            <DialogDescription className="text-sm sm:text-base">
               카페24 계정으로 로그인해 주세요.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-2 sm:mt-4">
             <Input
               ref={inputRef}
               type="text"
               value={mallId}
               onChange={(e) => setMallId(e.target.value)}
               placeholder="카페24 ID를 입력해주세요"
+              className="h-9 sm:h-10 text-sm sm:text-base"
               required
             />
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsOpen(false)} type="button">
+            <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-4 mt-2 sm:mt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsOpen(false)} 
+                type="button"
+                className="w-full sm:w-auto h-9 sm:h-10 text-sm sm:text-base"
+              >
                 취소
               </Button>
-              <Button type="submit">
+              <Button 
+                type="submit"
+                className="w-full sm:w-auto h-9 sm:h-10 text-sm sm:text-base"
+              >
                 로그인
               </Button>
             </DialogFooter>
@@ -86,15 +95,20 @@ export function AuthDialogProvider({ children }: { children: React.ReactNode }) 
       </Dialog>
 
       <Dialog open={showError} onOpenChange={setShowError}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>로그인 실패</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="sm:max-w-[425px] w-[95%] p-4 sm:p-6">
+          <DialogHeader className="space-y-2 sm:space-y-3">
+            <DialogTitle className="text-lg sm:text-xl">로그인 실패</DialogTitle>
+            <DialogDescription className="text-sm sm:text-base">
               {errorMessage}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setShowError(false)}>확인</Button>
+          <DialogFooter className="mt-2 sm:mt-4">
+            <Button 
+              onClick={() => setShowError(false)}
+              className="w-full sm:w-auto h-9 sm:h-10 text-sm sm:text-base"
+            >
+              확인
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
