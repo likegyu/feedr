@@ -26,7 +26,8 @@ export async function GET(req: NextRequest) {
         pc_feed_settings,
         mobile_feed_settings,
         feed_filter,
-        instagram_access_token
+        instagram_access_token,
+        insert_type
       FROM tokens 
       WHERE cafe24_mall_id = $1`,
       [mallId]

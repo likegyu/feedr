@@ -47,12 +47,13 @@
       this.feedFilter = 'all';
       this.currentLayout = null;
       this.handleResize = throttle(this.handleResize.bind(this), RESIZE_THROTTLE);
-      this.cleanup = this.cleanup.bind(this);
-      this.createContainer();
+      this.insertType = null; // 'auto' | 'manual'
       this.init();
     }
 
     createContainer() {
+      if (this.insertType === 'manual') return;
+      
       const footer = document.querySelector('#footer');
       if (!footer) return;
 
@@ -68,32 +69,23 @@
       footer.parentNode.insertBefore(this.container, footer);
     }
 
-    cleanup() {
-      window.removeEventListener('resize', this.handleResize);
-      window.removeEventListener('unload', this.cleanup);
-
-      ['pc', 'mobile'].forEach(type => {
-        const element = this.container?.querySelector(`.embla-${type}-${this.mallId}`);
-        if (element?.embla) {
-          element.embla.destroy();
-        }
-      });
-
-      const styleId = `instagram-feed-styles-${this.mallId}`;
-      document.getElementById(styleId)?.remove();
-    }
-
     // 초기화
     async init() {
       try {
-        this.container = document.getElementById('instagram-feed');
+        // 설정 및 필터 로드
+        await this.loadSettings();
+        
+        // 설정 로드 후 컨테이너 생성 또는 찾기
+        if (this.insertType === 'manual') {
+          this.container = document.getElementById('instagram-feed');
+        } else {
+          this.createContainer();
+        }
+        
         if (!this.container) return;
 
         // 윈도우 리사이즈 이벤트 등록
         window.addEventListener('resize', this.handleResize);
-
-        // 설정 및 필터 로드
-        await this.loadSettings();
         this.handleResize();
       } catch (error) {
         console.debug('Instagram Feed Error:', error);
@@ -417,6 +409,9 @@
 
         const element = this.container.querySelector(`.embla-${type}-${this.mallId}`);
         if (!element || !window.EmblaCarousel) return;
+
+        // 기존 캐러셀이 있으면 재사용
+        if (element.embla) return;
 
         const embla = new window.EmblaCarousel(element, {
           align: 'center',

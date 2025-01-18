@@ -5,12 +5,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Ban, UserRoundCheck, Info } from "lucide-react"
+import { Ban, UserRoundCheck, Info, Copy } from "lucide-react"
 import { useAuthDialog } from "@/components/auth-dialog-provider"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface InstagramStatus {
   isConnected: boolean;
   userName?: string;
+  hasScriptTag?: boolean;  // 추가
 }
 
 const InstagramConnect = () => {
@@ -20,6 +29,22 @@ const InstagramConnect = () => {
   const [error, setError] = useState<string | null>(null);
   const [instagramAuthUrl, setInstagramAuthUrl] = useState<string>('');
   const [showTokenAlert, setShowTokenAlert] = useState(false);
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deployType, setDeployType] = useState<'auto' | 'manual'>('auto');
+  const [copied, setCopied] = useState(false);
+
+  const manualCode = `<div id="instagram-feed"></div>
+<script src="https://cithmb.vercel.app/cafe24-script.js"></script>`;
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(manualCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('복사 실패:', err);
+    }
+  };
 
   const checkTokenExpiration = async () => {
     try {
@@ -79,6 +104,28 @@ const InstagramConnect = () => {
     }
   };
 
+  const deployInstagramFeed = async () => {
+    try {
+      setIsDeploying(true);
+      setError(null);
+      const response = await fetch('/api/cafe24-script/post', {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        await checkInstagramStatus();
+      } else {
+        const data = await response.json();
+        setError(data.error || '인스타그램 피드 배포에 실패했습니다.');
+      }
+    } catch (error) {
+      setError('인스타그램 피드 배포 중 오류가 발생했습니다.');
+      console.error('인스타그램 피드 배포 중 오류:', error);
+    } finally {
+      setIsDeploying(false);
+    }
+  };
+
   useEffect(() => {
     const fetchAuthUrl = async () => {
       try {
@@ -99,7 +146,7 @@ const InstagramConnect = () => {
   }, [checkInstagramStatus]);
 
   return (
-    <div>
+    <div className="space-y-4">
       <h2 className="text-2xl font-bold mb-4">Instagram 연동</h2>
       <Card>
         <CardContent className="p-6">
@@ -178,6 +225,74 @@ const InstagramConnect = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* 수정된 피드 배포 카드 */}
+      {status?.isConnected && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Instagram 피드 배포</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  배포 방식
+                </label>
+                <Select
+                  value={deployType}
+                  onValueChange={(value: 'auto' | 'manual') => setDeployType(value)}
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="배포 방식 선택" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">자동 배포</SelectItem>
+                    <SelectItem value="manual">수동 배포</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {deployType === 'auto' ? (
+                <>
+                  <p className="text-sm text-gray-500">
+                    자동 배포를 선택하면 쇼핑몰 메인 페이지 하단에 Instagram 피드가 자동으로 삽입됩니다.
+                    {status.hasScriptTag && (
+                      <span className="text-green-600 ml-2">
+                        (현재 배포됨)
+                      </span>
+                    )}
+                  </p>
+                  <Button
+                    variant={status.hasScriptTag ? "secondary" : "default"}
+                    onClick={deployInstagramFeed}
+                    disabled={isDeploying || showTokenAlert}
+                  >
+                    {isDeploying ? "배포 중..." : (status.hasScriptTag ? "다시 배포하기" : "피드 배포하기")}
+                  </Button>
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-500">
+                    수동 배포의 경우 아래 코드를 원하는 위치에 직접 삽입하세요.
+                  </p>
+                  <div className="relative">
+                    <ScrollArea className="h-[100px] w-full rounded-md border p-4">
+                      <pre className="text-sm">{manualCode}</pre>
+                    </ScrollArea>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={copyToClipboard}
+                    >
+                      <Copy className="h-4 w-4 mr-1" />
+                      {copied ? "복사됨" : "복사"}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

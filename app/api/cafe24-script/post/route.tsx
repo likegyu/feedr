@@ -15,6 +15,31 @@ export async function POST() {
       );
     }
 
+    // 기존 스크립트 태그 확인
+    const existingScript = await db.query(
+      'SELECT script_tag_no FROM tokens WHERE cafe24_mall_id = $1',
+      [mallId]
+    );
+
+    // 기존 스크립트가 있다면 삭제
+    if (existingScript.rows[0]?.script_tag_no) {
+      const deleteResponse = await fetch(
+        `https://${mallId}.cafe24api.com/api/v2/admin/scripttags/${existingScript.rows[0].script_tag_no}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            'X-Cafe24-Api-Version': '2024-12-01'
+          }
+        }
+      );
+
+      if (!deleteResponse.ok) {
+        console.warn('기존 스크립트 삭제 실패:', await deleteResponse.json());
+      }
+    }
+
     // PC 테마 정보 조회
     const themeResponse = await fetch(
       `https://${mallId}.cafe24api.com/api/v2/admin/themes?type=pc&fields=skin_no`,
@@ -70,6 +95,7 @@ export async function POST() {
 
     const result = await response.json();
     
+    // 성공 시 새로운 script_tag_no로 업데이트
     await db.query(
       `UPDATE tokens 
        SET script_tag_no = $1 
@@ -77,7 +103,10 @@ export async function POST() {
       [result.scripttag.script_no, mallId]
     );
 
-    return NextResponse.json(result);
+    return NextResponse.json({ 
+      ...result,
+      message: existingScript.rows[0]?.script_tag_no ? '스크립트가 성공적으로 재배포되었습니다.' : '스크립트가 성공적으로 배포되었습니다.'
+    });
 
   } catch (error) {
     console.error('스크립트 태그 API 에러:', error);

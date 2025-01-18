@@ -72,23 +72,7 @@ export async function GET(request: NextRequest) {
         cafe24MallId
       ]
     );
-
-    // Instagram 인증 완료 후 Cafe24 스크립트 생성
-    try {
-      const scriptResponse = await fetch(new URL('/api/cafe24-script/post', request.url), {
-        method: 'POST',
-        headers: {
-          'Cookie': `cafe24_mall_id=${cafe24MallId}; cafe24_access_token=${cookieStore.get('cafe24_access_token')?.value}`
-        }
-      });
-
-      if (!scriptResponse.ok) {
-        console.error('Cafe24 스크립트 생성 실패');
-      }
-    } catch (error) {
-      console.error('Cafe24 스크립트 생성 중 오류:', error);
-    }
-
+    
     return NextResponse.redirect(new URL(`/dashboard?success=true`, request.url));
   } catch (error) {
     console.error('Instagram 인증 처리 중 오류:', error);
