@@ -335,7 +335,6 @@
         }
         .feed-item-${type}-${this.mallId} {
           position: relative;
-          aspect-ratio: 1;
           border-radius: ${settings.borderRadius}px;
           overflow: hidden;
           width: 100%;
@@ -358,8 +357,8 @@
           user-select: none;
         }
         .embla-container-${type}-${this.mallId} .feed-item-${type}-${this.mallId} {
-      width: ${100 / settings.columns}%;
-      flex-shrink: 0;
+          width: ${100 / settings.columns}%;
+          flex-shrink: 0;
         }
         .media-type-icon-${type}-${this.mallId} {
           position: absolute;
