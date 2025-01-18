@@ -25,7 +25,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 const MobileFeedSettings = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [isCafe24LoggedIn, setIsCafe24LoggedIn] = useState<boolean | null>(null);
+  const [isCafe24TokenValid, setIsCafe24TokenValid] = useState<boolean | null>(null);
   const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
   const [initialSettings, setInitialSettings] = useState<FeedSettings | null>(null);
   const [mobileLayoutSettings, setMobileLayoutSettings] = useState<FeedSettings | null>(null);
@@ -44,10 +44,12 @@ const MobileFeedSettings = () => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        // Cafe24 로그인 상태 체크
-        const cafe24Response = await fetch('/api/auth/cafe24/status');
-        const cafe24Data = await cafe24Response.json();
-        setIsCafe24LoggedIn(cafe24Data.isLoggedIn);
+        // Cafe24 토큰 만료 체크
+        const tokenResponse = await fetch('/api/auth/cafe24/token-expires-check');
+        const tokenData = await tokenResponse.json();
+        const isTokenValid = tokenData?.data?.cafe24ExpiresAt 
+          && new Date(tokenData.data.cafe24ExpiresAt) > new Date();
+        setIsCafe24TokenValid(isTokenValid);
 
         // Instagram 연동 상태 체크
         const instaResponse = await fetch('/api/auth/instagram/status');
@@ -55,7 +57,7 @@ const MobileFeedSettings = () => {
         setIsInstagramConnected(instaData.isConnected);
       } catch (error) {
         console.error('인증 상태 확인 중 오류:', error);
-        setIsCafe24LoggedIn(false);
+        setIsCafe24TokenValid(false);
         setIsInstagramConnected(false);
       }
     };
@@ -319,7 +321,7 @@ const MobileFeedSettings = () => {
     );
   }
 
-  if (!isCafe24LoggedIn) {
+  if (!isCafe24TokenValid) {
     return (
       <div>
         <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
