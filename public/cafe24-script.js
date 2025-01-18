@@ -115,8 +115,19 @@
       const newLayout = isMobile ? 'mobile' : 'pc';
       
       if (this.currentLayout !== newLayout) {
+        const pcContainer = this.container.querySelector(`#instagram-feed-pc-${this.mallId}`);
+        const mobileContainer = this.container.querySelector(`#instagram-feed-mobile-${this.mallId}`);
+        
+        if (newLayout === 'mobile') {
+          if (pcContainer) pcContainer.style.display = 'none';
+          if (mobileContainer) mobileContainer.style.display = 'block';
+        } else {
+          if (pcContainer) pcContainer.style.display = 'block';
+          if (mobileContainer) mobileContainer.style.display = 'none';
+        }
+        
         this.currentLayout = newLayout;
-        this.render();
+        this.initCarousels();
       }
     }
 
@@ -342,30 +353,23 @@
 
     // 뷰포트에 따라 PC/모바일 레이아웃 렌더
     async render() {
-      console.debug('Render start', {
-        container: !!this.container,
-        pcSettings: !!this.pcSettings,
-        mobileSettings: !!this.mobileSettings,
-        mediaItems: this.mediaItems.length
-      });
-
-      if (!this.container || !this.pcSettings || !this.mobileSettings) {
-        console.debug('Render requirements not met');
-        return;
-      }
-
-      await this.loadEmblaIfNeeded();
-      this.injectStyles();
+      if (!this.container) return;
       
-      this.container.innerHTML = `
-        <div id="instagram-feed-pc-${this.mallId}">
-          ${this.renderLayout('pc')}
-        </div>
-        <div id="instagram-feed-mobile-${this.mallId}">
-          ${this.renderLayout('mobile')}
-        </div>
-      `;
-
+      // PC/Mobile 레이아웃 모두 미리 렌더링
+      ['pc', 'mobile'].forEach(type => {
+        const containerId = `instagram-feed-${type}-${this.mallId}`;
+        let container = this.container.querySelector(`#${containerId}`);
+        
+        if (!container) {
+          container = document.createElement('div');
+          container.id = containerId;
+          container.style.display = type === this.currentLayout ? 'block' : 'none';
+          this.container.appendChild(container);
+        }
+        
+        this.renderLayout(type);
+      });
+      
       this.initCarousels();
     }
 
