@@ -60,14 +60,8 @@
     async init() {
       try {
         console.debug('Init start');
-        await this.loadSettings();
-        console.debug('Settings loaded:', {
-          insertType: this.insertType,
-          pcSettings: !!this.pcSettings,
-          mobileSettings: !!this.mobileSettings
-        });
-
-        // manual 모드일 때는 div#instagram-feed를 찾아서 없으면 종료
+        
+        // container 초기화 및 스켈레톤 UI 표시
         if (this.insertType === 'manual') {
           this.container = document.getElementById('instagram-feed');
           if (!this.container) {
@@ -75,29 +69,31 @@
             return;
           }
         } else {
-          // auto 모드일 때만 container 생성
           this.createContainer();
           if (!this.container) {
             console.debug('Auto mode: Container creation failed, stopping init');
             return;
           }
         }
+        
+        this.renderSkeleton(); // 스켈레톤 UI 표시
 
-        this.container.style.cssText = `
-          width: 100%;
-          margin: 0 auto 40px;
-        `;
+        await this.loadSettings();
+        console.debug('Settings loaded:', {
+          insertType: this.insertType,
+          pcSettings: !!this.pcSettings,
+          mobileSettings: !!this.mobileSettings
+        });
 
         window.addEventListener('resize', this.handleResize);
         this.handleResize();
-        await this.render(); // await 추가
+        await this.render();
       } catch (error) {
         console.error('Instagram Feed Error:', error);
       }
     }
 
     createContainer() {
-      // insertType 체크 제거 (이미 init에서 체크함)
       const footer = document.querySelector('#footer');
       if (!footer) return;
 
@@ -105,10 +101,42 @@
       this.container.id = 'instagram-feed';
       this.container.style.cssText = `
         width: 100%;
+        max-width: 1200px;
+        min-height: 400px;
         margin: 0 auto 40px;
+        box-sizing: border-box;
       `;
 
       footer.parentNode.insertBefore(this.container, footer);
+    }
+
+    // 스켈레톤 UI 적용
+    renderSkeleton() {
+      if (!this.container) return;
+      
+      const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+      const columns = isMobile ? 2 : 4; // 모바일은 2열, PC는 4열
+      const rows = 2;
+      
+      const skeletonGrid = `
+        <div style="
+          display: grid;
+          grid-template-columns: repeat(${columns}, 1fr);
+          gap: 8px;
+          padding: 16px;
+        ">
+          ${Array(columns * rows).fill(0).map(() => `
+            <div style="
+              width: 100%;
+              padding-bottom: 100%;
+              background-color: #f3f4f6;
+              border-radius: 8px;
+            "></div>
+          `).join('')}
+        </div>
+      `;
+
+      this.container.innerHTML = skeletonGrid;
     }
 
     handleResize() {
