@@ -150,7 +150,10 @@
     setCache(type, data) {
       localStorage.setItem(getCacheKey(this.mallId, type), JSON.stringify({
         timestamp: Date.now(),
-        data
+        data: {
+          ...data,
+          insertType: this.insertType // insertType 추가
+        }
       }));
     }
 
@@ -166,6 +169,7 @@
         this.pcSettings = cached.pc.settings;
         this.mobileSettings = cached.mobile.settings;
         this.mediaItems = cached.pc.mediaItems;
+        this.insertType = cached.pc.insertType; // insertType 불러오기
         if (cached.pc.feedFilter) {
           this.feedFilter = cached.pc.feedFilter;
         }
