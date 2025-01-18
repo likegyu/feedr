@@ -19,20 +19,32 @@
   // 캐시 키 생성
   const getCacheKey = (mallId, type) => `instagram_feed_cache_${mallId}_${type}`;
 
-  // CAFE24API 로드 대기
-  function waitForCAFE24API() {
-    return new Promise((resolve) => {
+  // CAFE24API 로드 최적화
+  function waitForCAFE24API(timeout = 5000) {
+    return new Promise((resolve, reject) => {
+      // 이미 로드된 경우
       if (window.CAFE24API) {
-        resolve(window.CAFE24API);
-        return;
+        return resolve(window.CAFE24API);
       }
 
-      const checkAPI = setInterval(() => {
+      // 스크립트 로드 실패 처리
+      const timeoutId = setTimeout(() => {
+        reject(new Error('CAFE24API 로드 타임아웃'));
+      }, timeout);
+
+      // CAFE24API 로드 감지
+      const observer = new MutationObserver((mutations, obs) => {
         if (window.CAFE24API) {
-          clearInterval(checkAPI);
+          clearTimeout(timeoutId);
+          obs.disconnect();
           resolve(window.CAFE24API);
         }
-      }, 100);
+      });
+
+      observer.observe(document, {
+        childList: true,
+        subtree: true
+      });
     });
   }
 
