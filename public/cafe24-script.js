@@ -436,28 +436,39 @@
 
     // 캐러셀 초기화
     initCarousels() {
-      ['pc', 'mobile'].forEach(type => {
-        const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
-        if (settings.layout !== 'carousel') return;
-
-        const element = this.container.querySelector(`.embla-${type}-${this.mallId}`);
-        if (!element || !window.EmblaCarousel) return;
-
-        // 기존 캐러셀이 있으면 재사용
-        if (element.embla) return;
-
-        const embla = new window.EmblaCarousel(element, {
-          align: 'center',
-          containScroll: 'keepSnaps',
-          dragFree: false,
-          loop: true,
-          skipSnaps: true,
-          direction: 'ltr',
-          inViewThreshold: 0.7
+      // DOM 업데이트를 위한 지연
+      setTimeout(() => {
+        ['pc', 'mobile'].forEach(type => {
+          const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
+          if (settings.layout !== 'carousel') return;
+    
+          const element = this.container.querySelector(`.embla-${type}-${this.mallId}`);
+          if (!element || !window.EmblaCarousel) return;
+    
+          // 기존 캐러셀이 있으면 제거
+          if (element.embla) {
+            element.embla.destroy();
+          }
+    
+          // 캐러셀 초기화 전 스타일 강제 적용
+          const container = element.querySelector(`.embla-container-${type}-${this.mallId}`);
+          if (container) {
+            container.style.display = 'flex';
+          }
+    
+          const embla = new window.EmblaCarousel(element, {
+            align: 'center',
+            containScroll: 'keepSnaps',
+            dragFree: false,
+            loop: true,
+            skipSnaps: true,
+            direction: 'ltr',
+            inViewThreshold: 0.7
+          });
+    
+          element.embla = embla;
         });
-
-        element.embla = embla;
-      });
+      }, 100); // 100ms 지연
     }
   }
 
