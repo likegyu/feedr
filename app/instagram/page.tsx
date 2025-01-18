@@ -19,7 +19,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 interface InstagramStatus {
   isConnected: boolean;
   userName?: string;
-  hasScriptTag?: boolean;  // 추가
+  hasScriptTag?: boolean;
+  insertType?: 'auto' | 'manual';  // 추가
 }
 
 const InstagramConnect = () => {
@@ -39,6 +40,14 @@ const InstagramConnect = () => {
     // 초기 deployType 설정
     setTempDeployType(deployType);
   }, [deployType]);
+
+  useEffect(() => {
+    // status가 변경될 때마다 deployType과 tempDeployType을 DB 값과 동기화
+    if (status?.insertType) {
+      setDeployType(status.insertType);
+      setTempDeployType(status.insertType);
+    }
+  }, [status]);
 
   const manualCode = `<div id="instagram-feed"></div>
 <script src="https://cithmb.vercel.app/cafe24-script.js"></script>`;
@@ -314,7 +323,7 @@ const InstagramConnect = () => {
                       variant="default"
                       size="sm"
                       onClick={() => updateInsertType(tempDeployType)}
-                      disabled={isUpdatingType}
+                      disabled={isUpdatingType || tempDeployType === status?.insertType}
                     >
                       {isUpdatingType ? "변경 중..." : "변경 적용"}
                     </Button>

@@ -8,25 +8,25 @@ export async function GET() {
     const mallId = cookieStore.get('cafe24_mall_id')?.value;
 
     if (!mallId) {
-      return NextResponse.json({ isConnected: false });
+      return NextResponse.json({ error: '인증 정보가 없습니다.' }, { status: 401 });
     }
 
-    const result = await db.query(
-      `SELECT instagram_access_token, instagram_username, script_tag_no, insert_type 
+    const { rows } = await db.query(
+      `SELECT instagram_username, script_tag_no, insert_type
        FROM tokens 
        WHERE cafe24_mall_id = $1`,
       [mallId]
     );
 
-    const user = result.rows[0];
-    
-    return NextResponse.json({
-      isConnected: !!user?.instagram_username,
-      userName: user?.instagram_username,
-      hasScriptTag: !!user?.script_tag_no,
-      insertType: user?.insert_type || 'manual'
-    });
-  } catch (error: unknown) {
+    const status = {
+      isConnected: !!rows[0]?.instagram_username,
+      userName: rows[0]?.instagram_username || undefined,
+      hasScriptTag: !!rows[0]?.script_tag_no,
+      insertType: rows[0]?.insert_type || 'auto'
+    };
+
+    return NextResponse.json(status);
+  } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json({ isConnected: false, error: error.message });
     }

@@ -51,24 +51,6 @@
       this.init();
     }
 
-    createContainer() {
-      if (this.insertType === 'manual') return;
-      
-      const footer = document.querySelector('#footer');
-      if (!footer) return;
-
-      this.container = document.createElement('div');
-      this.container.id = 'instagram-feed';
-      this.container.style.cssText = `
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto 40px;
-        padding: 0 20px;
-      `;
-
-      footer.parentNode.insertBefore(this.container, footer);
-    }
-
     // 초기화
     async init() {
       try {
@@ -79,17 +61,21 @@
           pcSettings: !!this.pcSettings,
           mobileSettings: !!this.mobileSettings
         });
-        
+
+        // manual 모드일 때는 div#instagram-feed를 찾아서 없으면 종료
         if (this.insertType === 'manual') {
           this.container = document.getElementById('instagram-feed');
-          console.debug('Manual mode container:', !!this.container);
+          if (!this.container) {
+            console.debug('Manual mode: Container not found, stopping init');
+            return;
+          }
         } else {
+          // auto 모드일 때만 container 생성
           this.createContainer();
-        }
-        
-        if (!this.container) {
-          console.debug('Container not found, stopping init');
-          return;
+          if (!this.container) {
+            console.debug('Auto mode: Container creation failed, stopping init');
+            return;
+          }
         }
 
         this.container.style.cssText = `
@@ -105,6 +91,23 @@
       } catch (error) {
         console.error('Instagram Feed Error:', error);
       }
+    }
+
+    createContainer() {
+      // insertType 체크 제거 (이미 init에서 체크함)
+      const footer = document.querySelector('#footer');
+      if (!footer) return;
+
+      this.container = document.createElement('div');
+      this.container.id = 'instagram-feed';
+      this.container.style.cssText = `
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto 40px;
+        padding: 0 20px;
+      `;
+
+      footer.parentNode.insertBefore(this.container, footer);
     }
 
     handleResize() {
