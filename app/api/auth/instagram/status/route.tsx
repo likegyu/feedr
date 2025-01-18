@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 export async function GET() {
@@ -12,25 +12,24 @@ export async function GET() {
     }
 
     const result = await db.query(
-      'SELECT instagram_access_token, instagram_username, script_tag_no FROM tokens WHERE cafe24_mall_id = $1',
+      `SELECT instagram_access_token, instagram_username, script_tag_no, insert_type 
+       FROM tokens 
+       WHERE cafe24_mall_id = $1`,
       [mallId]
     );
 
-    if (result.rows.length === 0) {
-      return NextResponse.json({ isConnected: false });
-    }
-
-    const { instagram_access_token, instagram_username, script_tag_no } = result.rows[0];
+    const user = result.rows[0];
+    
     return NextResponse.json({
-      isConnected: !!instagram_access_token,
-      userName: instagram_username,
-      hasScriptTag: !!script_tag_no
+      isConnected: !!user?.instagram_username,
+      userName: user?.instagram_username,
+      hasScriptTag: !!user?.script_tag_no,
+      insertType: user?.insert_type || 'manual'
     });
-  } catch (error) {
-    console.error('Instagram 상태 확인 중 오류:', error);
-    return NextResponse.json(
-      { error: '서버 오류가 발생했습니다.' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ isConnected: false, error: error.message });
+    }
+    return NextResponse.json({ isConnected: false, error: 'An unknown error occurred' });
   }
 }

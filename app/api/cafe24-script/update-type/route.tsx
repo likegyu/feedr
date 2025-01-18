@@ -17,6 +17,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!['auto', 'manual'].includes(insertType)) {
+      return NextResponse.json(
+        { error: '유효하지 않은 배포 방식입니다.' },
+        { status: 400 }
+      );
+    }
+
     if (insertType === 'manual') {
       // 기존 스크립트 태그 확인 및 삭제
       const existingScript = await db.query(
