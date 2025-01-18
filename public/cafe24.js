@@ -1,21 +1,35 @@
+// DNS 프리페칭 및 사전연결 설정
+function initializeConnections() {
+    const resources = [
+      'https://cithmb.vercel.app',
+      'https://graph.instagram.com',
+      'https://unpkg.com'
+    ];
+    
+    resources.forEach(url => {
+      // DNS 프리페칭
+      const dnsPrefetch = document.createElement('link');
+      dnsPrefetch.rel = 'dns-prefetch';
+      dnsPrefetch.href = url;
+      document.head.appendChild(dnsPrefetch);
+  
+      // 사전연결
+      const preconnect = document.createElement('link');
+      preconnect.rel = 'preconnect';
+      preconnect.href = url;
+      preconnect.crossOrigin = 'anonymous';
+      document.head.appendChild(preconnect);
+    });
+  }
+  
+  // 스크립트 실행 전 먼저 실행
+  initializeConnections();
+  
 (function() {
   const MOBILE_BREAKPOINT = 768;
   const CACHE_DURATION = 1000 * 60 * 1;
   const EMBLA_CDN = 'https://unpkg.com/embla-carousel/embla-carousel.umd.js';
   const RESIZE_THROTTLE = 250;
-
-  function addDnsPrefetch() {
-    const links = [
-      'https://cithmb.vercel.app',
-      'https://graph.instagram.com'
-    ];
-    
-    links.forEach(url => {
-      const link = document.createElement('link');
-      link.rel = 'dns-prefetch';
-      link.href = url;
-      document.head.appendChild(link);
-    });
   // resize 함수 스로틀링
   function throttle(func, limit) {
     let inThrottle;
@@ -31,7 +45,6 @@
   // 캐시 키 생성
   const getCacheKey = (mallId, type) => `instagram_feed_cache_${mallId}_${type}`;
 
-  }
   // CAFE24API 로드 최적화
   function waitForCAFE24API(timeout = 5000) {
     return new Promise((resolve, reject) => {
@@ -78,8 +91,6 @@
       this.currentLayout = null;
       this.handleResize = throttle(this.handleResize.bind(this), RESIZE_THROTTLE);
       this.insertType = null; // 'auto' | 'manual'
-      this.apiCache = new Map();
-      addDnsPrefetch();
       this.init();
     }
 
