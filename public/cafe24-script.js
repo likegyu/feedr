@@ -85,7 +85,6 @@
 
         this.container.style.cssText = `
           width: 100%;
-          max-width: 1200px;
           margin: 0 auto 40px;
         `;
 
@@ -106,9 +105,7 @@
       this.container.id = 'instagram-feed';
       this.container.style.cssText = `
         width: 100%;
-        max-width: 1200px;
         margin: 0 auto 40px;
-        padding: 0 20px;
       `;
 
       footer.parentNode.insertBefore(this.container, footer);
@@ -361,8 +358,8 @@
           user-select: none;
         }
         .embla-container-${type}-${this.mallId} .feed-item-${type}-${this.mallId} {
-          flex: 0 0 ${100 / settings.columns}%;
-          min-width: 0;
+      width: ${100 / settings.columns}%;
+      flex-shrink: 0;
         }
         .media-type-icon-${type}-${this.mallId} {
           position: absolute;
