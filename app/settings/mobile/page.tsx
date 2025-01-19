@@ -384,10 +384,10 @@ const MobileFeedSettings = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-6">
+    <div className="max-w-7xl mx-auto p-4 space-y-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">모바일 레이아웃 설정</h2>
-      <div className="xl:grid xl:grid-cols-12 xl:gap-8">
-        <div className="xl:col-span-5 xl:sticky xl:top-4 space-y-6">
+      <div className="2xl:grid 2xl:grid-cols-12 2xl:gap-8">
+        <div className="2xl:col-span-5 2xl:sticky 2xl:top-4 space-y-6">
           <Card className="shadow-lg">
             <CardContent className="p-6 sm:p-8">
               {renderMobilePreview()}
