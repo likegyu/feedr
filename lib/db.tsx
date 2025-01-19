@@ -26,7 +26,7 @@ type Token = {
 };
 
 const pool = new Pool({
-  connectionString: process.env.NEON_DATABASE_URL,
+  connectionString: process.env.DATABASE_POSTGRES_URL,
   ssl: {
     rejectUnauthorized: false,
   },
