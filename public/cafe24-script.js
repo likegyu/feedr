@@ -64,7 +64,7 @@ const MEDIA_ICONS = {
 class InstagramFeed {
   constructor(mallId) {
     this.mallId = mallId;
-    this.apiEndpoint = 'https://cithmb.vercel.app/api/cafe24-script/get';
+    this.apiEndpoint = 'https://feedr.dstudio.kr/api/cafe24-script/get';
     this.container = null;
     this.pcSettings = null;
     this.mobileSettings = null;

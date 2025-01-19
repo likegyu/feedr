@@ -1,7 +1,7 @@
 // DNS 프리페칭 및 사전연결 설정
 function initializeConnections() {
     const resources = [
-      'https://cithmb.vercel.app',
+      'https://feedr.dstudio.kr',
       'https://graph.instagram.com',
       'https://unpkg.com'
     ];
@@ -64,7 +64,7 @@ function initializeConnections() {
   class InstagramFeed {
     constructor(mallId) {
       this.mallId = mallId;
-      this.apiEndpoint = 'https://cithmb.vercel.app/api/cafe24-script/get';
+      this.apiEndpoint = 'https://feedr.dstudio.kr/api/cafe24-script/get';
       this.container = null;
       this.pcSettings = null;
       this.mobileSettings = null;
