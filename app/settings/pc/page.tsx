@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ImageIcon, PlayCircleIcon, Info } from 'lucide-react';
+import { ImageIcon, SquarePlay, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
@@ -195,9 +195,9 @@ const FeedSettings = () => {
           {layoutSettings.showMediaType && (
             <div className="absolute top-2 right-2 rounded-full p-1">
               {isVideo ? (
-                <PlayCircleIcon className="w-4 h-4 text-black" />
+                <SquarePlay className="w-4 h-4 text-white" />
               ) : (
-                <ImageIcon className="w-4 h-4 text-black" />
+                <ImageIcon className="w-4 h-4 text-white" />
               )}
             </div>
           )}
