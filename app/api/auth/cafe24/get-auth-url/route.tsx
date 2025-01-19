@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const authUrl = `${baseUrl}/api/v2/oauth/authorize?response_type=code&client_id=${process.env.CAFE24_CLIENT_ID}&state=${mallId}&redirect_uri=${process.env.CAFE24_REDIRECT_URI}&scope=mall.read_store,mall.read_application,mall.write_application,mall.write_design,mall.read_design`;
+    const authUrl = `${baseUrl}/api/v2/oauth/authorize?response_type=code&client_id=${process.env.CAFE24_CLIENT_ID}&state=${mallId}&redirect_uri=${process.env.CAFE24_REDIRECT_URI}&scope=mall.read_store,mall.read_application,mall.write_application,mall.read_design`;
 
     return NextResponse.json({ url: authUrl });
   } catch (err: unknown) {
