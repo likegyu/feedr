@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Ban, UserRoundCheck, Info, Copy } from "lucide-react"
+import { Ban, UserRoundCheck, Info, Copy, Loader } from "lucide-react"
 import { useAuthDialog } from "@/components/auth-dialog-provider"
 import {
   Select,
@@ -319,7 +319,7 @@ const canDeployFeed = () => {
                     onValueChange={(value: 'auto' | 'manual') => setTempDeployType(value)}
                     disabled={isUpdatingType}
                   >
-                    <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectTrigger className="w-full sm:w-[200px] lg:w-[350px]">
                       <SelectValue placeholder="배포 방식 선택" />
                     </SelectTrigger>
                     <SelectContent>
@@ -329,12 +329,13 @@ const canDeployFeed = () => {
                   </Select>
                   
                   {tempDeployType !== status.insertType && (
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <div className="flex sm:flex-row items-stretch sm:items-center gap-2">
                       <Button
                         variant="default"
                         size="sm"
                         onClick={() => updateInsertType(tempDeployType)}
                         disabled={isUpdatingType}
+                        className="flex-1"
                       >
                         {isUpdatingType ? "변경 중..." : "변경 적용"}
                       </Button>
@@ -343,6 +344,7 @@ const canDeployFeed = () => {
                         size="sm"
                         onClick={() => setTempDeployType(status.insertType || 'auto')}
                         disabled={isUpdatingType}
+                        className="flex-1"
                       >
                         취소
                       </Button>
@@ -370,21 +372,23 @@ const canDeployFeed = () => {
               )}
 
               {/* 배포 버튼 */}
-              <Button
-              variant={status.hasScriptTag ? "secondary" : "default"}
-              onClick={deployInstagramFeed}
-              disabled={isDeploying || !canDeployFeed()}
-              className={`w-full sm:w-auto ${isDeploying ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              {isDeploying ? (
-                <div className="flex items-center gap-2">
-                  <span className="loading-spinner h-4 w-4 animate-spin"></span>
-                  배포 중...
-                </div>
-              ) : (
-                "피드 배포하기"
+              {!status.hasScriptTag && (
+                <Button
+                  variant="default"
+                  onClick={deployInstagramFeed}
+                  disabled={isDeploying || !canDeployFeed()}
+                  className={`w-full sm:w-auto ${isDeploying ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {isDeploying ? (
+                    <div className="flex items-center gap-2">
+                      <span className="loading-spinner h-4 w-4 animate-spin"><Loader /></span>
+                      배포 중...
+                    </div>
+                  ) : (
+                    "피드 배포하기"
+                  )}
+                </Button>
               )}
-              </Button>
 
               {status.insertType === 'auto' ? (
                 <p className="text-xs sm:text-sm text-gray-500">
