@@ -334,12 +334,12 @@ const FeedSettings = () => {
             <Alert className="bg-yellow-50 border-yellow-200">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-yellow-500" />
+                  <Info className="h-5 w-5 text-yellow-700" />
                   <span>Instagram 계정 연동이 필요합니다.</span>
                 </div>
                 <Button
                   variant="default"
-                  className="bg-yellow-500 hover:bg-yellow-700 transition-colors"
+                  className="border-yellow-200 text-yellow-700 hover:bg-yellow-100"
                   asChild
                 >
                   <a href="/instagram">연동하기</a>

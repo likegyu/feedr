@@ -134,12 +134,12 @@ const FeedFilter = () => {
             <Alert className="bg-yellow-50 border-yellow-200">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-yellow-600" />
+                  <Info className="h-5 w-5 text-yellow-700" />
                   <span>필터 설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
                 </div>
                 <Button
                   variant="default"
-                  className="bg-yellow-500 hover:bg-yellow-700 transition-colors"
+                  className="border-yellow-200 text-yellow-700 hover:bg-yellow-100"
                   asChild
                 >
                   <a href="/instagram">연동하기</a>

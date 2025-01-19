@@ -299,7 +299,7 @@ const canDeployFeed = () => {
                 asChild
                 variant="default"
                 disabled={showTokenAlert}
-                className={`w-full sm:w-auto bg-[#405DE6] hover:bg-[#2c41a3] transition-colors ${
+                className={`w-full sm:w-auto border-yellow-200 text-yellow-700 hover:bg-yellow-100 ${
                   showTokenAlert ? 'opacity-50' : ''
                 }`}
               >
