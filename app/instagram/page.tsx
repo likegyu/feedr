@@ -231,43 +231,53 @@ const canDeployFeed = () => {
 };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold mb-4">Instagram 연동</h2>
-      <Card>
-        <CardContent className="p-6">
+    <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Instagram 연동</h2>
+      <Card className="shadow-lg">
+        <CardContent className="p-6 sm:p-8">
           {showTokenAlert && (
-            <Alert className="mb-4">
-              <AlertDescription className="flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                카페24 로그인이 필요합니다. 다시 로그인해 주세요.
-                <Button onClick={onOpen} variant="default" size="sm" className="ml-1 h-7">
-                로그인
+            <Alert className="mb-6 bg-blue-50 border-blue-200">
+              <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-2">
+                  <Info className="h-5 w-5 text-blue-500" />
+                  <span>카페24 로그인이 필요합니다. 다시 로그인해 주세요.</span>
+                </div>
+                <Button onClick={onOpen} variant="default" className="bg-blue-500 hover:bg-blue-600">
+                  로그인
                 </Button>
               </AlertDescription>
             </Alert>
           )}
+
           {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription><Ban /> {error}</AlertDescription>
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription className="flex items-center gap-2">
+                <Ban className="h-5 w-5" />
+                {error}
+              </AlertDescription>
             </Alert>
           )}
+
           {loading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-4 w-[250px]" />
-              <Skeleton className="h-4 w-[200px]" />
+            <div className="space-y-4">
+              <Skeleton className="h-6 w-[300px]" />
+              <Skeleton className="h-6 w-[250px]" />
             </div>
           ) : status?.isConnected ? (
-            <div>
-              <Alert variant="success" className="mb-4">
+            <div className="space-y-6">
+              <Alert variant="success" className="bg-green-50 border-green-200">
                 <AlertDescription>
-                  <p><UserRoundCheck />Instagram 계정이 연동되었습니다.</p>
-                  <p className="text-sm mt-2">
+                  <div className="flex items-center gap-2 mb-3">
+                    <UserRoundCheck className="h-5 w-5 text-green-600" />
+                    <span className="font-medium text-green-700">Instagram 계정이 연동되었습니다.</span>
+                  </div>
+                  <p className="text-sm text-gray-600">
                     연동된 계정 ID:{' '}
                     <a
                       href={`https://instagram.com/${status.userName}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-black hover:text-slate-400"
+                      className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
                     >
                       {status.userName}
                     </a>
@@ -277,49 +287,47 @@ const canDeployFeed = () => {
               <Button
                 variant="destructive"
                 onClick={disconnectInstagram}
+                className="w-full sm:w-auto hover:bg-red-600 transition-colors"
               >
                 연동 해제
               </Button>
             </div>
           ) : (
-            <>
-              <p className="mb-4">Instagram 계정을 연동하여 쇼핑몰에 Instagram 피드를 자동으로 게시하세요.</p>
+            <div className="space-y-4">
+              <p className="text-gray-600">Instagram 계정을 연동하여 쇼핑몰에 Instagram 피드를 자동으로 게시하세요.</p>
               <Button
                 asChild
                 variant="default"
                 disabled={showTokenAlert}
-                className={showTokenAlert ? 'opacity-50 cursor-not-allowed' : ''}
+                className={`w-full sm:w-auto bg-[#405DE6] hover:bg-[#2c41a3] transition-colors ${
+                  showTokenAlert ? 'opacity-50' : ''
+                }`}
               >
-                <a 
-                  href={instagramAuthUrl}
-                  className={showTokenAlert ? 'pointer-events-none cursor-not-allowed' : ''}
-                  onClick={(e) => showTokenAlert && e.preventDefault()}
-                >
+                <a href={instagramAuthUrl} className={showTokenAlert ? 'pointer-events-none' : ''}>
                   Instagram 계정 연동하기
                 </a>
               </Button>
-            </>
+            </div>
           )}
         </CardContent>
       </Card>
 
-      {/* 수정된 피드 배포 카드 */}
       {status?.isConnected && (
-        <Card className="w-full">
-          <CardContent className="p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">Instagram 피드 배포</h3>
-            <div className="space-y-3 sm:space-y-4">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium mb-1 sm:mb-2">
+        <Card className="shadow-lg">
+          <CardContent className="p-6 sm:p-8">
+            <h3 className="text-xl font-semibold mb-6 text-gray-800">Instagram 피드 배포</h3>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700">
                   배포 방식
                 </label>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <Select
                     value={tempDeployType}
                     onValueChange={(value: 'auto' | 'manual') => setTempDeployType(value)}
                     disabled={isUpdatingType}
                   >
-                    <SelectTrigger className="w-full sm:w-[200px] lg:w-[350px]">
+                    <SelectTrigger className="w-full sm:w-[350px] bg-white">
                       <SelectValue placeholder="배포 방식 선택" />
                     </SelectTrigger>
                     <SelectContent>
@@ -329,19 +337,17 @@ const canDeployFeed = () => {
                   </Select>
                   
                   {tempDeployType !== status.insertType && (
-                    <div className="flex sm:flex-row items-stretch sm:items-center gap-2">
+                    <div className="flex gap-2">
                       <Button
                         variant="default"
-                        size="sm"
                         onClick={() => updateInsertType(tempDeployType)}
                         disabled={isUpdatingType}
-                        className="flex-1"
+                        className="flex-1 bg-green-600 hover:bg-green-700 transition-colors"
                       >
                         {isUpdatingType ? "변경 중..." : "변경 적용"}
                       </Button>
                       <Button
                         variant="outline"
-                        size="sm"
                         onClick={() => setTempDeployType(status.insertType || 'auto')}
                         disabled={isUpdatingType}
                         className="flex-1"
@@ -353,15 +359,13 @@ const canDeployFeed = () => {
                 </div>
               </div>
 
-              {/* 공통 영역: 스크립트 제거 버튼 */}
               {status.hasScriptTag && (
-                <Alert>
-                  <AlertDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                    <span className="text-xs sm:text-sm">현재 배포된 스크립트가 있습니다.</span>
+                <Alert className="bg-yellow-50 border-yellow-200">
+                  <AlertDescription className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <span className="text-sm text-yellow-700">현재 배포된 스크립트가 있습니다.</span>
                     <Button
                       variant="outline"
-                      size="sm"
-                      className="w-full sm:w-auto"
+                      className="w-full sm:w-auto border-yellow-400 text-yellow-700 hover:bg-yellow-100"
                       onClick={removeScriptTag}
                       disabled={isDeploying}
                     >
@@ -371,17 +375,18 @@ const canDeployFeed = () => {
                 </Alert>
               )}
 
-              {/* 배포 버튼 */}
               {!status.hasScriptTag && (
                 <Button
                   variant="default"
                   onClick={deployInstagramFeed}
                   disabled={isDeploying || !canDeployFeed()}
-                  className={`w-full sm:w-auto ${isDeploying ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`w-full sm:w-auto bg-blue-600 hover:bg-blue-700 transition-colors ${
+                    isDeploying ? 'opacity-50' : ''
+                  }`}
                 >
                   {isDeploying ? (
                     <div className="flex items-center gap-2">
-                      <span className="loading-spinner h-4 w-4 animate-spin"><Loader /></span>
+                      <Loader className="h-4 w-4 animate-spin" />
                       배포 중...
                     </div>
                   ) : (
@@ -391,34 +396,31 @@ const canDeployFeed = () => {
               )}
 
               {status.insertType === 'auto' ? (
-                <p className="text-xs sm:text-sm text-gray-500">
+                <p className="text-sm text-gray-600 bg-gray-50 p-4 rounded-md">
                   자동 배포를 선택하면 쇼핑몰 메인 페이지 하단에 Instagram 피드가 자동으로 삽입됩니다.
                   {status.hasScriptTag && (
-                    <span className="text-green-600 ml-2">
+                    <span className="text-green-600 font-medium ml-2">
                       (현재 배포됨)
                     </span>
                   )}
                 </p>
               ) : (
-                <div className="space-y-3 sm:space-y-4">
-                  <p className="text-xs sm:text-sm text-gray-500">
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600 bg-gray-50 p-4 rounded-md">
                     수동 배포의 경우 배포 이후 아래 코드를 원하는 위치에 직접 삽입하세요.
                   </p>
                   <div className="relative">
-                    <ScrollArea className="h-[100px] w-full rounded-md border p-2 sm:p-4">
-                      <pre className="text-xs sm:text-sm whitespace-pre-wrap break-all">
-                        <code className="inline-block min-w-0 max-w-full">
-                          {manualCode}
-                        </code>
+                    <ScrollArea className="h-[120px] w-full rounded-md border bg-gray-50 p-4">
+                      <pre className="text-sm font-mono text-gray-800">
+                        <code>{manualCode}</code>
                       </pre>
                     </ScrollArea>
                     <Button
                       variant="outline"
-                      size="sm"
-                      className="absolute top-2 right-2 z-10"
+                      className="absolute top-2 right-2 bg-white hover:bg-gray-100"
                       onClick={copyToClipboard}
                     >
-                      <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                      <Copy className="h-4 w-4 mr-2" />
                       {copied ? "복사됨" : "복사"}
                     </Button>
                   </div>
