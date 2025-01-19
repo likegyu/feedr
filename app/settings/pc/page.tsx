@@ -30,6 +30,7 @@ const FeedSettings = () => {
   const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
   const [initialSettings, setInitialSettings] = useState<FeedSettingsType | null>(null);
   const [layoutSettings, setLayoutSettings] = useState<FeedSettingsType | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [emblaRef] = useEmblaCarousel({
     align: 'center',
@@ -115,6 +116,7 @@ const FeedSettings = () => {
   };
 
   const handleSaveSettings = async () => {
+    setIsSaving(true);
     try {
       const response = await fetch('/api/settings/feed', {
         method: 'POST',
@@ -138,6 +140,18 @@ const FeedSettings = () => {
         console.error('Cafe24 스크립트 업데이트 실패');
       }
 
+      // null 체크를 추가하고 타입 안전성 보장
+      if (layoutSettings) {
+        setInitialSettings({
+          layout: layoutSettings.layout,
+          columns: layoutSettings.columns,
+          rows: layoutSettings.rows,
+          gap: layoutSettings.gap,
+          borderRadius: layoutSettings.borderRadius,
+          showMediaType: layoutSettings.showMediaType,
+        });
+      }
+
       toast({
         title: "설정이 저장되었습니다",
         description: "PC 레이아웃 설정이 성공적으로 저장되었습니다.",
@@ -150,6 +164,8 @@ const FeedSettings = () => {
         description: "설정 저장 중 문제가 발생했습니다. 다시 시도해주세요.",
         variant: "destructive",
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -459,10 +475,12 @@ const FeedSettings = () => {
               <Button 
                 className="w-full bg-blue-600 hover:bg-blue-700 transition-colors"
                 onClick={handleSaveSettings}
-                disabled={!isInstagramConnected || !hasSettingsChanged()}
+                disabled={!isInstagramConnected || !hasSettingsChanged() || isSaving}
               >
                 {!isInstagramConnected 
                   ? "인스타그램 연동 필요"
+                  : isSaving
+                  ? "저장 중..."
                   : !hasSettingsChanged()
                   ? "변경사항 없음"
                   : "설정 저장하기"}

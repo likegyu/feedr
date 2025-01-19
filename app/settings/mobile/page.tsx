@@ -31,6 +31,7 @@ const MobileFeedSettings = () => {
   const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
   const [initialSettings, setInitialSettings] = useState<FeedSettings | null>(null);
   const [mobileLayoutSettings, setMobileLayoutSettings] = useState<FeedSettings | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [mobileEmblaRef] = useEmblaCarousel({
     align: 'center',
@@ -112,6 +113,7 @@ const MobileFeedSettings = () => {
 
   // 설정 저장 로직 수정
   const handleSaveSettings = async () => {
+    setIsSaving(true);
     try {
       const response = await fetch('/api/settings/feed', {
         method: 'POST',
@@ -134,7 +136,18 @@ const MobileFeedSettings = () => {
       if (!scriptResponse.ok) {
         console.error('Cafe24 스크립트 업데이트 실패');
       }
-      
+
+      // null 체크를 추가하고 타입 안전성 보장
+      if (mobileLayoutSettings) {
+        setInitialSettings({
+          layout: mobileLayoutSettings.layout,
+          columns: mobileLayoutSettings.columns,
+          rows: mobileLayoutSettings.rows,
+          gap: mobileLayoutSettings.gap,
+          borderRadius: mobileLayoutSettings.borderRadius,
+          showMediaType: mobileLayoutSettings.showMediaType,
+        });
+      }
 
       toast({
         title: "설정이 저장되었습니다",
@@ -148,6 +161,8 @@ const MobileFeedSettings = () => {
         description: "설정 저장 중 문제가 발생했습니다. 다시 시도해주세요.",
         variant: "destructive",
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -494,10 +509,12 @@ const MobileFeedSettings = () => {
               <Button 
                 className="w-full"
                 onClick={handleSaveSettings}
-                disabled={!isInstagramConnected || !hasSettingsChanged()}
+                disabled={!isInstagramConnected || !hasSettingsChanged() || isSaving}
               >
                 {!isInstagramConnected 
                   ? "인스타그램 연동 필요"
+                  : isSaving
+                  ? "저장 중..."
                   : !hasSettingsChanged()
                   ? "변경사항 없음"
                   : "설정 저장하기"}
