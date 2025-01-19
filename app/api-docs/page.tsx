@@ -20,7 +20,7 @@ const ApiDocs = () => {
                 </p>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <pre className="text-sm text-gray-700">
-                    <code>// 예시 코드가 들어갈 자리</code>
+                    <code>{`// 예시 코드가 들어갈 자리`}</code>
                   </pre>
                 </div>
               </section>
@@ -40,7 +40,7 @@ const ApiDocs = () => {
                 </div>
               </section>
               
-              {/* 추가 섹션들... */}
+              {/* API 문서의 추가 섹션들이 이어집니다 */}
             </div>
           </ScrollArea>
         </CardContent>
