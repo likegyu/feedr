@@ -415,7 +415,7 @@ const canDeployFeed = () => {
                 <div className="space-y-4">
                     <p className="text-sm text-gray-600 bg-gray-50 p-4 rounded-md">
                     수동 배포의 경우 스크립트 배포 이후 아래 코드를 원하는 위치에 직접 삽입하세요.
-                    <strong className="mt-2 text-red-600 display-block">
+                    <strong className="mt-2 text-red-600 block">
                       <CircleAlert className="inline-block"/> 스크립트는 제거하지 마세요. 스크립트를 제거하면 피드가 동작하지 않습니다.
                     </strong>
                     </p>
