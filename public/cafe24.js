@@ -24,8 +24,19 @@ function initializeConnections() {
   
   // 스크립트 실행 전 먼저 실행
   initializeConnections();
-  
-(function() {
+
+(function(CAFE24API) {
+  if (!CAFE24API) {
+    console.error('CAFE24API를 찾을 수 없습니다.');
+    return;
+  }
+
+  const MALL_ID = CAFE24API.MALL_ID;
+  if (!MALL_ID) {
+    console.error('MALL_ID를 찾을 수 없습니다.');
+    return;
+  }
+
   const MOBILE_BREAKPOINT = 768;
   const CACHE_DURATION = 1000 * 60 * 1;
   const EMBLA_CDN = 'https://unpkg.com/embla-carousel/embla-carousel.umd.js';
@@ -44,35 +55,6 @@ function initializeConnections() {
 
   // 캐시 키 생성
   const getCacheKey = (mallId, type) => `instagram_feed_cache_${mallId}_${type}`;
-
-  // CAFE24API 로드 최적화
-  function waitForCAFE24API(timeout = 5000) {
-    return new Promise((resolve, reject) => {
-      // 이미 로드된 경우
-      if (window.CAFE24API) {
-        return resolve(window.CAFE24API);
-      }
-
-      // 스크립트 로드 실패 처리
-      const timeoutId = setTimeout(() => {
-        reject(new Error('CAFE24API 로드 타임아웃'));
-      }, timeout);
-
-      // CAFE24API 로드 감지
-      const observer = new MutationObserver((mutations, obs) => {
-        if (window.CAFE24API) {
-          clearTimeout(timeoutId);
-          obs.disconnect();
-          resolve(window.CAFE24API);
-        }
-      });
-
-      observer.observe(document, {
-        childList: true,
-        subtree: true
-      });
-    });
-  }
 
   const MEDIA_ICONS = {
     IMAGE: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`,
@@ -410,7 +392,7 @@ function initializeConnections() {
     }
 
     // 뷰포트에 따라 PC/모바일 레이아웃 렌더
-    async render() {
+    render() {
       console.debug('Render start', {
         container: !!this.container,
         pcSettings: !!this.pcSettings,
@@ -423,7 +405,6 @@ function initializeConnections() {
         return;
       }
 
-      await this.loadEmblaIfNeeded();
       this.injectStyles();
       
       this.container.innerHTML = `
@@ -558,21 +539,14 @@ function initializeConnections() {
     }
   }
 
-  // 초기화 함수
-  async function initialize() {
-    try {
-      const CAFE24API = await waitForCAFE24API();
-      const mallId = CAFE24API.MALL_ID;
-      new InstagramFeed(mallId);
-    } catch (error) {
-      console.error('초기화 실패:', error);
-    }
+  // 단순화된 초기화
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => new InstagramFeed(MALL_ID));
+  } else {
+    new InstagramFeed(MALL_ID);
   }
 
-  // DOM 로드 후 실행
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initialize);
-  } else {
-    initialize();
-  }
-})();
+})(CAFE24API.init({
+  client_id: 'FVxX96V5FRclfqXvKveEDD',
+  version: '2024-12-01'
+}));
