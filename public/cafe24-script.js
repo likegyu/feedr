@@ -87,9 +87,9 @@ class InstagramFeed {
         mobileSettings: !!this.mobileSettings
       });
 
-      // manual 모드일 때는 div#instagram-feed를 찾아서 없으면 종료
+      // manual 모드일 때는 div#feedr-instagram-feed를 찾아서 없으면 종료
       if (this.insertType === 'manual') {
-        this.container = document.getElementById('instagram-feed');
+        this.container = document.getElementById('feedr-instagram-feed');
         if (!this.container) {
           console.debug('Manual mode: Container not found, stopping init');
           return;
@@ -122,7 +122,7 @@ class InstagramFeed {
     if (!footer) return;
 
     this.container = document.createElement('div');
-    this.container.id = 'instagram-feed';
+    this.container.id = 'feedr-instagram-feed';
     this.container.style.cssText = `
       width: 100%;
       margin: 40px 0 40px 0;
@@ -136,7 +136,7 @@ class InstagramFeed {
     const newLayout = isMobile ? 'mobile' : 'pc';
     
     // 레이아웃이 이미 렌더링되어 있지 않은 경우에만 최초 렌더링
-    if (!this.container.querySelector(`#instagram-feed-${newLayout}-${this.mallId}`)) {
+    if (!this.container.querySelector(`#feedr-instagram-feed-${newLayout}-${this.mallId}`)) {
       this.render();
       return;
     }
@@ -308,7 +308,7 @@ class InstagramFeed {
 
   // PC/모바일 각각 스타일 삽입
   injectStyles() {
-    const styleId = `instagram-feed-styles-${this.mallId}`;
+    const styleId = `feedr-instagram-feed-styles-${this.mallId}`;
     let styleTag = document.getElementById(styleId);
     
     if (!styleTag) {
@@ -321,18 +321,18 @@ class InstagramFeed {
       ${this.generateStyles('pc')}
       ${this.generateStyles('mobile')}
       @media (max-width: ${MOBILE_BREAKPOINT - 1}px) {
-        #instagram-feed-pc-${this.mallId} { 
+        #feedr-instagram-feed-pc-${this.mallId} { 
           display: none !important;
         }
-        #instagram-feed-mobile-${this.mallId} {
+        #feedr-instagram-feed-mobile-${this.mallId} {
           display: block !important;
         }
       }
       @media (min-width: ${MOBILE_BREAKPOINT}px) {
-        #instagram-feed-pc-${this.mallId} { 
+        #feedr-instagram-feed-pc-${this.mallId} { 
           display: block !important;
         }
-        #instagram-feed-mobile-${this.mallId} {
+        #feedr-instagram-feed-mobile-${this.mallId} {
           display: none !important;
         }
       }
@@ -344,7 +344,7 @@ class InstagramFeed {
     if (!settings) return '';
   
     return `
-      #instagram-feed-${type}-${this.mallId} {
+      #feedr-instagram-feed-${type}-${this.mallId} {
         width: 100%;
         overflow: hidden;
       }
@@ -386,7 +386,7 @@ class InstagramFeed {
         right: 8px;
         padding: 4px;
         z-index: 2;
-        color: black;
+        color: white;
       }
     `;
   }
@@ -408,10 +408,10 @@ class InstagramFeed {
     this.injectStyles();
     
     this.container.innerHTML = `
-      <div id="instagram-feed-pc-${this.mallId}">
+      <div id="feedr-instagram-feed-pc-${this.mallId}">
         ${this.renderLayout('pc')}
       </div>
-      <div id="instagram-feed-mobile-${this.mallId}">
+      <div id="feedr-instagram-feed-mobile-${this.mallId}">
         ${this.renderLayout('mobile')}
       </div>
     `;

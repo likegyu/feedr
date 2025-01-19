@@ -49,8 +49,7 @@ const InstagramConnect = () => {
     }
   }, [status]);
 
-  const manualCode = `<div id="instagram-feed"></div>
-<script src="https://cithmb.vercel.app/cafe24-script.js"></script>`;
+  const manualCode = `<div id="feedr-instagram-feed"></div>`;
 
   const copyToClipboard = async () => {
     try {
@@ -165,7 +164,7 @@ const InstagramConnect = () => {
           return {
             ...prev,
             insertType: newType,
-            hasScriptTag: newType === 'manual' ? prev.hasScriptTag : false
+            hasScriptTag: prev.hasScriptTag
           };
         });
         setDeployType(newType);
@@ -360,46 +359,48 @@ const InstagramConnect = () => {
                 )}
               </div>
 
+              {/* 공통 영역: 스크립트 제거 버튼 */}
+              {status.hasScriptTag && (
+                <Alert>
+                  <AlertDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <span className="text-xs sm:text-sm">현재 배포된 스크립트가 있습니다.</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                      onClick={removeScriptTag}
+                      disabled={isDeploying}
+                    >
+                      {isDeploying ? "제거 중..." : "스크립트 제거"}
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* 배포 버튼 */}
+              <Button
+                variant={status.hasScriptTag ? "secondary" : "default"}
+                onClick={deployInstagramFeed}
+                disabled={!canDeployFeed()}
+                className="w-full sm:w-auto"
+              >
+                {getDeployButtonText()}
+              </Button>
+
               {status.insertType === 'auto' ? (
-                <>
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    자동 배포를 선택하면 쇼핑몰 메인 페이지 하단에 Instagram 피드가 자동으로 삽입됩니다.
-                    {status.hasScriptTag && (
-                      <span className="text-green-600 ml-2">
-                        (현재 배포됨)
-                      </span>
-                    )}
-                  </p>
-                  <Button
-                    variant={status.hasScriptTag ? "secondary" : "default"}
-                    onClick={deployInstagramFeed}
-                    disabled={!canDeployFeed()}
-                    className="w-full sm:w-auto"
-                  >
-                    {getDeployButtonText()}
-                  </Button>
-                </>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  자동 배포를 선택하면 쇼핑몰 메인 페이지 하단에 Instagram 피드가 자동으로 삽입됩니다.
+                  {status.hasScriptTag && (
+                    <span className="text-green-600 ml-2">
+                      (현재 배포됨)
+                    </span>
+                  )}
+                </p>
               ) : (
                 <div className="space-y-3 sm:space-y-4">
                   <p className="text-xs sm:text-sm text-gray-500">
-                    수동 배포의 경우 아래 코드를 원하는 위치에 직접 삽입하세요.
+                    수동 배포의 경우 배포 이후 아래 코드를 원하는 위치에 직접 삽입하세요.
                   </p>
-                  {status.hasScriptTag && (
-                    <Alert>
-                      <AlertDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                        <span className="text-xs sm:text-sm">현재 자동 배포된 스크립트가 남아있습니다.</span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full sm:w-auto"
-                          onClick={removeScriptTag}
-                          disabled={isDeploying}
-                        >
-                          {isDeploying ? "제거 중..." : "스크립트 제거"}
-                        </Button>
-                      </AlertDescription>
-                    </Alert>
-                  )}
                   <div className="relative">
                     <ScrollArea className="h-[100px] w-full rounded-md border p-2 sm:p-4">
                       <pre className="text-xs sm:text-sm whitespace-pre-wrap break-all">
