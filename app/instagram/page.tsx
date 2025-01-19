@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Ban, UserRoundCheck, Info, Copy, Loader } from "lucide-react"
+import { Ban, UserRoundCheck, Info, Copy, Loader, TriangleAlert } from "lucide-react"
 import { useAuthDialog } from "@/components/auth-dialog-provider"
 import {
   Select,
@@ -362,10 +362,10 @@ const canDeployFeed = () => {
               {status.hasScriptTag && (
                 <Alert className="bg-yellow-50 border-yellow-200">
                   <AlertDescription className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <span className="text-sm text-yellow-500">현재 배포된 스크립트가 있습니다.</span>
+                    <span className="text-sm text-yellow-700">현재 배포된 스크립트가 있습니다.</span>
                     <Button
                       variant="outline"
-                      className="w-full sm:w-auto border-yellow-200 text-yellow-500 hover:bg-yellow-100"
+                      className="w-full sm:w-auto border-yellow-200 text-yellow-700 hover:bg-yellow-100"
                       onClick={removeScriptTag}
                       disabled={isDeploying}
                     >
@@ -397,7 +397,7 @@ const canDeployFeed = () => {
 
               {status.insertType === 'auto' ? (
                 <p className="text-sm text-gray-600 bg-gray-50 p-4 rounded-md">
-                  자동 배포를 선택하면 쇼핑몰 메인 페이지 하단에 Instagram 피드가 자동으로 삽입됩니다.
+                  자동 배포를 선택하면 쇼핑몰 메인의 footer 요소 상단에 자동으로 피드가 표시됩니다.
                   {status.hasScriptTag && (
                     <span className="text-green-600 font-medium ml-2">
                       (현재 배포됨)
@@ -406,9 +406,12 @@ const canDeployFeed = () => {
                 </p>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-sm text-gray-600 bg-gray-50 p-4 rounded-md">
-                    수동 배포의 경우 배포 이후 아래 코드를 원하는 위치에 직접 삽입하세요.
-                  </p>
+                    <p className="text-sm text-gray-600 bg-gray-50 p-4 rounded-md">
+                    수동 배포의 경우 스크립트 배포 이후 아래 코드를 원하는 위치에 직접 삽입하세요.
+                    <strong className="block mt-2 text-red-600">
+                      <TriangleAlert /> 스크립트는 제거하지 마세요. 스크립트를 제거하면 피드가 동작하지 않습니다.
+                    </strong>
+                    </p>
                   <div className="relative">
                     <ScrollArea className="h-[120px] w-full rounded-md border bg-gray-50 p-4">
                       <pre className="text-sm font-mono text-gray-800">
