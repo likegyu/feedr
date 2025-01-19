@@ -42,9 +42,10 @@ const MobileFeedSettings = () => {
     inViewThreshold: 0.7,
   });
 
-  // 인증 상태 확인
+  // 인증 상태 확인 및 설정 로드 통합
   useEffect(() => {
-    const checkAuthStatus = async () => {
+    const loadData = async () => {
+      setIsLoading(true);
       try {
         // Cafe24 토큰 만료 체크
         const tokenResponse = await fetch('/api/auth/cafe24/token-expires-check');
@@ -57,49 +58,36 @@ const MobileFeedSettings = () => {
         const instaResponse = await fetch('/api/auth/instagram/status');
         const instaData = await instaResponse.json();
         setIsInstagramConnected(instaData.isConnected);
-      } catch (error) {
-        console.error('인증 상태 확인 중 오류:', error);
-        setIsCafe24TokenValid(false);
-        setIsInstagramConnected(false);
-      }
-    };
 
-    checkAuthStatus();
-  }, []);
+        // 인증이 유효한 경우에만 설정 로드
+        if (isTokenValid && instaData.isConnected) {
+          const response = await fetch('/api/settings/feed');
+          if (!response.ok) {
+            throw new Error('설정 로드에 실패했습니다');
+          }
 
-  // 설정 로드 로직 수정
-  useEffect(() => {
-    const loadSettings = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch('/api/settings/feed');
-        if (!response.ok) {
-          throw new Error('설정 로드에 실패했습니다');
+          const data = await response.json();
+          let settings: FeedSettings;
+          if (data.mobile_feed_settings) {
+            settings = typeof data.mobile_feed_settings === 'string' 
+              ? JSON.parse(data.mobile_feed_settings)
+              : data.mobile_feed_settings;
+          } else {
+            settings = {
+              layout: 'grid',
+              columns: 2,
+              rows: 3,
+              gap: 8,
+              borderRadius: 8,
+              showMediaType: true,
+            };
+          }
+          
+          setInitialSettings(settings);
+          setMobileLayoutSettings(settings);
         }
-
-        const data = await response.json();
-        console.log('서버 응답:', data); // 디버깅용
-
-        let settings: FeedSettings;
-        if (data.mobile_feed_settings) {
-          settings = typeof data.mobile_feed_settings === 'string' 
-            ? JSON.parse(data.mobile_feed_settings)
-            : data.mobile_feed_settings;
-        } else {
-          settings = {
-            layout: 'grid',
-            columns: 2,
-            rows: 3,
-            gap: 8,
-            borderRadius: 8,
-            showMediaType: true,
-          };
-        }
-        
-        setInitialSettings(settings);
-        setMobileLayoutSettings(settings);
       } catch (error) {
-        console.error('설정 로드 중 오류:', error);
+        console.error('데이터 로드 중 오류:', error);
         toast({
           title: "설정 로드 실패",
           description: error instanceof Error ? error.message : "설정을 불러오는데 실패했습니다.",
@@ -110,7 +98,7 @@ const MobileFeedSettings = () => {
       }
     };
 
-    loadSettings();
+    loadData();
   }, [toast]);
 
   const handleMobileSettingChange = (key: string, value: string | number | boolean) => {
@@ -377,12 +365,12 @@ const MobileFeedSettings = () => {
             <Alert className="bg-yellow-50 border-yellow-200">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-yellow-600" />
+                  <Info className="h-5 w-5 text-yellow-500" />
                   <span>Instagram 계정 연동이 필요합니다.</span>
                 </div>
                 <Button
                   variant="default"
-                  className="bg-yellow-600 hover:bg-yellow-700 transition-colors"
+                  className="bg-yellow-500 hover:bg-yellow-700 transition-colors"
                   asChild
                 >
                   <a href="/instagram">연동하기</a>

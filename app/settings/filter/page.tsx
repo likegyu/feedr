@@ -8,25 +8,36 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
+import { useAuthDialog } from "@/components/auth-dialog-provider";
 
 export type MediaFilter = 'all' | 'image' | 'video';
 
 const FeedFilter = () => {
-  const [isInstagramConnected, setIsInstagramConnected] = useState<boolean>(false);
+  const { onOpen } = useAuthDialog();
+  const [loading, setLoading] = useState(true);
+  const [isCafe24TokenValid, setIsCafe24TokenValid] = useState<boolean | null>(null);
+  const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<MediaFilter>('all');
   const [savedFilter, setSavedFilter] = useState<MediaFilter>('all');
-  const [loading, setLoading] = useState(true);
 
-  // DB에서 현재 필터 설정 가져오기
   useEffect(() => {
-    const checkInstagramStatus = async () => {
+    const loadData = async () => {
+      setLoading(true);
       try {
-        const response = await fetch('/api/auth/instagram/status');
-        const data = await response.json();
-        setIsInstagramConnected(data.isConnected);
-        
-        // Instagram이 연동된 경우에만 필터 설정을 가져옴
-        if (data.isConnected) {
+        // Cafe24 토큰 만료 체크
+        const tokenResponse = await fetch('/api/auth/cafe24/token-expires-check');
+        const tokenData = await tokenResponse.json();
+        const isTokenValid = tokenData?.data?.cafe24ExpiresAt 
+          && new Date(tokenData.data.cafe24ExpiresAt) > new Date();
+        setIsCafe24TokenValid(isTokenValid);
+
+        // Instagram 연동 상태 체크
+        const instaResponse = await fetch('/api/auth/instagram/status');
+        const instaData = await instaResponse.json();
+        setIsInstagramConnected(instaData.isConnected);
+
+        // 인증이 유효한 경우에만 필터 설정 로드
+        if (isTokenValid && instaData.isConnected) {
           const filterResponse = await fetch('/api/feedfilter/get');
           if (!filterResponse.ok) throw new Error('필터 조회 실패');
           const filterData = await filterResponse.json();
@@ -34,13 +45,13 @@ const FeedFilter = () => {
           setSavedFilter(filterData.filter);
         }
       } catch (error) {
-        console.error(error);
+        console.error('데이터 로드 중 오류:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    checkInstagramStatus();
+    loadData();
   }, []);
 
   // 필터 적용
@@ -87,6 +98,33 @@ const FeedFilter = () => {
     );
   }
 
+  if (!isCafe24TokenValid) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">필터 설정</h2>
+        <Card className="shadow-lg">
+          <CardContent className="p-6 sm:p-8">
+            <Alert className="bg-blue-50 border-blue-200">
+              <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-2">
+                  <Info className="h-5 w-5 text-blue-500" />
+                  <span>설정을 사용하기 위해서는 먼저 Cafe24에 로그인해주세요.</span>
+                </div>
+                <Button 
+                  onClick={onOpen}
+                  variant="default"
+                  className="bg-blue-500 hover:bg-blue-600 transition-colors"
+                >
+                  로그인
+                </Button>
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (!isInstagramConnected) {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
@@ -101,7 +139,7 @@ const FeedFilter = () => {
                 </div>
                 <Button
                   variant="default"
-                  className="bg-yellow-600 hover:bg-yellow-700 transition-colors"
+                  className="bg-yellow-500 hover:bg-yellow-700 transition-colors"
                   asChild
                 >
                   <a href="/instagram">연동하기</a>

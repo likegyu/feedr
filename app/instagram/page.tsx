@@ -362,10 +362,10 @@ const canDeployFeed = () => {
               {status.hasScriptTag && (
                 <Alert className="bg-yellow-50 border-yellow-200">
                   <AlertDescription className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <span className="text-sm text-yellow-700">현재 배포된 스크립트가 있습니다.</span>
+                    <span className="text-sm text-yellow-500">현재 배포된 스크립트가 있습니다.</span>
                     <Button
                       variant="outline"
-                      className="w-full sm:w-auto border-yellow-400 text-yellow-700 hover:bg-yellow-100"
+                      className="w-full sm:w-auto border-yellow-200 text-yellow-500 hover:bg-yellow-100"
                       onClick={removeScriptTag}
                       disabled={isDeploying}
                     >
