@@ -57,7 +57,7 @@ export async function PUT() {
       shop_no: 1,
       request: {
         display_location: ['MAIN'],
-        src: 'https://cithmb.vercel.app/cafe24-script.js',
+        src: 'https://feedr.dstudio.kr/cafe24-script.js',
         skin_no: [currentSkinNo] // 현재 사용중인 스킨만 적용
       }
     };

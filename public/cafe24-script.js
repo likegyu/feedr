@@ -1,7 +1,7 @@
 // DNS 프리페칭 및 사전연결 설정
 function initializeConnections() {
   const resources = [
-    'https://cithmb.vercel.app',
+    'https://feedr.dstudio.kr',
     'https://graph.instagram.com',
     'https://unpkg.com'
   ];
