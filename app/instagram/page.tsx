@@ -222,22 +222,19 @@ const InstagramConnect = () => {
     checkInstagramStatus();
   }, [checkInstagramStatus]);
 
-  // 자동 배포 버튼 활성화 조건 함수
-  const canDeployFeed = () => {
-    if (!status?.isConnected) return false;
-    if (isDeploying) return false;
-    if (showTokenAlert) return false;
-    // 배포 방식이 auto가 아닌 경우 배포 불가
-    if (status.insertType !== 'auto') return false;
-    return true;
-  };
+// 배포 버튼 활성화 조건 함수
+const canDeployFeed = () => {
+  if (!status?.isConnected) return false;
+  if (isDeploying) return false;
+  if (showTokenAlert) return false;
+  return true;
+};
 
-  // 피드 배포 버튼 텍스트
-  const getDeployButtonText = () => {
-    if (isDeploying) return "배포 중...";
-    if (status?.insertType !== 'auto') return "자동 배포로 변경 필요";
-    return status?.hasScriptTag ? "다시 배포하기" : "피드 배포하기";
-  };
+// 피드 배포 버튼 텍스트
+const getDeployButtonText = () => {
+  if (isDeploying) return "배포 중...";
+  return status?.hasScriptTag ? "다시 배포하기" : "피드 배포하기";
+};
 
   return (
     <div className="space-y-4">
