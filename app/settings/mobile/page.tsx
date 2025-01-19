@@ -137,16 +137,9 @@ const MobileFeedSettings = () => {
         console.error('Cafe24 스크립트 업데이트 실패');
       }
 
-      // null 체크를 추가하고 타입 안전성 보장
+      // 저장 성공 시 초기 설정값 업데이트
       if (mobileLayoutSettings) {
-        setInitialSettings({
-          layout: mobileLayoutSettings.layout,
-          columns: mobileLayoutSettings.columns,
-          rows: mobileLayoutSettings.rows,
-          gap: mobileLayoutSettings.gap,
-          borderRadius: mobileLayoutSettings.borderRadius,
-          showMediaType: mobileLayoutSettings.showMediaType,
-        });
+        setInitialSettings({ ...mobileLayoutSettings });
       }
 
       toast({

@@ -140,16 +140,9 @@ const FeedSettings = () => {
         console.error('Cafe24 스크립트 업데이트 실패');
       }
 
-      // null 체크를 추가하고 타입 안전성 보장
+      // 저장 성공 시 초기 설정값 업데이트
       if (layoutSettings) {
-        setInitialSettings({
-          layout: layoutSettings.layout,
-          columns: layoutSettings.columns,
-          rows: layoutSettings.rows,
-          gap: layoutSettings.gap,
-          borderRadius: layoutSettings.borderRadius,
-          showMediaType: layoutSettings.showMediaType,
-        });
+        setInitialSettings({ ...layoutSettings });
       }
 
       toast({
