@@ -84,25 +84,31 @@ const Dashboard = () => {
     }, [cafe24MallId]);
 
     return (
-        <div>
-            <h2 className="text-2xl font-bold mb-4">대시보드</h2>
+        <div className="max-w-4xl mx-auto p-4 space-y-6">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">대시보드</h2>
             {showTokenAlert && (
-                <Alert className="mb-4">
-                    <AlertDescription className="flex items-center gap-2">
-                        <Info className="h-4 w-4" />
-                        카페24 로그인이 필요합니다. 다시 로그인해 주세요.
-                        <Button onClick={onOpen} variant="default" size="sm" className="ml-1 h-7">
-                        로그인
+                <Alert className="mb-6 bg-blue-50 border-blue-200">
+                    <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
+                        <div className="flex items-center gap-2">
+                            <Info className="h-5 w-5 text-blue-500" />
+                            <span>카페24 로그인이 필요합니다. 다시 로그인해 주세요.</span>
+                        </div>
+                        <Button 
+                            onClick={onOpen} 
+                            variant="default" 
+                            className="bg-blue-500 hover:bg-blue-600 transition-colors"
+                        >
+                            로그인
                         </Button>
                     </AlertDescription>
                 </Alert>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>매장 정보</CardTitle>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="shadow-lg">
+                    <CardHeader className="p-6">
+                        <CardTitle className="text-xl text-gray-800">매장 정보</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2">
+                    <CardContent className="p-6 pt-0 space-y-4">
                         {loading ? (
                             <>
                                 <Skeleton className="h-6 w-3/4" />
@@ -110,8 +116,12 @@ const Dashboard = () => {
                             </>
                         ) : cafe24ShopName ? (
                             <>
-                                <p><span className="font-medium">스토어명:</span> {cafe24ShopName}</p>
-                                <p><span className="font-medium">Mall ID:</span> {cafe24MallId}</p>
+                                <p className="text-gray-600">
+                                    <span className="font-medium text-gray-800">스토어명:</span> {cafe24ShopName}
+                                </p>
+                                <p className="text-gray-600">
+                                    <span className="font-medium text-gray-800">Mall ID:</span> {cafe24MallId}
+                                </p>
                             </>
                         ) : (
                             <p className="text-gray-500">매장 정보가 없습니다</p>
@@ -119,11 +129,11 @@ const Dashboard = () => {
                     </CardContent>
                 </Card>
                 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>연동된 Instagram 계정</CardTitle>
+                <Card className="shadow-lg">
+                    <CardHeader className="p-6">
+                        <CardTitle className="text-xl text-gray-800">연동된 Instagram 계정</CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-6 pt-0">
                         {loading ? (
                             <div className="space-y-2">
                                 <Skeleton className="h-5 w-24" />
