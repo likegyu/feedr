@@ -42,7 +42,7 @@ export async function POST() {
 
     // PC 테마 정보 조회
     const themeResponse = await fetch(
-      `https://${mallId}.cafe24api.com/api/v2/admin/themes?type=pc&fields=skin_no`,
+      `https://${mallId}.cafe24api.com/api/v2/admin/themes?type=pc&fields=skin_no,published_in`,
       {
         method: 'GET',
         headers: {
@@ -61,7 +61,19 @@ export async function POST() {
     }
 
     const themeData = await themeResponse.json();
-    const currentSkinNo = themeData.themes[0].skin_no; // 첫 번째 테마의 skin_no
+    
+    interface Theme {
+      skin_no: string;
+      published_in: string;
+    }
+    const publishedTheme = (themeData.themes as Theme[]).find((theme: Theme) => theme.published_in === "1");
+    if (!publishedTheme) {
+      return NextResponse.json(
+        { error: '현재 사용중인 테마를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+    const currentSkinNo = publishedTheme.skin_no;
 
     const scriptTagData = {
       shop_no: 1,
