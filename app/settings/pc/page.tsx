@@ -41,10 +41,9 @@ const FeedSettings = () => {
     inViewThreshold: 0.7,    // 성능 최적화를 위한 임계값
   });
 
-  // 인증 상태 확인 및 설정 로드 통합
+  // Instagram 연동 상태 확인
   useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
+    const checkAuthStatus = async () => {
       try {
         // Cafe24 토큰 만료 체크
         const tokenResponse = await fetch('/api/auth/cafe24/token-expires-check');
@@ -58,13 +57,13 @@ const FeedSettings = () => {
         const instaData = await instaResponse.json();
         setIsInstagramConnected(instaData.isConnected);
 
-        // 인증이 유효한 경우에만 설정 로드
+        // 두 인증이 모두 유효한 경우에만 설정 로드
         if (isTokenValid && instaData.isConnected) {
           const response = await fetch('/api/settings/feed');
           if (!response.ok) {
             throw new Error('설정 로드에 실패했습니다');
           }
-
+          
           const data = await response.json();
           let settings: FeedSettingsType;
           if (data.pc_feed_settings) {
@@ -86,7 +85,7 @@ const FeedSettings = () => {
           setLayoutSettings(settings);
         }
       } catch (error) {
-        console.error('데이터 로드 중 오류:', error);
+        console.error('인증 상태 확인 중 오류:', error);
         toast({
           title: "설정 로드 실패",
           description: error instanceof Error ? error.message : "설정을 불러오는데 실패했습니다.",
@@ -97,7 +96,7 @@ const FeedSettings = () => {
       }
     };
 
-    loadData();
+    checkAuthStatus();
   }, [toast]);
 
   // 설정 변경 여부 확인 함수
@@ -307,16 +306,25 @@ const FeedSettings = () => {
     );
   }
 
-  if (!layoutSettings) {
+  if (!isInstagramConnected) {
     return (
-      <div>
-        <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
-        <Card>
-          <CardContent className='p-6 pt-6'>
-            <Alert variant="destructive">
-              <AlertDescription className="flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                설정을 불러오는 중에 문제가 발생했습니다. 새로고침 후 다시 시도해주세요.
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">PC 레이아웃 설정</h2>
+        <Card className="shadow-lg">
+          <CardContent className="p-6 sm:p-8">
+            <Alert className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+              <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-2">
+                  <Info className="h-5 w-5 text-purple-600" />
+                  <span className="text-purple-900">설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
+                </div>
+                <Button
+                  variant="default"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all"
+                  asChild
+                >
+                  <a href="/instagram">연동하기</a>
+                </Button>
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -325,25 +333,16 @@ const FeedSettings = () => {
     );
   }
 
-  if (!isInstagramConnected) {
+  if (!layoutSettings) {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">PC 레이아웃 설정</h2>
-        <Card className="shadow-lg">
-          <CardContent className="p-6 sm:p-8">
-            <Alert className="bg-yellow-50 border-yellow-200">
-              <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-yellow-700" />
-                  <span>Instagram 계정 연동이 필요합니다.</span>
-                </div>
-                <Button
-                  variant="default"
-                  className="border-yellow-200 text-yellow-700 hover:bg-yellow-100"
-                  asChild
-                >
-                  <a href="/instagram">연동하기</a>
-                </Button>
+        <Card>
+          <CardContent className='p-6 pt-6'>
+            <Alert variant="destructive">
+              <AlertDescription className="flex items-center gap-2">
+                <Info className="h-4 w-4" />
+                설정을 불러오는데 실패했습니다. 페이지를 새로고침하거나 잠시 후 다시 시도해주세요.
               </AlertDescription>
             </Alert>
           </CardContent>

@@ -59,7 +59,7 @@ const MobileFeedSettings = () => {
         const instaData = await instaResponse.json();
         setIsInstagramConnected(instaData.isConnected);
 
-        // 인증이 유효한 경우에만 설정 로드
+        // 두 인증이 모두 유효한 경우에만 설정 로드
         if (isTokenValid && instaData.isConnected) {
           const response = await fetch('/api/settings/feed');
           if (!response.ok) {
@@ -338,39 +338,21 @@ const MobileFeedSettings = () => {
     );
   }
 
-  if (!mobileLayoutSettings) {
-    return (
-      <div>
-        <h2 className="text-2xl font-bold mb-4">모바일 레이아웃 설정</h2>
-        <Card>
-          <CardContent className='p-6 pt-6'>
-            <Alert variant="destructive">
-              <AlertDescription className="flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                설정을 불러오는 중에 문제가 발생했습니다. 새로고침 후 다시 시도해주세요.
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   if (!isInstagramConnected) {
     return (
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">모바일 레이아웃 설정</h2>
         <Card className="shadow-lg">
           <CardContent className="p-6 sm:p-8">
-            <Alert className="bg-yellow-50 border-yellow-200">
+            <Alert className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-yellow-700" />
-                  <span>Instagram 계정 연동이 필요합니다.</span>
+                  <Info className="h-5 w-5 text-purple-600" />
+                  <span className="text-purple-900">설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
                 </div>
                 <Button
                   variant="default"
-                  className="border-yellow-200 text-yellow-700 hover:bg-yellow-100"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all"
                   asChild
                 >
                   <a href="/instagram">연동하기</a>
@@ -383,11 +365,29 @@ const MobileFeedSettings = () => {
     );
   }
 
+  if (!mobileLayoutSettings) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">모바일 레이아웃 설정</h2>
+        <Card>
+          <CardContent className='p-6 pt-6'>
+            <Alert variant="destructive">
+              <AlertDescription className="flex items-center gap-2">
+                <Info className="h-4 w-4" />
+                설정을 불러오는데 실패했습니다. 페이지를 새로고침하거나 잠시 후 다시 시도해주세요.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">모바일 레이아웃 설정</h2>
-      <div className="xl:grid xl:grid-cols-2 xl:gap-8">
-        <div className="xl:sticky xl:top-4 space-y-6">
+      <div className="xl:grid xl:grid-cols-12 xl:gap-8">
+        <div className="xl:col-span-5 xl:sticky xl:top-4 space-y-6">
           <Card className="shadow-lg">
             <CardContent className="p-6 sm:p-8">
               {renderMobilePreview()}
@@ -395,7 +395,7 @@ const MobileFeedSettings = () => {
           </Card>
         </div>
         
-        <Card className="shadow-lg mt-6 xl:mt-0">
+        <Card className="shadow-lg mt-6 xl:mt-0 xl:col-span-7">
           <CardContent className="p-6 sm:p-8 space-y-6">
             <div className="space-y-4">
               <div>

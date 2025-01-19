@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Ban, UserRoundCheck, Info, Copy, Loader, TriangleAlert } from "lucide-react"
+import { Ban, UserRoundCheck, Info, Copy, Loader, CircleAlert } from "lucide-react"
 import { useAuthDialog } from "@/components/auth-dialog-provider"
 import {
   Select,
@@ -294,19 +294,26 @@ const canDeployFeed = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              <p className="text-gray-600">Instagram 계정을 연동하여 쇼핑몰에 Instagram 피드를 자동으로 게시하세요.</p>
-              <Button
-                asChild
+              <Alert className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+              <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-2">
+                <Info className="h-5 w-5 text-purple-600" />
+                <span className="text-purple-900">Instagram 계정을 연동하여 쇼핑몰에 피드를 자동으로 게시할 수 있습니다.</span>
+                </div>
+                <Button
                 variant="default"
+                asChild
                 disabled={showTokenAlert}
-                className={`w-full sm:w-auto border-yellow-200 text-yellow-700 hover:bg-yellow-100 ${
+                className={`bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all ${
                   showTokenAlert ? 'opacity-50' : ''
                 }`}
-              >
+                >
                 <a href={instagramAuthUrl} className={showTokenAlert ? 'pointer-events-none' : ''}>
-                  Instagram 계정 연동하기
+                  Instagram 연동하기
                 </a>
-              </Button>
+                </Button>
+              </AlertDescription>
+              </Alert>
             </div>
           )}
         </CardContent>
@@ -408,8 +415,8 @@ const canDeployFeed = () => {
                 <div className="space-y-4">
                     <p className="text-sm text-gray-600 bg-gray-50 p-4 rounded-md">
                     수동 배포의 경우 스크립트 배포 이후 아래 코드를 원하는 위치에 직접 삽입하세요.
-                    <strong className="block mt-2 text-red-600">
-                      <TriangleAlert /> 스크립트는 제거하지 마세요. 스크립트를 제거하면 피드가 동작하지 않습니다.
+                    <strong className="mt-2 text-red-600">
+                      <CircleAlert className="inline-block"/> 스크립트는 제거하지 마세요. 스크립트를 제거하면 피드가 동작하지 않습니다.
                     </strong>
                     </p>
                   <div className="relative">

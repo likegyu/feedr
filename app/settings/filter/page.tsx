@@ -131,15 +131,15 @@ const FeedFilter = () => {
         <h2 className="text-2xl font-bold mb-6 text-gray-800">필터 설정</h2>
         <Card className="shadow-lg">
           <CardContent className="p-6 sm:p-8">
-            <Alert className="bg-yellow-50 border-yellow-200">
+            <Alert className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-yellow-700" />
-                  <span>필터 설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
+                  <Info className="h-5 w-5 text-purple-600" />
+                  <span className="text-purple-900">설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
                 </div>
                 <Button
                   variant="default"
-                  className="border-yellow-200 text-yellow-700 hover:bg-yellow-100"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all"
                   asChild
                 >
                   <a href="/instagram">연동하기</a>
