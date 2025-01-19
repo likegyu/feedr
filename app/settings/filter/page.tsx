@@ -89,14 +89,23 @@ const FeedFilter = () => {
 
   if (!isInstagramConnected) {
     return (
-      <div>
-        <h2 className="text-2xl font-bold mb-4">필터 설정</h2>
-        <Card>
-          <CardContent className='p-6 pt-6'>
-            <Alert>
-              <AlertDescription className="flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                필터 설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">필터 설정</h2>
+        <Card className="shadow-lg">
+          <CardContent className="p-6 sm:p-8">
+            <Alert className="bg-yellow-50 border-yellow-200">
+              <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-2">
+                  <Info className="h-5 w-5 text-yellow-600" />
+                  <span>필터 설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
+                </div>
+                <Button
+                  variant="default"
+                  className="bg-yellow-600 hover:bg-yellow-700 transition-colors"
+                  asChild
+                >
+                  <a href="/instagram">연동하기</a>
+                </Button>
               </AlertDescription>
             </Alert>
           </CardContent>
