@@ -230,12 +230,6 @@ const canDeployFeed = () => {
   return true;
 };
 
-// 피드 배포 버튼 텍스트
-const getDeployButtonText = () => {
-  if (isDeploying) return "배포 중...";
-  return status?.hasScriptTag ? "다시 배포하기" : "피드 배포하기";
-};
-
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold mb-4">Instagram 연동</h2>
@@ -319,41 +313,42 @@ const getDeployButtonText = () => {
                 <label className="block text-sm font-medium mb-1 sm:mb-2">
                   배포 방식
                 </label>
-                <Select
-                  value={tempDeployType}
-                  onValueChange={(value: 'auto' | 'manual') => setTempDeployType(value)}
-                  disabled={isUpdatingType}
-                >
-                  <SelectTrigger className="w-full sm:w-[200px]">
-                    <SelectValue placeholder="배포 방식 선택" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="auto">자동 배포</SelectItem>
-                    <SelectItem value="manual">수동 배포</SelectItem>
-                  </SelectContent>
-                </Select>
-                {tempDeployType !== status.insertType && (
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-2">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="w-full sm:w-auto"
-                      onClick={() => updateInsertType(tempDeployType)}
-                      disabled={isUpdatingType}
-                    >
-                      {isUpdatingType ? "변경 중..." : "변경 적용"}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full sm:w-auto"
-                      onClick={() => setTempDeployType(status.insertType || 'auto')}
-                      disabled={isUpdatingType}
-                    >
-                      취소
-                    </Button>
-                  </div>
-                )}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                  <Select
+                    value={tempDeployType}
+                    onValueChange={(value: 'auto' | 'manual') => setTempDeployType(value)}
+                    disabled={isUpdatingType}
+                  >
+                    <SelectTrigger className="w-full sm:w-[200px]">
+                      <SelectValue placeholder="배포 방식 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">자동 배포</SelectItem>
+                      <SelectItem value="manual">수동 배포</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  {tempDeployType !== status.insertType && (
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => updateInsertType(tempDeployType)}
+                        disabled={isUpdatingType}
+                      >
+                        {isUpdatingType ? "변경 중..." : "변경 적용"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setTempDeployType(status.insertType || 'auto')}
+                        disabled={isUpdatingType}
+                      >
+                        취소
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* 공통 영역: 스크립트 제거 버튼 */}
@@ -376,12 +371,19 @@ const getDeployButtonText = () => {
 
               {/* 배포 버튼 */}
               <Button
-                variant={status.hasScriptTag ? "secondary" : "default"}
-                onClick={deployInstagramFeed}
-                disabled={!canDeployFeed()}
-                className="w-full sm:w-auto"
-              >
-                {getDeployButtonText()}
+              variant={status.hasScriptTag ? "secondary" : "default"}
+              onClick={deployInstagramFeed}
+              disabled={isDeploying || !canDeployFeed()}
+              className={`w-full sm:w-auto ${isDeploying ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {isDeploying ? (
+                <div className="flex items-center gap-2">
+                  <span className="loading-spinner h-4 w-4 animate-spin"></span>
+                  배포 중...
+                </div>
+              ) : (
+                "피드 배포하기"
+              )}
               </Button>
 
               {status.insertType === 'auto' ? (
