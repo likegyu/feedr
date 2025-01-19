@@ -290,7 +290,7 @@ const FeedSettings = () => {
 
   if (!isCafe24TokenValid) {
     return (
-      <div className="max-w-screen-2xl mx-auto p-4 space-y-6">
+      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">PC 레이아웃 설정</h2>
         <Card className="shadow-lg">
           <CardContent className="p-6 sm:p-8">
@@ -317,7 +317,7 @@ const FeedSettings = () => {
 
   if (!isInstagramConnected) {
     return (
-      <div className="max-w-screen-2xl mx-auto p-4 space-y-6">
+      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">PC 레이아웃 설정</h2>
         <Card className="shadow-lg">
           <CardContent className="p-6 sm:p-8">
@@ -344,7 +344,7 @@ const FeedSettings = () => {
 
   if (!layoutSettings) {
     return (
-      <div className="max-w-screen-2xl mx-auto p-4 space-y-6">
+      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">PC 레이아웃 설정</h2>
         <Card>
           <CardContent className='p-6 pt-6'>
@@ -361,7 +361,7 @@ const FeedSettings = () => {
   }
 
   return (
-    <div className="max-w-screen-2xl mx-auto p-4 space-y-6">
+    <div className="max-w-screen-xl mx-auto p-4 space-y-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">PC 레이아웃 설정</h2>
       <Card className="shadow-lg">
         <CardContent className="p-6 sm:p-8">
