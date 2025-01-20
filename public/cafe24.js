@@ -547,6 +547,6 @@ function initializeConnections() {
   }
 
 })(CAFE24API.init({
-  client_id: 'FVxX96V5FRclfqXvKveEDD',
+  client_id: 'Op6O0B7hF5rq7QHsHWlvdB',
   version: '2024-12-01'
 }));
