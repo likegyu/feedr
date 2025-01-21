@@ -36,10 +36,10 @@ const CodeBlock = ({ code, language, filePath, onCopy }: CodeBlockProps) => (
     <CodeBlockHeader filePath={filePath} onCopy={onCopy} />
     <Highlight code={code} language={language} theme={theme}>
       {({ className, tokens, getLineProps, getTokenProps }) => (
-        <pre className={`${className} p-4 m-0 bg-gray-50 overflow-x-auto whitespace-pre`}>
+        <pre className={`${className} p-4 m-0 bg-gray-50 overflow-x-auto whitespace-normal`}>
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line })} className="flex gap-3 border-collapse border-b border-b-slate-200 select-text">
-              <span className="text-gray-500 pr-4 select-none w-[2.5em] text-right flex-shrink-0">
+              <span className="text-gray-500 pr-4 select-none w-[2.5em] text-right flex-shrink-0 align-middle">
                 {i + 1}
               </span>
               <span>
