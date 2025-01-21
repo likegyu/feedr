@@ -88,10 +88,4 @@
   body {
     @apply select-none;
   }
-  pre {
-    @apply inline-block max-w-full overflow-x-auto;
-  }
-  code {
-    @apply font-mono block;
-  }
 }

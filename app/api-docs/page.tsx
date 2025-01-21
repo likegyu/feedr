@@ -3,6 +3,7 @@
 import React from 'react';
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { CodeBlock, dracula } from "react-code-blocks";
 
 const ApiDocs = () => {
   return (
@@ -18,9 +19,12 @@ const ApiDocs = () => {
                   API 연동을 위한 기본 가이드입니다. 아래 설명을 따라 진행해주세요.
                 </p>
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <pre>
-                    <code>{`// 예시 코드가 들어갈 자리`}</code>
-                  </pre>
+                  <CodeBlock
+                    text="// 예시 코드가 들어갈 자리"
+                    language="javascript"
+                    showLineNumbers={false}
+                    theme={dracula}
+                  />
                 </div>
               </section>
               
@@ -33,9 +37,12 @@ const ApiDocs = () => {
                 </p>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h3 className="text-sm font-medium text-gray-700 mb-2">인증 헤더</h3>
-                  <pre>
-                    <code>{`Authorization: Bearer YOUR_ACCESS_TOKEN`}</code>
-                  </pre>
+                  <CodeBlock
+                    text="Authorization: Bearer YOUR_ACCESS_TOKEN"
+                    language="bash"
+                    showLineNumbers={false}
+                    theme={dracula}
+                  />
                 </div>
               </section>
               
