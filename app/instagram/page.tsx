@@ -432,13 +432,4 @@ const canDeployFeed = () => {
   );
 };
 
-const ApiDocs = () => {
-  return (
-    <div>
-      {/* ApiDocs component content */}
-    </div>
-  );
-};
-
 export default InstagramConnect;
-export { ApiDocs };
