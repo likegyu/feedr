@@ -231,9 +231,9 @@ const canDeployFeed = () => {
 };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-6">
+    <div className="max-w-screen-xl mx-auto p-4 space-y-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Instagram 연동</h2>
-      <Card className="shadow-lg">
+      <Card>
         <CardContent className="p-6 sm:p-8">
           {showTokenAlert && (
             <Alert className="mb-6 bg-blue-50 border-blue-200">
@@ -294,17 +294,17 @@ const canDeployFeed = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              <Alert className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+              <Alert className="bg-gradient-to-r from-[#fdf5e6] to-[#fef1f6] border-[#fbcac9]">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
-                <Info className="h-5 w-5 text-purple-600" />
-                <span className="text-purple-900">Instagram 계정을 연동하여 쇼핑몰에 피드를 자동으로 게시할 수 있습니다.</span>
+                <Info className="h-5 w-5 text-[#fbcac9]" />
+                <span>Instagram 계정을 연동하여 쇼핑몰에 피드를 자동으로 게시할 수 있습니다.</span>
                 </div>
                 <Button
                 variant="default"
                 asChild
                 disabled={showTokenAlert}
-                className={`bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all ${
+                className={`bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCB045] hover:brightness-110 text-white font-bold transition-all ${
                   showTokenAlert ? 'opacity-50' : ''
                 }`}
                 >
@@ -320,7 +320,7 @@ const canDeployFeed = () => {
       </Card>
 
       {status?.isConnected && (
-        <Card className="shadow-lg">
+        <Card>
           <CardContent className="p-6 sm:p-8">
             <h3 className="text-xl font-semibold mb-6 text-gray-800">Instagram 피드 배포</h3>
             <div className="space-y-6">
@@ -421,7 +421,7 @@ const canDeployFeed = () => {
                     </p>
                   <div className="relative">
                     <ScrollArea className="h-[120px] w-full rounded-md border bg-gray-50 p-4">
-                      <pre className="text-sm font-mono text-gray-800">
+                      <pre>
                         <code>{manualCode}</code>
                       </pre>
                     </ScrollArea>

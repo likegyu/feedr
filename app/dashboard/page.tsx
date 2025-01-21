@@ -195,7 +195,7 @@ const Dashboard = () => {
 
     // 에러 표시 컴포넌트 추가
     const ErrorAlert = ({ message }: { message: string }) => (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className='bg-destructive text-destructive-foreground'>
             <AlertDescription>
                 {message}
             </AlertDescription>
@@ -203,7 +203,7 @@ const Dashboard = () => {
     );
 
     return (
-        <div className="max-w-4xl mx-auto p-4 space-y-6">
+        <div className="max-w-screen-xl mx-auto p-4 space-y-6">
             <h2 className="text-2xl font-bold mb-6 text-gray-800">대시보드</h2>
             
             {error && <ErrorAlert message={error} />}
@@ -226,7 +226,7 @@ const Dashboard = () => {
                 </Alert>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="shadow-lg">
+                <Card>
                     <CardHeader className="p-6">
                         <CardTitle className="text-xl text-gray-800">매장 정보</CardTitle>
                     </CardHeader>
@@ -251,7 +251,7 @@ const Dashboard = () => {
                     </CardContent>
                 </Card>
                 
-                <Card className="shadow-lg">
+                <Card>
                     <CardHeader className="p-6">
                         <CardTitle className="text-xl text-gray-800">연동된 Instagram 계정</CardTitle>
                     </CardHeader>

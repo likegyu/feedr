@@ -296,7 +296,7 @@ const MobileFeedSettings = () => {
   );
 
   const SettingsSkeleton = () => (
-    <div className="bg-white p-6 rounded-lg shadow space-y-6">
+    <div className="bg-white p-6 rounded-lg space-y-6">
       {Array(5).fill(0).map((_, i) => (
         <div key={i} className="space-y-2">
           <Skeleton className="h-4 w-24" />
@@ -321,10 +321,8 @@ const MobileFeedSettings = () => {
 
   if (!isCafe24TokenValid) {
     return (
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">모바일 레이아웃 설정</h2>
-        <Card className="shadow-lg">
-          <CardContent className="p-6 sm:p-8">
             <Alert className="bg-blue-50 border-blue-200">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
@@ -340,42 +338,36 @@ const MobileFeedSettings = () => {
                 </Button>
               </AlertDescription>
             </Alert>
-          </CardContent>
-        </Card>
       </div>
     );
   }
 
   if (!isInstagramConnected) {
     return (
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">모바일 레이아웃 설정</h2>
-        <Card className="shadow-lg">
-          <CardContent className="p-6 sm:p-8">
-            <Alert className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+            <Alert className="bg-gradient-to-r from-[#fdf5e6] to-[#fef1f6] border-[#fbcac9]">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-purple-600" />
-                  <span className="text-purple-900">설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
+                  <Info className="h-5 w-5 text-[#fbcac9]" />
+                  <span>설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
                 </div>
                 <Button
                   variant="default"
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all"
+                  className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCB045] hover:brightness-110 text-white font-bold transition-all"
                   asChild
                 >
                   <a href="/instagram">연동하기</a>
                 </Button>
               </AlertDescription>
             </Alert>
-          </CardContent>
-        </Card>
       </div>
     );
   }
 
   if (!mobileLayoutSettings) {
     return (
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">모바일 레이아웃 설정</h2>
         <Card>
           <CardContent className='p-6 pt-6'>
@@ -392,18 +384,18 @@ const MobileFeedSettings = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 space-y-6">
+    <div className="max-w-screen-xl mx-auto p-4 space-y-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">모바일 레이아웃 설정</h2>
       <div className="2xl:grid 2xl:grid-cols-12 2xl:gap-8">
         <div className="2xl:col-span-5 2xl:sticky 2xl:top-4 space-y-6">
-          <Card className="shadow-lg">
+          <Card>
             <CardContent className="p-6 sm:p-8">
               {renderMobilePreview()}
             </CardContent>
           </Card>
         </div>
         
-        <Card className="shadow-lg mt-6 xl:mt-0 xl:col-span-7">
+        <Card className="mt-6 xl:mt-0 xl:col-span-7">
           <CardContent className="p-6 sm:p-8 space-y-6">
             <div className="space-y-4">
               <div>

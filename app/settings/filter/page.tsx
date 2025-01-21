@@ -100,10 +100,8 @@ const FeedFilter = () => {
 
   if (!isCafe24TokenValid) {
     return (
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">필터 설정</h2>
-        <Card className="shadow-lg">
-          <CardContent className="p-6 sm:p-8">
             <Alert className="bg-blue-50 border-blue-200">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
@@ -113,41 +111,35 @@ const FeedFilter = () => {
                 <Button 
                   onClick={onOpen}
                   variant="default"
-                  className="bg-blue-500 hover:bg-blue-600 transition-colors"
+                  className="bg-blue-500 hover:bg-blue-600 transition-colors "
                 >
                   로그인
                 </Button>
               </AlertDescription>
             </Alert>
-          </CardContent>
-        </Card>
       </div>
     );
   }
 
   if (!isInstagramConnected) {
     return (
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">필터 설정</h2>
-        <Card className="shadow-lg">
-          <CardContent className="p-6 sm:p-8">
-            <Alert className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+            <Alert className="bg-gradient-to-r from-[#fdf5e6] to-[#fef1f6] border-[#fbcac9]">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-purple-600" />
-                  <span className="text-purple-900">설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
+                  <Info className="h-5 w-5 text-[#fbcac9]" />
+                  <span>설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
                 </div>
                 <Button
                   variant="default"
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all"
+                  className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCB045] hover:brightness-110 text-white font-bold transition-all"
                   asChild
                 >
                   <a href="/instagram">연동하기</a>
                 </Button>
               </AlertDescription>
             </Alert>
-          </CardContent>
-        </Card>
       </div>
     );
   }
@@ -157,9 +149,9 @@ const FeedFilter = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-6">
+    <div className="max-w-screen-xl mx-auto p-4 space-y-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">필터 설정</h2>
-      <Card className="shadow-lg">
+      <Card>
         <CardContent className="p-6 sm:p-8 space-y-6">
           <RadioGroup
             value={selectedFilter}
