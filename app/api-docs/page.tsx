@@ -5,7 +5,6 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Highlight, themes } from 'prism-react-renderer';
 import { Files } from 'lucide-react';
-import { ScrollArea } from "@/components/ui/scroll-area"
 
 const theme = themes.github;
 const exampleCode = `// 예시 코드가 들어갈 자리\nconst example = "Hello, World!";\nconsole.log(example);`;
@@ -37,7 +36,7 @@ const CodeBlock = ({ code, language, filePath, onCopy }: CodeBlockProps) => (
     <CodeBlockHeader filePath={filePath} onCopy={onCopy} />
     <Highlight code={code} language={language} theme={theme}>
       {({ className, tokens, getLineProps, getTokenProps }) => (
-        <ScrollArea className={`${className} p-4 m-0 bg-gray-50 overflow-x-auto whitespace-pre`}>
+        <pre className={`${className} p-4 m-0 bg-gray-50 overflow-x-auto whitespace-pre`}>
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line })} className="flex gap-3 border-collapse border-b border-b-slate-200 select-text">
               <span className="text-gray-500 pr-4 select-none w-[2.5em] text-right flex-shrink-0">
@@ -50,7 +49,7 @@ const CodeBlock = ({ code, language, filePath, onCopy }: CodeBlockProps) => (
               </span>
             </div>
           ))}
-        </ScrollArea>
+        </pre>
       )}
     </Highlight>
   </div>
