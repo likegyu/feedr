@@ -32,7 +32,6 @@ const InstagramConnect = () => {
   const [showTokenAlert, setShowTokenAlert] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployType, setDeployType] = useState<'auto' | 'manual'>('auto');
-  const [copied, setCopied] = useState(false);
   const [isUpdatingType, setIsUpdatingType] = useState(false);
   const [tempDeployType, setTempDeployType] = useState<'auto' | 'manual'>('auto');
 
