@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { cookies } from 'next/headers';
 
-export async function GET(req: NextRequest) {
+interface InstagramTrack {
+  media_id: string;
+  permalink: string;
+  display_url: string;
+  clicks: number;
+  clicked_at: string;
+}
+
+export async function GET() {
   try {
     // 쿠키 이름을 'cafe24_mall_id'로 수정
     const cookieStore = await cookies();
@@ -39,7 +47,7 @@ export async function GET(req: NextRequest) {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const filteredTracks = tracks.filter((track: any) => {
+    const filteredTracks = tracks.filter((track: InstagramTrack) => {
       const clickedAt = new Date(track.clicked_at);
       return clickedAt >= thirtyDaysAgo;
     });
