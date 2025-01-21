@@ -5,7 +5,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Highlight, themes } from 'prism-react-renderer';
 
-const theme = themes.github;
+const theme = themes.vsLight;
 const exampleCode = `// 예시 코드가 들어갈 자리\nconst example = "Hello, World!";\nconsole.log(example);`;
 const authCode = `Authorization:\nBearer YOUR_ACCESS_TOKEN`;
 
@@ -21,9 +21,9 @@ const ApiDocs = () => {
   const renderCodeBlock = (code: string, language: string) => (
     <Highlight code={code} language={language} theme={theme}>
       {({ className, tokens, getLineProps, getTokenProps }) => (
-        <pre className={`${className} p-4 rounded-lg shadow-lg select-text bg-gray-100 text-gray-800`}>
+        <pre className={`${className} border-collapse p-4 rounded-lg shadow-lg select-text bg-gray-100`}>
           {tokens.map((line, i) => (
-            <div key={i} {...getLineProps({ line })} className="table-row border-b border-gray-200 leading-7">
+            <div key={i} {...getLineProps({ line })} className="table-row border-b border-gray-400 leading-7">
               <span className="table-cell text-right text-gray-500 pr-4 select-none">{i + 1}</span>
               <span className="table-cell pl-4">
                 {line.map((token, key) => (
