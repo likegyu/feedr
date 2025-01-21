@@ -38,7 +38,7 @@ const CodeBlock = ({ code, language, filePath, onCopy }: CodeBlockProps) => (
       {({ className, tokens, getLineProps, getTokenProps }) => (
         <pre className={`${className} p-4 m-0 bg-gray-50 overflow-x-auto whitespace-pre`}>
           {tokens.map((line, i) => (
-            <div key={i} {...getLineProps({ line })} className="flex border-collapse border-b border-b-slate-200">
+            <div key={i} {...getLineProps({ line })} className="flex gap-3 border-collapse border-b-slate-200">
               <span className="text-gray-500 pr-4 select-none w-[2.5em] text-right flex-shrink-0">
                 {i + 1}
               </span>
