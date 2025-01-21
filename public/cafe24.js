@@ -288,7 +288,7 @@ function initializeConnections() {
 
     // 인스타그램 미디어 API
     async fetchInstagramMedia(token) {
-      const endpoint = `https://graph.instagram.com/me/media?fields=id,media_type,thumbnail_url,display_url,permalink&access_token=${token}`;
+      const endpoint = `https://graph.instagram.com/me/media?fields=id,media_type,thumbnail_url,permalink&access_token=${token}`;
       try {
         const response = await fetch(endpoint);
         if (!response.ok) throw new Error('Instagram API 요청 실패');
