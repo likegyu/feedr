@@ -21,6 +21,7 @@ import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button"
 import { useAuthDialog } from "@/components/auth-dialog-provider"
 import { Label, Pie, PieChart } from "recharts"
+import Image from 'next/image';
 
 // 타입 정의 추가
 interface InstagramTrack {
@@ -345,7 +346,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             {trackData.map((item, index) => (
               <div key={item.media_id} className="relative group">
-                <img 
+                <Image 
                   src={item.display_url} 
                   alt={`Instagram post ${index + 1}`}
                   className="w-full aspect-square object-cover rounded-lg"
