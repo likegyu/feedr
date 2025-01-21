@@ -4,6 +4,7 @@ import React from 'react';
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Highlight, themes } from 'prism-react-renderer';
+import { Files } from 'lucide-react';
 
 const theme = themes.github;
 const exampleCode = `// 예시 코드가 들어갈 자리\nconst example = "Hello, World!";\nconsole.log(example);`;
@@ -17,15 +18,15 @@ interface CodeBlockProps {
 }
 
 const CodeBlockHeader = ({ filePath, onCopy }: { filePath?: string; onCopy: () => void }) => (
-  <div className="flex justify-between items-center px-4 py-2 bg-gray-100 border-b rounded-t-lg">
+  <div className="flex justify-between items-center px-4 py-2 bg-slate-100 border-b rounded-t-lg">
     <div className="text-sm text-gray-600 font-mono">
       {filePath || '예제 코드'}
     </div>
     <button
       onClick={onCopy}
-      className="px-3 py-1 text-xs bg-white hover:bg-gray-50 text-gray-600 rounded border transition-colors"
+      className="px-3 py-1 text-gray-500 hover:text-black transition-colors"
     >
-      복사
+      <Files size={16}/>
     </button>
   </div>
 );
@@ -37,7 +38,7 @@ const CodeBlock = ({ code, language, filePath, onCopy }: CodeBlockProps) => (
       {({ className, tokens, getLineProps, getTokenProps }) => (
         <pre className={`${className} p-4 m-0 bg-gray-50 overflow-x-auto whitespace-pre`}>
           {tokens.map((line, i) => (
-            <div key={i} {...getLineProps({ line })} className="flex">
+            <div key={i} {...getLineProps({ line })} className="flex border-collapse border-b border-b-slate-200">
               <span className="text-gray-500 pr-4 select-none w-[2.5em] text-right flex-shrink-0">
                 {i + 1}
               </span>
