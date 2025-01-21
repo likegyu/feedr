@@ -18,7 +18,7 @@ interface CodeBlockProps {
 }
 
 const CodeBlockHeader = ({ filePath, onCopy }: { filePath?: string; onCopy: () => void }) => (
-  <div className="flex justify-between items-center px-4 py-2 bg-slate-100 border-b rounded-t-lg">
+  <div className="flex justify-between items-center px-4 py-2 bg-white border-b rounded-t-lg">
     <div className="text-sm text-gray-600 font-mono">
       {filePath || '예제 코드'}
     </div>
@@ -36,9 +36,9 @@ const CodeBlock = ({ code, language, filePath, onCopy }: CodeBlockProps) => (
     <CodeBlockHeader filePath={filePath} onCopy={onCopy} />
     <Highlight code={code} language={language} theme={theme}>
       {({ className, tokens, getLineProps, getTokenProps }) => (
-        <pre className={`${className} p-4 m-0 bg-gray-50 overflow-x-auto whitespace-pre select-text`}>
+        <pre className={`${className} p-4 m-0 bg-gray-50 overflow-x-auto whitespace-pre`}>
           {tokens.map((line, i) => (
-            <div key={i} {...getLineProps({ line })} className="flex gap-3 border-collapse border-b border-b-slate-200">
+            <div key={i} {...getLineProps({ line })} className="flex gap-3 border-collapse border-b border-b-slate-200 select-text">
               <span className="text-gray-500 pr-4 select-none w-[2.5em] text-right flex-shrink-0">
                 {i + 1}
               </span>
