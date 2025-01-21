@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Ban, UserRoundCheck, Info, Copy, Loader, CircleAlert } from "lucide-react"
+import { Ban, UserRoundCheck, Info, Loader, CircleAlert } from "lucide-react"
 import { useAuthDialog } from "@/components/auth-dialog-provider"
 import {
   Select,
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { CodeBlock } from "@/components/ui/code-block"
 
 interface InstagramStatus {
   isConnected: boolean;
@@ -51,14 +51,12 @@ const InstagramConnect = () => {
 
   const manualCode = `<div id="feedr-instagram-feed"></div>`;
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(manualCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('클립보드에 복사되었습니다.');
+    }).catch(err => {
       console.error('복사 실패:', err);
-    }
+    });
   };
 
   const checkTokenExpiration = async () => {
@@ -419,21 +417,12 @@ const canDeployFeed = () => {
                       <CircleAlert className="inline-block"/> 스크립트는 제거하지 마세요. 스크립트를 제거하면 피드가 동작하지 않습니다.
                     </strong>
                     </p>
-                  <div className="relative">
-                    <ScrollArea className="h-[120px] w-full rounded-md border bg-gray-50 p-4">
-                      <pre>
-                        <code>{manualCode}</code>
-                      </pre>
-                    </ScrollArea>
-                    <Button
-                      variant="outline"
-                      className="absolute top-2 right-2 bg-white hover:bg-gray-100"
-                      onClick={copyToClipboard}
-                    >
-                      <Copy className="h-4 w-4 mr-2" />
-                      {copied ? "복사됨" : "복사"}
-                    </Button>
-                  </div>
+                    <CodeBlock
+                      code={manualCode}
+                      language="bash"
+                      filePath="auth-example.sh"
+                      onCopy={() => handleCopy(manualCode)}
+                    />
                 </div>
               )}
             </div>
@@ -444,4 +433,13 @@ const canDeployFeed = () => {
   );
 };
 
+const ApiDocs = () => {
+  return (
+    <div>
+      {/* ApiDocs component content */}
+    </div>
+  );
+};
+
 export default InstagramConnect;
+export { ApiDocs };
