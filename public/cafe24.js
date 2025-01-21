@@ -105,7 +105,6 @@ function initializeConnections() {
 
         this.container.style.cssText = `
           width: 100%;
-          margin: 40px 0 40px 0;
         `;
 
         window.addEventListener('resize', this.handleResize);
@@ -126,6 +125,7 @@ function initializeConnections() {
       this.container.style.cssText = `
         width: 100%;
         margin: 40px 0 40px 0;
+        text-align: center;
       `;
 
       footer.parentNode.insertBefore(this.container, footer);
@@ -234,7 +234,7 @@ function initializeConnections() {
         // 인스타그램 미디어
         if (data.instagram_access_token) {
           const mediaResponse = await this.fetchInstagramMedia(data.instagram_access_token);
-          this.mediaItems = (mediaResponse.data || []).filter(item => !!item.media_url);
+          this.mediaItems = (mediaResponse.data || []).filter(item => !!item.display_url);
         }
 
         // 캐시에 저장
@@ -288,7 +288,7 @@ function initializeConnections() {
 
     // 인스타그램 미디어 API
     async fetchInstagramMedia(token) {
-      const endpoint = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}`;
+      const endpoint = `https://graph.instagram.com/me/media?fields=id,media_type,thumbnail_url,display_url,permalink&access_token=${token}`;
       try {
         const response = await fetch(endpoint);
         if (!response.ok) throw new Error('Instagram API 요청 실패');
@@ -297,7 +297,7 @@ function initializeConnections() {
           ...data,
           data: data.data.map(item => ({
             ...item,
-            display_url: item.thumbnail_url || item.media_url
+            display_url: item.thumbnail_url || item.display_url
           }))
         };
       } catch (error) {
@@ -325,12 +325,12 @@ function initializeConnections() {
             display: none !important;
           }
           #feedr-instagram-feed-mobile-${this.mallId} {
-            display: block !important;
+            display: inline-block !important;
           }
         }
         @media (min-width: ${MOBILE_BREAKPOINT}px) {
           #feedr-instagram-feed-pc-${this.mallId} { 
-            display: block !important;
+            display: inline-block !important;
           }
           #feedr-instagram-feed-mobile-${this.mallId} {
             display: none !important;
@@ -386,7 +386,7 @@ function initializeConnections() {
           right: 8px;
           padding: 4px;
           z-index: 2;
-          color: black;
+          color: white;
         }
       `;
     }
@@ -486,7 +486,7 @@ function initializeConnections() {
         <div class="feed-item-${type}-${this.mallId}">
           <a href="${item.permalink}" target="_blank" rel="noopener noreferrer">
             <img 
-              src="${mediaType === 'VIDEO' ? item.thumbnail_url : item.media_url}" 
+              src="${mediaType === 'VIDEO' ? item.thumbnail_url : item.display_url}" 
               alt="${item.caption || ''}"
               loading="lazy"
               style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1;"
