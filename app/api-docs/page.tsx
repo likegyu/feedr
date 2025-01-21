@@ -21,11 +21,11 @@ const ApiDocs = () => {
   const renderCodeBlock = (code: string, language: string) => (
     <Highlight code={code} language={language} theme={theme}>
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <pre className={`${className} p-4 rounded-lg shadow-lg`} style={{ ...style, backgroundColor: '#f5f5f5', color: '#333' }}>
+        <pre className={`${className} p-4 rounded-lg shadow-lg select-text bg-gray-100 text-gray-800`}>
           {tokens.map((line, i) => (
-            <div key={i} {...getLineProps({ line })} className="table-row border-b border-gray-200 leading-6">
-              <span className="table-cell text-right text-gray-500">{i + 1}</span>
-              <span className="table-cell pl-2">
+            <div key={i} {...getLineProps({ line })} className="table-row border-b border-gray-200 leading-7">
+              <span className="table-cell text-right text-gray-500 pr-4 select-none">{i + 1}</span>
+              <span className="table-cell pl-4">
                 {line.map((token, key) => (
                   <span key={key} {...getTokenProps({ token })} />
                 ))}
