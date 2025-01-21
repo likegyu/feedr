@@ -58,6 +58,7 @@ function initializeConnections() {
 
   const MEDIA_ICONS = {
     IMAGE: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`,
+    CAROUSEL_ALBUM: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gallery-thumbnails"><rect width="18" height="14" x="3" y="3" rx="2"/><path d="M4 21h1"/><path d="M9 21h1"/><path d="M14 21h1"/><path d="M19 21h1"/></svg>`,
     VIDEO: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-play"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg>`
   };
 
@@ -65,6 +66,7 @@ function initializeConnections() {
     constructor(mallId) {
       this.mallId = mallId;
       this.apiEndpoint = 'https://feedr.dstudio.kr/api/cafe24-script/get';
+      this.clickTrackingEndpoint = 'https://feedr.dstudio.kr/api/instagram-tracks';
       this.container = null;
       this.pcSettings = null;
       this.mobileSettings = null;
@@ -114,6 +116,26 @@ function initializeConnections() {
         console.error('Instagram Feed Error:', error);
       }
     }
+
+    async trackClick(mediaId, permalink) {
+      try {
+          const response = await fetch(this.trackingEndpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  mall_id: this.mallId,
+                  media_id: mediaId,
+                  permalink: permalink,
+                  display_url: this.mediaItems.find(item => item.id === mediaId)?.display_url
+              })
+          });
+          return response.ok;
+      } catch (error) {
+          console.error('Click tracking failed:', error);
+          return false;
+      }
+  }
+
 
     createContainer() {
       // insertType 체크 제거 (이미 init에서 체크함)
@@ -234,7 +256,7 @@ function initializeConnections() {
         // 인스타그램 미디어
         if (data.instagram_access_token) {
           const mediaResponse = await this.fetchInstagramMedia(data.instagram_access_token);
-          this.mediaItems = (mediaResponse.data || []).filter(item => !!item.display_url);
+          this.mediaItems = (mediaResponse.data || []).filter(item => !!item.media_url);
         }
 
         // 캐시에 저장
@@ -288,7 +310,7 @@ function initializeConnections() {
 
     // 인스타그램 미디어 API
     async fetchInstagramMedia(token) {
-      const endpoint = `https://graph.instagram.com/me/media?fields=id,media_type,thumbnail_url,permalink&access_token=${token}`;
+      const endpoint = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}`;
       try {
         const response = await fetch(endpoint);
         if (!response.ok) throw new Error('Instagram API 요청 실패');
@@ -297,7 +319,7 @@ function initializeConnections() {
           ...data,
           data: data.data.map(item => ({
             ...item,
-            display_url: item.thumbnail_url || item.display_url
+            display_url: item.thumbnail_url || item.media_url
           }))
         };
       } catch (error) {
@@ -480,13 +502,20 @@ function initializeConnections() {
     // 미디어 단위 렌더링
     renderItem(item, type) {
       const settings = type === 'mobile' ? this.mobileSettings : this.pcSettings;
-      const mediaType = item.media_type === 'VIDEO' ? 'VIDEO' : 'IMAGE';
+      const mediaType = item.media_type === 'VIDEO' ? 'VIDEO' : 
+                       item.media_type === 'CAROUSEL_ALBUM' ? 'CAROUSEL_ALBUM' : 'IMAGE';
       
       return `
         <div class="feed-item-${type}-${this.mallId}">
-          <a href="${item.permalink}" target="_blank" rel="noopener noreferrer">
+          <a href="${item.permalink}" target="_blank" rel="noopener noreferrer"
+              onclick="(function(e) {
+              e.preventDefault();
+              window.feedrInstagram_${this.mallId}.trackClick('${item.id}', '${item.permalink}')
+                .then(() => window.open('${item.permalink}', '_blank')).bind(this);
+            })(event)"
+             >
             <img 
-              src="${mediaType === 'VIDEO' ? item.thumbnail_url : item.display_url}" 
+              src="${mediaType === 'VIDEO' ? item.thumbnail_url : item.media_url}" 
               alt="${item.caption || ''}"
               loading="lazy"
               style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1;"

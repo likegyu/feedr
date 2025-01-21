@@ -23,6 +23,7 @@ type Token = {
   instagram_issued_at?: number; // UNIX timestamp로 저장
   script_tag_no?: number;
   insert_type: 'auto' | 'manual';
+  instagram_tracks?: string;
 };
 
 const pool = new Pool({
