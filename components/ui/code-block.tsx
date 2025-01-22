@@ -65,11 +65,11 @@ export function CodeBlock({ code, language, filePath, maxHeight = '500px', onCop
           {({ className, tokens, getLineProps, getTokenProps }) => (
             <pre className={`${className} p-4 m-0`}>
               {tokens.map((line, i) => (
-                <div key={i} {...getLineProps({ line })} className="table-row select-text">
+                <div key={i} {...getLineProps({ line })} className="table-row">
                   <span className="pr-4 text-gray-400 select-none w-[2.5em]">
                     {i + 1}
                   </span>
-                  <span>
+                  <span className="select-text">
                     {line.map((token, key) => (
                       <span key={key} {...getTokenProps({ token })} />
                     ))}
