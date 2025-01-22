@@ -230,8 +230,6 @@ const canDeployFeed = () => {
   return (
     <div className="max-w-screen-xl mx-auto p-4 space-y-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Instagram 연동</h2>
-      <Card>
-        <CardContent className="p-6 sm:p-8">
           {showTokenAlert && (
             <Alert className="mb-6 bg-blue-50 border-blue-200">
               <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
@@ -313,8 +311,6 @@ const canDeployFeed = () => {
               </Alert>
             </div>
           )}
-        </CardContent>
-      </Card>
 
       {status?.isConnected && (
         <Card>
@@ -418,8 +414,8 @@ const canDeployFeed = () => {
                     </p>
                     <CodeBlock
                       code={manualCode}
-                      language="bash"
-                      filePath="auth-example.sh"
+                      language="jsx"
+                      filePath="/main.html"
                       onCopy={() => handleCopy(manualCode)}
                     />
                 </div>

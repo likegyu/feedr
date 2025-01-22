@@ -229,24 +229,26 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader className="p-6">
-                        <CardTitle className="text-xl text-gray-800">매장 정보</CardTitle>
-                    <Button 
-                      onClick={() => {
-                        // 로그아웃 로직 추가
-                        fetch('/api/auth/cafe24/logout', { method: 'POST' })
-                          .then(() => {
-                            // 로그아웃 후 리디렉션
-                            window.location.href = '/login';
-                          })
-                          .catch(error => {
-                            console.error('로그아웃 실패:', error);
-                          });
-                      }} 
-                      variant="default" 
-                      className="bg-red-500 hover:bg-red-600 transition-colors ml-auto"
-                    >
-                      로그아웃
-                    </Button>
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-xl text-gray-800">매장 정보</CardTitle>
+                            {cafe24MallId && (
+                                <Button 
+                                    onClick={() => {
+                                        fetch('/api/auth/cafe24/logout', { method: 'POST' })
+                                            .then(() => {
+                                                window.location.href = '/';
+                                            })
+                                            .catch(error => {
+                                                console.error('로그아웃 실패:', error);
+                                            });
+                                    }} 
+                                    variant="default" 
+                                    className="bg-red-500 hover:bg-red-600 transition-colors"
+                                >
+                                    로그아웃
+                                </Button>
+                            )}
+                        </div>
                     </CardHeader>
                     <CardContent className="p-6 pt-0 space-y-4">
                         {loading ? (

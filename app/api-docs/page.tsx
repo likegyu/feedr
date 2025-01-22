@@ -30,7 +30,7 @@ const ApiDocs = () => {
               </p>
               <CodeBlock
                 code={exampleCode}
-                language="javascript"
+                language="jsx"
                 filePath="example.js"
                 onCopy={() => handleCopy(exampleCode)}
               />
