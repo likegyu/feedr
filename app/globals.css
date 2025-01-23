@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    font-family: 'Pretendard', -apple-system, sans-serif;
-  }
-}
-
 
 @layer base {
     :root {
