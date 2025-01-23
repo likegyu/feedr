@@ -1,5 +1,6 @@
 "use client"
 
+import { usePathname } from "next/navigation"
 import { ChevronRight, type LucideIcon } from "lucide-react"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -37,6 +38,7 @@ export function NavMain({
 }) {
   const { toggleSidebar } = useSidebar()
   const isMobile = useIsMobile()
+  const pathname = usePathname()
 
   const handleClick = () => {
     if (isMobile) {
@@ -49,11 +51,15 @@ export function NavMain({
       <SidebarGroupLabel>Feedr</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
+          const isActive = item.url && pathname.startsWith(item.url)
+          const hasActiveChild = item.items?.some(
+            subItem => subItem.url && pathname.startsWith(subItem.url)
+          )
           // 하위 아이템이 없는 경우
           if (!item.items || item.items.length === 0) {
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild tooltip={item.title}>
+                <SidebarMenuButton className={isActive ? "bg-accent text-white" : ""} asChild tooltip={item.title}>
                   <Link
                   href={item.url || "#"}
                   onClick={(e) => {
@@ -78,7 +84,10 @@ export function NavMain({
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title}>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    className={hasActiveChild ? "bg-accent/50 text-white" : ""}
+                  >
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -86,9 +95,14 @@ export function NavMain({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items?.map((subItem) => (
+                    {item.items?.map((subItem) => {
+                      const isSubItemActive = pathname.startsWith(subItem.url)
+                      return (
                       <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
+                        <SidebarMenuSubButton
+                          asChild
+                          className={isSubItemActive ? "bg-accent [&_svg]:text-white text-white" : ""}
+                        >
                           <Link 
                             href={subItem.url}
                             onClick={handleClick}
@@ -98,7 +112,8 @@ export function NavMain({
                           </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
-                    ))}
+                      )
+                    })}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>

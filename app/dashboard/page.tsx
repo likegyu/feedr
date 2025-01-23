@@ -302,6 +302,36 @@ const Dashboard = () => {
                     </CardContent>
                 </Card>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                    <CardHeader className="p-6">
+                            <CardTitle className="text-xl text-gray-800">현재 레이아웃</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6 pt-0 space-y-4">
+                        <p className="text-gray-600">
+                            <span className="font-medium text-gray-800">현재 레이아웃:</span> 1
+                        </p>
+                        <p className="text-gray-600">
+                            <span className="font-medium text-gray-800">레이아웃 변경:</span> 2
+                        </p>
+                    </CardContent>
+                </Card>
+                
+                <Card>
+                <CardHeader className="p-6">
+                  <CardTitle className="text-xl text-gray-800">문의 연락처 안내</CardTitle>
+                  <CardDescription>Mall ID, @인스타그램 계정 등의 정보를 함께 알려주세요.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-6 pt-0">
+                 
+                  <p className="text-gray-600">
+                     <span className="font-medium text-gray-800">이메일:</span> <a className='hover:text-black' href='mailto:admin@dstudio.com'>admin@dstudio.com</a>
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            
             <Card className="flex flex-col">
         <CardHeader className="items-center pb-0">
           <CardTitle>인스타그램 클릭 분석</CardTitle>
