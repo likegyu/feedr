@@ -13,14 +13,13 @@ import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthDialog } from "@/components/auth-dialog-provider";
-import { Label, Pie, PieChart } from "recharts";
+import { Label, Pie, PieChart, TooltipProps } from "recharts";
 import Image from "next/image";
 import {
   Store,
@@ -141,7 +140,27 @@ const Dashboard = () => {
 
     fetchTrackData();
   }, [cafe24MallId]);
+  const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const trackItem = trackData.find((item) => item.media_id === data.id);
 
+      return (
+        <div className="bg-white p-2 border rounded-lg shadow">
+          <Image
+            src={trackItem?.display_url ?? ""}
+            alt="Instagram post"
+            width={25}
+            height={25}
+          />
+          <p className="text-sm text-gray-700 mt-2">
+            총 클릭수: {data.clicks.toLocaleString()}회
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
   // 토큰 만료 체크 함수 개선
   const checkTokenExpiration = useCallback(async () => {
     try {
@@ -544,10 +563,7 @@ const Dashboard = () => {
               className="mx-auto aspect-square max-h-[250px]"
             >
               <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
+                <ChartTooltip cursor={false} content={<CustomTooltip />} />
                 <Pie
                   data={chartData}
                   dataKey="clicks"
