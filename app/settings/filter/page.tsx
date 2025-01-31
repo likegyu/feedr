@@ -41,7 +41,7 @@ const FeedFilter = () => {
         // Instagram 연동 상태 체크
         const instaResponse = await fetch("/api/auth/instagram/status");
         const instaData = await instaResponse.json();
-        setIsInstagramConnected(instaData.isConnected);
+        setIsInstagramConnected(instaData.data.isConnected); // .data 추가
 
         // 인증이 유효한 경우에만 필터 설정 로드
         if (isTokenValid && instaData.isConnected) {

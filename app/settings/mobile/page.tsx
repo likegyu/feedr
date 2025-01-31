@@ -68,10 +68,10 @@ const MobileFeedSettings = () => {
         // Instagram 연동 상태 체크
         const instaResponse = await fetch("/api/auth/instagram/status");
         const instaData = await instaResponse.json();
-        setIsInstagramConnected(instaData.isConnected);
+        setIsInstagramConnected(instaData.data.isConnected); // .data 추가
 
         // 두 인증이 모두 유효한 경우에만 설정 로드
-        if (isTokenValid && instaData.isConnected) {
+        if (isTokenValid && instaData.data.isConnected) {
           const response = await fetch("/api/settings/feed");
           if (!response.ok) {
             throw new Error("설정 로드에 실패했습니다");

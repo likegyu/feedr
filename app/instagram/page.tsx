@@ -92,8 +92,12 @@ const InstagramConnect = () => {
 
     try {
       const response = await fetch(`/api/auth/instagram/status`);
-      const data = await response.json();
-      setStatus(data);
+      const result = await response.json();
+      if (result.success) {
+        setStatus(result.data); // data 객체에 올바르게 접근
+      } else {
+        setError(result.error || "상태 확인 실패");
+      }
     } catch (error) {
       console.error("Instagram 상태 확인 중 오류:", error);
       setError("Instagram 상태 확인 중 오류가 발생했습니다.");
