@@ -374,9 +374,9 @@ const Dashboard = () => {
                     href={`https://${cafe24MallId}.cafe24.com`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
+                    className="text-blue-500 hover:text-blue-600 items-center gap-1 inline-block"
                   >
-                    방문하기 <ExternalLink className="h-4 w-4" />
+                    방문하기 <ExternalLink className="h-4 w-4 inline-block" />
                   </a>
                 </p>
               </>

@@ -1,14 +1,27 @@
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+
+interface InstagramStatus {
+  isConnected: boolean;
+  userName?: string;
+  hasScriptTag: boolean;
+  insertType: "auto" | "manual";
+}
 
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const mallId = cookieStore.get('cafe24_mall_id')?.value;
+    const mallId = cookieStore.get("cafe24_mall_id")?.value;
 
     if (!mallId) {
-      return NextResponse.json({ error: '인증 정보가 없습니다.' }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "인증 정보가 없습니다.",
+        },
+        { status: 401 }
+      );
     }
 
     const { rows } = await db.query(
@@ -18,18 +31,25 @@ export async function GET() {
       [mallId]
     );
 
-    const status = {
+    const status: InstagramStatus = {
       isConnected: !!rows[0]?.instagram_username,
       userName: rows[0]?.instagram_username || undefined,
       hasScriptTag: !!rows[0]?.script_tag_no,
-      insertType: rows[0]?.insert_type || 'auto'
+      insertType: rows[0]?.insert_type || "auto",
     };
 
-    return NextResponse.json(status);
+    return NextResponse.json({
+      success: true,
+      data: status,
+    });
   } catch (error) {
-    if (error instanceof Error) {
-      return NextResponse.json({ isConnected: false, error: error.message });
-    }
-    return NextResponse.json({ isConnected: false, error: 'An unknown error occurred' });
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      },
+      { status: 500 }
+    );
   }
 }
