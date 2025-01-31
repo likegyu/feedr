@@ -19,7 +19,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthDialog } from "@/components/auth-dialog-provider";
-import { Label, Pie, PieChart, TooltipProps } from "recharts";
+import { Label, Pie, PieChart, TooltipProps, Cell } from "recharts";
 import Image from "next/image";
 import {
   Store,
@@ -150,11 +150,11 @@ const Dashboard = () => {
           <Image
             src={trackItem?.display_url ?? ""}
             alt="Instagram post"
-            width={25}
-            height={25}
+            width={100}
+            height={100}
           />
           <p className="text-sm text-gray-700 mt-2">
-            총 클릭수: {data.clicks.toLocaleString()}회
+            클릭수: {data.clicks.toLocaleString()}회
           </p>
         </div>
       );
@@ -571,6 +571,14 @@ const Dashboard = () => {
                   innerRadius={60}
                   strokeWidth={5}
                 >
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.fill}
+                      onClick={() => console.log("클릭된 데이터:", entry)}
+                      style={{ cursor: "pointer" }}
+                    />
+                  ))}
                   <Label
                     content={({ viewBox }) => {
                       if (viewBox && "cx" in viewBox && "cy" in viewBox) {
