@@ -101,7 +101,7 @@ const Dashboard = () => {
         id: item.media_id,
         clicks: item.clicks,
         fill: CHART_COLORS[index % CHART_COLORS.length],
-        url: item.display_url,
+        url: item.permalink,
       })),
     [trackData, CHART_COLORS]
   );
