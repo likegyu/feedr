@@ -80,6 +80,7 @@ initializeConnections();
         RESIZE_THROTTLE
       );
       this.insertType = null; // 'auto' | 'manual'
+      window[`feedrInstagram_${this.mallId}`] = this;
       this.init();
     }
 
@@ -126,7 +127,7 @@ initializeConnections();
 
     async trackClick(mediaId, permalink) {
       try {
-        const response = await fetch(this.trackingEndpoint, {
+        const response = await fetch(this.clickTrackingEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -552,38 +553,36 @@ initializeConnections();
           : "IMAGE";
 
       return `
-        <div class="feed-item-${type}-${this.mallId}">
-          <a href="${item.permalink}" target="_blank" rel="noopener noreferrer"
-              onclick="(function(e) {
-              e.preventDefault();
-              window.feedrInstagram_${this.mallId}.trackClick('${item.id}', '${
-        item.permalink
-      }')
-                .then(() => window.open('${
-                  item.permalink
-                }', '_blank')).bind(this);
-            })(event)"
-             >
-            <img 
-              src="${
-                mediaType === "VIDEO" ? item.thumbnail_url : item.media_url
-              }" 
-              alt="${item.caption || ""}"
-              loading="lazy"
-              style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1;"
-            >
-            ${
-              settings.showMediaType
-                ? `
-              <div class="media-type-icon-${type}-${this.mallId}">
-                ${MEDIA_ICONS[mediaType]}
-              </div>
-            `
-                : ""
-            }
-          </a>
-        </div>
-      `;
+    <div class="feed-item-${type}-${this.mallId}">
+      <a href="${item.permalink}" 
+         target="_blank" 
+         rel="noopener noreferrer"
+         onclick="(async function(e) {
+           e.preventDefault();
+           await window.feedrInstagram_${this.mallId}.trackClick('${
+        item.id
+      }', '${item.permalink}');
+           window.open('${item.permalink}', '_blank');
+         })(event)"
+      >
+        <img 
+          src="${mediaType === "VIDEO" ? item.thumbnail_url : item.media_url}" 
+          alt="${item.caption || ""}"
+          loading="lazy"
+          style="width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1;"
+        >
+        ${
+          settings.showMediaType
+            ? `
+          <div class="media-type-icon-${type}-${this.mallId}">
+            ${MEDIA_ICONS[mediaType]}
+          </div>
+        `
+            : ""
+        }
+      </a>
+    </div>
+  `;
     }
 
     // 캐러셀 초기화
