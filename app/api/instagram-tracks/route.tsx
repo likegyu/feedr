@@ -2,18 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 interface TrackClickRequest {
-  mall_id: string; // cafe24.js의 this.mallId
-  media_id: string; // cafe24.js의 mediaId
-  permalink: string; // cafe24.js의 permalink
-  display_url: string; // 필수 필드로 변경
+  tracks: {
+    mall_id: string;
+    media_id: string;
+    permalink: string;
+    display_url: string;
+    timestamp: string;
+  };
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as TrackClickRequest;
-    const { mall_id, media_id, permalink, display_url } = body;
+    const { mall_id, media_id, permalink, display_url } = body.tracks;
 
-    // cafe24.js에서 보내는 필수 데이터 검증
+    // 검증
     if (!mall_id || !media_id || !permalink || !display_url) {
       return NextResponse.json({ success: false }, { status: 400 });
     }
