@@ -480,7 +480,7 @@ const Dashboard = () => {
                     </span>{" "}
                     {mediaFilter !== "all"
                       ? formatMediaType(mediaFilter)
-                      : "정보 없음"}
+                      : "모든 미디어"}
                   </p>
                 </div>
               </div>
