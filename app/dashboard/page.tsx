@@ -213,14 +213,18 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/auth/instagram/status`);
-      const data = await response.json();
+      const result = await response.json();
 
-      if (!data.success) {
-        throw new Error(data.error || "Instagram 상태를 확인할 수 없습니다.");
+      if (!result.success) {
+        throw new Error(result.error || "Instagram 상태를 확인할 수 없습니다.");
       }
 
+      // API 응답 구조에 맞게 수정
+      const { data } = result;
       setInstagramStatus(data.isConnected);
       setInstagramUserName(data.userName);
+
+      console.log("Instagram 상태:", data); // 디버깅용
     } catch (error) {
       console.error("Instagram 상태 조회 실패:", error);
       setError(
