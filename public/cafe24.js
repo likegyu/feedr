@@ -131,11 +131,15 @@ initializeConnections();
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            mall_id: this.mallId,
-            media_id: mediaId,
-            permalink: permalink,
-            display_url: this.mediaItems.find((item) => item.id === mediaId)
-              ?.display_url,
+            tracks: {
+              // JSONB 구조에 맞게 최상위 객체로 감싸기
+              mall_id: this.mallId,
+              media_id: mediaId,
+              permalink: permalink,
+              display_url: this.mediaItems.find((item) => item.id === mediaId)
+                ?.display_url,
+              timestamp: new Date().toISOString(),
+            },
           }),
         });
         return response.ok;
