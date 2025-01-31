@@ -593,11 +593,17 @@ const Dashboard = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             {trackData.map((item, index) => (
               <div key={item.media_id} className="relative group">
-                <Image
-                  src={item.display_url}
-                  alt={`Instagram post ${index + 1}`}
-                  className="w-full aspect-square object-cover rounded-lg"
-                />
+                <a
+                  href={item.permalink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Image
+                    src={item.display_url}
+                    alt={`Instagram post ${index + 1}`}
+                    className="w-full aspect-square object-cover rounded-lg"
+                  />
+                </a>
                 <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded-full text-sm">
                   {item.clicks}회
                 </div>
