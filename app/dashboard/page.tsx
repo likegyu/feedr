@@ -45,6 +45,7 @@ interface ChartDataItem {
   id: string;
   clicks: number;
   fill: string;
+  url: string;
 }
 
 interface ApiResponse<T> {
@@ -100,6 +101,7 @@ const Dashboard = () => {
         id: item.media_id,
         clicks: item.clicks,
         fill: CHART_COLORS[index % CHART_COLORS.length],
+        url: item.display_url,
       })),
     [trackData, CHART_COLORS]
   );
@@ -575,7 +577,7 @@ const Dashboard = () => {
                     <Cell
                       key={`cell-${index}`}
                       fill={entry.fill}
-                      onClick={() => console.log("클릭된 데이터:", entry)}
+                      onClick={() => (window.location.href = entry.url)}
                       style={{ cursor: "pointer" }}
                     />
                   ))}
