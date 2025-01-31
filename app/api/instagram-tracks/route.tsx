@@ -27,11 +27,11 @@ export async function POST(req: NextRequest) {
       SELECT COALESCE(
         jsonb_agg(
           CASE 
-            WHEN track->>'media_id' = $2 THEN 
+            WHEN track->>'media_id' = $2::text THEN 
               jsonb_build_object(
-                'media_id', $2,
-                'permalink', $3,
-                'display_url', $4,
+                'media_id', $2::text,
+                'permalink', $3::text,
+                'display_url', $4::text,
                 'clicks', (COALESCE((track->>'clicks')::int, 0) + 1),
                 'clicked_at', NOW()::text
               )
@@ -47,19 +47,19 @@ export async function POST(req: NextRequest) {
       ) filtered
     ) || 
     CASE 
-      WHEN NOT instagram_tracks @> jsonb_build_array(jsonb_build_object('media_id', $2))
+      WHEN NOT instagram_tracks @> jsonb_build_array(jsonb_build_object('media_id', $2::text))
       THEN jsonb_build_array(
         jsonb_build_object(
-          'media_id', $2,
-          'permalink', $3,
-          'display_url', $4,
+          'media_id', $2::text,
+          'permalink', $3::text,
+          'display_url', $4::text,
           'clicks', 1,
           'clicked_at', NOW()::text
         )
       )
       ELSE '[]'::jsonb
     END
-    WHERE cafe24_mall_id = $1
+    WHERE cafe24_mall_id = $1::text
     RETURNING true as success;
 `;
 
