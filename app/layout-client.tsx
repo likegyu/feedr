@@ -1,20 +1,26 @@
-'use client';
+"use client";
 
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 import { useEffect } from "react";
-import { differenceInSeconds } from 'date-fns';
+import { differenceInSeconds } from "date-fns";
 import { useCafe24Store } from "@/store/cafe24Store";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { AuthDialogProvider } from "@/components/auth-dialog-provider"
+} from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { AuthDialogProvider } from "@/components/auth-dialog-provider";
 
 function InitializeCafe24() {
-  const { initialized, expiresAt, setShopName, setExpiresAt, setIsLoading, setInitialized } = useCafe24Store();
-
+  const {
+    initialized,
+    expiresAt,
+    setShopName,
+    setExpiresAt,
+    setIsLoading,
+    setInitialized,
+  } = useCafe24Store();
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -24,7 +30,7 @@ function InitializeCafe24() {
       try {
         const [shopNameRes, expiresRes] = await Promise.all([
           fetch("/api/auth/cafe24/shop-name"),
-          fetch("/api/auth/cafe24/token-expires-check")
+          fetch("/api/auth/cafe24/token-expires-check"),
         ]);
 
         if (shopNameRes.ok) {
@@ -36,7 +42,6 @@ function InitializeCafe24() {
           const { data } = await expiresRes.json();
           setExpiresAt(data.cafe24ExpiresAt); // API 응답에 맞는 속성명 사용
         }
-        
       } catch (error) {
         console.error(error);
       } finally {
@@ -48,25 +53,27 @@ function InitializeCafe24() {
     fetchData();
   }, [initialized, setShopName, setExpiresAt, setIsLoading, setInitialized]);
 
-    
   // 토큰 만료 체크
   useEffect(() => {
     const checkExpiration = () => {
       // initialized가 true이고 expiresAt이 있을 때만 체크
       if (initialized && expiresAt) {
-        const diffInSeconds = differenceInSeconds(new Date(expiresAt), new Date());
+        const diffInSeconds = differenceInSeconds(
+          new Date(expiresAt),
+          new Date()
+        );
         const isExpired = diffInSeconds <= 0;
-        const hasInitialReload = sessionStorage.getItem('tokenExpiredReload');
+        const hasInitialReload = sessionStorage.getItem("tokenExpiredReload");
 
         // 만료되었고 아직 첫 리로드를 하지 않은 경우에만 리로드
         if (isExpired && !hasInitialReload) {
-          sessionStorage.setItem('tokenExpiredReload', 'true');
+          sessionStorage.setItem("tokenExpiredReload", "true");
           window.location.reload();
         }
-        
+
         // 만료 상태가 아닐 때는 리로드 플래그 제거
         if (!isExpired) {
-          sessionStorage.removeItem('tokenExpiredReload');
+          sessionStorage.removeItem("tokenExpiredReload");
         }
       }
     };
@@ -75,7 +82,6 @@ function InitializeCafe24() {
     checkExpiration(); // 초기 체크
     return () => clearInterval(interval);
   }, [expiresAt, initialized]);
-
 
   return null;
 }

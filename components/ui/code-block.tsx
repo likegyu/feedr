@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Highlight, themes } from 'prism-react-renderer';
-import { Check, Copy } from 'lucide-react';
+import React from "react";
+import { Highlight, themes } from "prism-react-renderer";
+import { Check, Copy } from "lucide-react";
 
 interface CodeBlockProps {
   code: string;
@@ -12,7 +12,13 @@ interface CodeBlockProps {
   onCopy?: () => void;
 }
 
-const CodeBlockHeader = ({ filePath, onCopy }: { filePath?: string; onCopy?: () => void }) => {
+const CodeBlockHeader = ({
+  filePath,
+  onCopy,
+}: {
+  filePath?: string;
+  onCopy?: () => void;
+}) => {
   const [copied, setCopied] = React.useState(false);
 
   const handleCopy = () => {
@@ -29,8 +35,8 @@ const CodeBlockHeader = ({ filePath, onCopy }: { filePath?: string; onCopy?: () 
           <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
           <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
         </div>
-        <span className="text-sm text-gray-600 font-mono ml-2">
-          {filePath || '예제 코드'}
+        <span className="text-sm text-gray-600 !font-geistMono ml-2">
+          {filePath || "예제 코드"}
         </span>
       </div>
       <button
@@ -47,7 +53,13 @@ const CodeBlockHeader = ({ filePath, onCopy }: { filePath?: string; onCopy?: () 
   );
 };
 
-export function CodeBlock({ code, language, filePath, maxHeight = '500px', onCopy }: CodeBlockProps) {
+export function CodeBlock({
+  code,
+  language,
+  filePath,
+  maxHeight = "500px",
+  onCopy,
+}: CodeBlockProps) {
   const theme = themes.github;
   const handleCopy = () => {
     if (onCopy) {
@@ -63,7 +75,7 @@ export function CodeBlock({ code, language, filePath, maxHeight = '500px', onCop
       <div style={{ maxHeight }} className="overflow-auto  bg-[#fbfbfb]">
         <Highlight code={code} language={language} theme={theme}>
           {({ className, tokens, getLineProps, getTokenProps }) => (
-            <pre className={`${className} p-4 m-0`}>
+            <pre className={`${className} p-4 m-0 !font-geistMono`}>
               {tokens.map((line, i) => (
                 <div key={i} {...getLineProps({ line })} className="table-row">
                   <span className="pr-4 text-gray-400 select-none w-[2.5em]">

@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { cookies } from 'next/headers';
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { cookies } from "next/headers";
 
 interface InstagramTrack {
   media_id: string;
@@ -14,11 +14,11 @@ export async function GET() {
   try {
     // 쿠키 이름을 'cafe24_mall_id'로 수정
     const cookieStore = await cookies();
-    const mallId = cookieStore.get('cafe24_mall_id')?.value;
+    const mallId = cookieStore.get("cafe24_mall_id")?.value;
 
     if (!mallId) {
       return NextResponse.json(
-        { success: false, error: '스토어 정보를 찾을 수 없습니다.' },
+        { success: false, error: "스토어 정보를 찾을 수 없습니다." },
         { status: 401 }
       );
     }
@@ -31,17 +31,18 @@ export async function GET() {
     `;
 
     const result = await db.query(query, [mallId]);
-    
+
     if (!result.rows.length) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         success: true,
-        data: [] 
+        data: [],
       });
     }
 
-    const tracks = typeof result.rows[0].instagram_tracks === 'string' 
-      ? JSON.parse(result.rows[0].instagram_tracks)
-      : (result.rows[0].instagram_tracks || []);
+    const tracks =
+      typeof result.rows[0].instagram_tracks === "string"
+        ? JSON.parse(result.rows[0].instagram_tracks)
+        : result.rows[0].instagram_tracks || [];
 
     // 30일이 지난 데이터는 필터링
     const thirtyDaysAgo = new Date();
@@ -54,15 +55,14 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      data: filteredTracks
+      data: filteredTracks,
     });
-
   } catch (error) {
-    console.error('Analytics error:', error);
+    console.error("Analytics error:", error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: '데이터를 불러오는 중 오류가 발생했습니다.' 
+      {
+        success: false,
+        error: "데이터를 불러오는 중 오류가 발생했습니다.",
       },
       { status: 500 }
     );

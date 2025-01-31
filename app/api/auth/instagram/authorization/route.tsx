@@ -3,15 +3,16 @@ import { db } from '@/lib/db';
 import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
-  const url = new URL(request.url);
-  const code = url.searchParams.get('code');
+  const baseUrl = process.env.APP_URL;
+  const { searchParams } = new URL(request.url);
+  const code = searchParams.get('code');
   const cookieStore = await cookies()
   const cafe24MallId = cookieStore.get('cafe24_mall_id')?.value
 
 
   if (!code) {
     console.error('필수 파라미터 누락:', { code: !!code });
-    return NextResponse.redirect(new URL('/dashboard?error=인증_정보_누락', request.url));
+    return NextResponse.redirect(new URL(`${baseUrl}/dashboard?error=인증_정보_누락`, request.url));
   }
 
   try {
@@ -73,9 +74,9 @@ export async function GET(request: NextRequest) {
       ]
     );
     
-    return NextResponse.redirect(new URL(`/dashboard?success=true`, request.url));
+    return NextResponse.redirect(new URL(`${baseUrl}/dashboard?success=true`, request.url));
   } catch (error) {
     console.error('Instagram 인증 처리 중 오류:', error);
-    return NextResponse.redirect(new URL(`/dashboard?error=서버_오류`, request.url));
+    return NextResponse.redirect(new URL(`${baseUrl}/dashboard?error=서버_오류`, request.url));
   }
 }

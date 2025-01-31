@@ -1,45 +1,52 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import React, { useState, useEffect } from "react";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import useEmblaCarousel from 'embla-carousel-react';
-import { ImageIcon, SquarePlay, Info } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/select";
+import useEmblaCarousel from "embla-carousel-react";
+import { ImageIcon, SquarePlay, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FeedSettings as FeedSettingsType } from '@/types/settings';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuthDialog } from "@/components/auth-dialog-provider"
+import { FeedSettings as FeedSettingsType } from "@/types/settings";
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuthDialog } from "@/components/auth-dialog-provider";
 
 const FeedSettings = () => {
   const { onOpen } = useAuthDialog();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [isCafe24TokenValid, setIsCafe24TokenValid] = useState<boolean | null>(null);
-  const [isInstagramConnected, setIsInstagramConnected] = useState<boolean | null>(null);
-  const [initialSettings, setInitialSettings] = useState<FeedSettingsType | null>(null);
-  const [layoutSettings, setLayoutSettings] = useState<FeedSettingsType | null>(null);
+  const [isCafe24TokenValid, setIsCafe24TokenValid] = useState<boolean | null>(
+    null
+  );
+  const [isInstagramConnected, setIsInstagramConnected] = useState<
+    boolean | null
+  >(null);
+  const [initialSettings, setInitialSettings] =
+    useState<FeedSettingsType | null>(null);
+  const [layoutSettings, setLayoutSettings] = useState<FeedSettingsType | null>(
+    null
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   const [emblaRef] = useEmblaCarousel({
-    align: 'center',
-    containScroll: 'keepSnaps',
-    dragFree: false,           // 스냅 효과를 위해 false로 설정
+    align: "center",
+    containScroll: "keepSnaps",
+    dragFree: false, // 스냅 효과를 위해 false로 설정
     loop: true,
-    skipSnaps: true,         // 정확한 스냅 위치 유지
-    direction: 'ltr',
-    inViewThreshold: 0.7,    // 성능 최적화를 위한 임계값
+    skipSnaps: true, // 정확한 스냅 위치 유지
+    direction: "ltr",
+    inViewThreshold: 0.7, // 성능 최적화를 위한 임계값
   });
 
   // Instagram 연동 상태 확인
@@ -47,33 +54,37 @@ const FeedSettings = () => {
     const checkAuthStatus = async () => {
       try {
         // Cafe24 토큰 만료 체크
-        const tokenResponse = await fetch('/api/auth/cafe24/token-expires-check');
+        const tokenResponse = await fetch(
+          "/api/auth/cafe24/token-expires-check"
+        );
         const tokenData = await tokenResponse.json();
-        const isTokenValid = tokenData?.data?.cafe24ExpiresAt 
-          && new Date(tokenData.data.cafe24ExpiresAt) > new Date();
+        const isTokenValid =
+          tokenData?.data?.cafe24ExpiresAt &&
+          new Date(tokenData.data.cafe24ExpiresAt) > new Date();
         setIsCafe24TokenValid(isTokenValid);
 
         // Instagram 연동 상태 체크
-        const instaResponse = await fetch('/api/auth/instagram/status');
+        const instaResponse = await fetch("/api/auth/instagram/status");
         const instaData = await instaResponse.json();
         setIsInstagramConnected(instaData.isConnected);
 
         // 두 인증이 모두 유효한 경우에만 설정 로드
         if (isTokenValid && instaData.isConnected) {
-          const response = await fetch('/api/settings/feed');
+          const response = await fetch("/api/settings/feed");
           if (!response.ok) {
-            throw new Error('설정 로드에 실패했습니다');
+            throw new Error("설정 로드에 실패했습니다");
           }
-          
+
           const data = await response.json();
           let settings: FeedSettingsType;
           if (data.pc_feed_settings) {
-            settings = typeof data.pc_feed_settings === 'string' 
-              ? JSON.parse(data.pc_feed_settings)
-              : data.pc_feed_settings;
+            settings =
+              typeof data.pc_feed_settings === "string"
+                ? JSON.parse(data.pc_feed_settings)
+                : data.pc_feed_settings;
           } else {
             settings = {
-              layout: 'grid',
+              layout: "grid",
               columns: 3,
               rows: 2,
               gap: 16,
@@ -81,15 +92,18 @@ const FeedSettings = () => {
               showMediaType: true,
             };
           }
-          
+
           setInitialSettings(settings);
           setLayoutSettings(settings);
         }
       } catch (error) {
-        console.error('인증 상태 확인 중 오류:', error);
+        console.error("인증 상태 확인 중 오류:", error);
         toast({
           title: "설정 로드 실패",
-          description: error instanceof Error ? error.message : "설정을 불러오는데 실패했습니다.",
+          description:
+            error instanceof Error
+              ? error.message
+              : "설정을 불러오는데 실패했습니다.",
           variant: "destructive",
         });
       } finally {
@@ -106,38 +120,41 @@ const FeedSettings = () => {
     return JSON.stringify(initialSettings) !== JSON.stringify(layoutSettings);
   };
 
-  const handleSettingChange = (key: string, value: string | number | boolean) => {
+  const handleSettingChange = (
+    key: string,
+    value: string | number | boolean
+  ) => {
     if (!layoutSettings) return;
-    
-    setLayoutSettings(prev => ({
+
+    setLayoutSettings((prev) => ({
       ...prev!,
-      [key]: value
+      [key]: value,
     }));
   };
 
   const handleSaveSettings = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch('/api/settings/feed', {
-        method: 'POST',
+      const response = await fetch("/api/settings/feed", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          type: 'pc',
+          type: "pc",
           settings: layoutSettings,
         }),
       });
 
-      if (!response.ok) throw new Error('설정 저장 실패');
+      if (!response.ok) throw new Error("설정 저장 실패");
 
       // Cafe24 스크립트 업데이트
-      const scriptResponse = await fetch('/api/cafe24-script/put', {
-        method: 'PUT',
+      const scriptResponse = await fetch("/api/cafe24-script/put", {
+        method: "PUT",
       });
-      
+
       if (!scriptResponse.ok) {
-        console.error('Cafe24 스크립트 업데이트 실패');
+        console.error("Cafe24 스크립트 업데이트 실패");
       }
 
       // 저장 성공 시 초기 설정값 업데이트
@@ -150,8 +167,9 @@ const FeedSettings = () => {
         description: "PC 레이아웃 설정이 성공적으로 저장되었습니다.",
       });
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다';
-      console.error('설정 저장 오류:', errorMessage);
+      const errorMessage =
+        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다";
+      console.error("설정 저장 오류:", errorMessage);
       toast({
         title: "오류가 발생했습니다",
         description: "설정 저장 중 문제가 발생했습니다. 다시 시도해주세요.",
@@ -167,70 +185,73 @@ const FeedSettings = () => {
     if (!layoutSettings) return null;
 
     // 레이아웃에 따라 아이템 개수 계산
-    const itemCount = layoutSettings.layout === 'carousel' 
-      ? 9 
-      : layoutSettings.columns * layoutSettings.rows;
+    const itemCount =
+      layoutSettings.layout === "carousel"
+        ? 9
+        : layoutSettings.columns * layoutSettings.rows;
 
-    const previewItems = Array(itemCount).fill(0).map((_, i) => {
-      const isVideo = i % 3 === 0; // 예시로 3번째마다 비디오로 설정
+    const previewItems = Array(itemCount)
+      .fill(0)
+      .map((_, i) => {
+        const isVideo = i % 3 === 0; // 예시로 3번째마다 비디오로 설정
 
-      return (
-        <div
-          key={i}
-          className="relative overflow-hidden"
-          style={{
-            width: layoutSettings.layout === 'carousel' 
-              ? `${100 / layoutSettings.columns}%` 
-              : '100%',
-            aspectRatio: '1 / 1',
-            borderRadius: layoutSettings.borderRadius,
-            backgroundColor: '#e5e7eb',
-            flexShrink: 0,
-          }}
-        >
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-            예시 이미지 {i + 1}
-          </div>
-          {/* 미디어 타입 아이콘 */}
-          {layoutSettings.showMediaType && (
-            <div className="absolute top-2 right-2 rounded-full p-1">
-              {isVideo ? (
-                <SquarePlay className="w-4 h-4 text-white" />
-              ) : (
-                <ImageIcon className="w-4 h-4 text-white" />
-              )}
+        return (
+          <div
+            key={i}
+            className="relative overflow-hidden"
+            style={{
+              width:
+                layoutSettings.layout === "carousel"
+                  ? `${100 / layoutSettings.columns}%`
+                  : "100%",
+              aspectRatio: "1 / 1",
+              borderRadius: layoutSettings.borderRadius,
+              backgroundColor: "#e5e7eb",
+              flexShrink: 0,
+            }}
+          >
+            <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+              예시 이미지 {i + 1}
             </div>
-          )}
-        </div>
-      );
-    });
+            {/* 미디어 타입 아이콘 */}
+            {layoutSettings.showMediaType && (
+              <div className="absolute top-2 right-2 rounded-full p-1">
+                {isVideo ? (
+                  <SquarePlay className="w-4 h-4 text-white" />
+                ) : (
+                  <ImageIcon className="w-4 h-4 text-white" />
+                )}
+              </div>
+            )}
+          </div>
+        );
+      });
 
     return (
       <div className="mb-8 bg-gray-50 p-4 rounded-lg">
         <p className="text-sm text-gray-500 mb-4">
-          {layoutSettings.layout === 'carousel' 
-            ? '👉 옆으로 스크롤하여 더 많은 이미지를 확인해보세요' 
-            : '👉 화면의 가로 길이가 768px 이상이 되면 피드가 PC 레이아웃으로 보여요'
-          }
+          {layoutSettings.layout === "carousel"
+            ? "👉 옆으로 스크롤하여 더 많은 이미지를 확인해보세요"
+            : "👉 화면의 가로 길이가 768px 이상이 되면 피드가 PC 레이아웃으로 보여요"}
         </p>
-        {layoutSettings.layout === 'carousel' ? (
+        {layoutSettings.layout === "carousel" ? (
           <div className="bg-white rounded-lg p-4">
-            <div 
-              className="overflow-hidden will-change-transform" 
+            <div
+              className="overflow-hidden will-change-transform"
               ref={emblaRef}
               style={{
-                WebkitBackfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: "hidden",
                 WebkitPerspective: 1000,
-                WebkitTransform: 'translate3d(0,0,0)',
+                WebkitTransform: "translate3d(0,0,0)",
               }}
             >
-              <div 
+              <div
                 className="flex"
                 style={{
                   gap: `${layoutSettings.gap}px`,
                   padding: `0 ${layoutSettings.gap}px`,
-                  transform: 'translate3d(0,0,0)',  // 하드웨어 가속 활성화
-                  willChange: 'transform',          // 변형 최적화
+                  transform: "translate3d(0,0,0)", // 하드웨어 가속 활성화
+                  willChange: "transform", // 변형 최적화
                 }}
               >
                 {previewItems}
@@ -241,7 +262,7 @@ const FeedSettings = () => {
           <div
             className="bg-white rounded-lg p-4"
             style={{
-              display: 'grid',
+              display: "grid",
               gridTemplateColumns: `repeat(${layoutSettings.columns}, 1fr)`,
               gap: `${layoutSettings.gap}px`,
             }}
@@ -258,9 +279,11 @@ const FeedSettings = () => {
       <Skeleton className="h-4 w-3/4 mb-4" />
       <div className="bg-white rounded-lg p-4">
         <div className="grid grid-cols-3 gap-4">
-          {Array(6).fill(0).map((_, i) => (
-            <Skeleton key={i} className="aspect-square rounded-lg" />
-          ))}
+          {Array(6)
+            .fill(0)
+            .map((_, i) => (
+              <Skeleton key={i} className="aspect-square rounded-lg" />
+            ))}
         </div>
       </div>
     </div>
@@ -268,19 +291,21 @@ const FeedSettings = () => {
 
   const SettingsSkeleton = () => (
     <div className="bg-white p-6 rounded-lg space-y-6">
-      {Array(5).fill(0).map((_, i) => (
-        <div key={i} className="space-y-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-      ))}
+      {Array(5)
+        .fill(0)
+        .map((_, i) => (
+          <div key={i} className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ))}
     </div>
   );
 
   // Preview 및 설정 UI 렌더링 조건부 처리
   if (isLoading) {
     return (
-      <div>
+      <div className="max-w-screen-2xl mx-auto p-4 space-y-6">
         <h2 className="text-2xl font-bold mb-4">PC 레이아웃 설정</h2>
         <PreviewSkeleton />
         <SettingsSkeleton />
@@ -290,60 +315,71 @@ const FeedSettings = () => {
 
   if (!isCafe24TokenValid) {
     return (
-      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">PC 레이아웃 설정</h2>
-            <Alert className="bg-blue-50 border-blue-200">
-              <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-blue-500" />
-                  <span>설정을 사용하기 위해서는 먼저 Cafe24에 로그인해주세요.</span>
-                </div>
-                <Button 
-                  onClick={onOpen}
-                  variant="default"
-                  className="bg-blue-500 hover:bg-blue-600 transition-colors"
-                >
-                  로그인
-                </Button>
-              </AlertDescription>
-            </Alert>
+      <div className="max-w-screen-2xl mx-auto p-4 space-y-6">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          PC 레이아웃 설정
+        </h2>
+        <Alert className="bg-blue-50 border-blue-200">
+          <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-blue-500" />
+              <span>
+                설정을 사용하기 위해서는 먼저 Cafe24에 로그인해주세요.
+              </span>
+            </div>
+            <Button
+              onClick={onOpen}
+              variant="default"
+              className="bg-blue-500 hover:bg-blue-600 transition-colors"
+            >
+              로그인
+            </Button>
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
 
   if (!isInstagramConnected) {
     return (
-      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">PC 레이아웃 설정</h2>
-            <Alert className="bg-gradient-to-r from-[#fdf5e6] to-[#fef1f6] border-[#fbcac9]">
-              <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-[#fbcac9]" />
-                  <span>설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.</span>
-                </div>
-                <Button
-                  variant="default"
-                  className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCB045] hover:brightness-110 text-white font-bold transition-all"
-                  asChild
-                >
-                  <a href="/instagram">연동하기</a>
-                </Button>
-              </AlertDescription>
-            </Alert>
+      <div className="max-w-screen-2xl mx-auto p-4 space-y-6">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          PC 레이아웃 설정
+        </h2>
+        <Alert className="bg-gradient-to-r from-[#fdf5e6] to-[#fef1f6] border-[#fbcac9]">
+          <AlertDescription className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-[#fbcac9]" />
+              <span>
+                설정을 사용하기 위해서는 먼저 Instagram 계정을 연동해주세요.
+              </span>
+            </div>
+            <Button
+              variant="default"
+              className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCB045] hover:brightness-110 text-white font-bold transition-all"
+              asChild
+            >
+              <a href="/instagram">연동하기</a>
+            </Button>
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
 
   if (!layoutSettings) {
     return (
-      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">PC 레이아웃 설정</h2>
+      <div className="max-w-screen-2xl mx-auto p-4 space-y-6">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          PC 레이아웃 설정
+        </h2>
         <Card>
-          <CardContent className='p-6 pt-6'>
+          <CardContent className="p-6 pt-6">
             <Alert variant="destructive">
               <AlertDescription className="flex items-center gap-2">
                 <Info className="h-4 w-4" />
-                설정을 불러오는데 실패했습니다. 페이지를 새로고침하거나 잠시 후 다시 시도해주세요.
+                설정을 불러오는데 실패했습니다. 페이지를 새로고침하거나 잠시 후
+                다시 시도해주세요.
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -353,12 +389,12 @@ const FeedSettings = () => {
   }
 
   return (
-    <div className="max-w-screen-xl mx-auto p-4 space-y-6">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">PC 레이아웃 설정</h2>
+    <div className="max-w-screen-2xl mx-auto p-4 space-y-6">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">
+        PC 레이아웃 설정
+      </h2>
       <Card>
-        <CardContent className="p-6 sm:p-8">
-          {renderPreview()}
-        </CardContent>
+        <CardContent className="p-6 sm:p-8">{renderPreview()}</CardContent>
       </Card>
       <Card>
         <CardContent className="p-6 sm:p-8 space-y-6">
@@ -367,7 +403,7 @@ const FeedSettings = () => {
               <Label className="text-gray-700 mb-2">레이아웃 스타일</Label>
               <Select
                 value={layoutSettings.layout}
-                onValueChange={(value) => handleSettingChange('layout', value)}
+                onValueChange={(value) => handleSettingChange("layout", value)}
               >
                 <SelectTrigger className="w-full bg-white border-gray-200 hover:border-gray-300 transition-colors">
                   <SelectValue placeholder="레이아웃 선택" />
@@ -388,14 +424,16 @@ const FeedSettings = () => {
                   min={1}
                   max={6}
                   step={1}
-                  onValueChange={([value]) => handleSettingChange('columns', value)}
+                  onValueChange={([value]) =>
+                    handleSettingChange("columns", value)
+                  }
                 />
                 <span className="text-sm text-gray-500">
                   {layoutSettings.columns}개
                 </span>
               </div>
 
-              {layoutSettings.layout === 'grid' && (
+              {layoutSettings.layout === "grid" && (
                 <div className="space-y-2">
                   <Label className="text-gray-700">로우 수</Label>
                   <Slider
@@ -404,7 +442,9 @@ const FeedSettings = () => {
                     min={1}
                     max={4}
                     step={1}
-                    onValueChange={([value]) => handleSettingChange('rows', value)}
+                    onValueChange={([value]) =>
+                      handleSettingChange("rows", value)
+                    }
                   />
                   <span className="text-sm text-gray-500">
                     {layoutSettings.rows}줄
@@ -420,7 +460,7 @@ const FeedSettings = () => {
                   min={0}
                   max={40}
                   step={4}
-                  onValueChange={([value]) => handleSettingChange('gap', value)}
+                  onValueChange={([value]) => handleSettingChange("gap", value)}
                 />
                 <span className="text-sm text-gray-500">
                   {layoutSettings.gap}px
@@ -435,7 +475,9 @@ const FeedSettings = () => {
                   min={0}
                   max={24}
                   step={2}
-                  onValueChange={([value]) => handleSettingChange('borderRadius', value)}
+                  onValueChange={([value]) =>
+                    handleSettingChange("borderRadius", value)
+                  }
                 />
                 <span className="text-sm text-gray-500">
                   {layoutSettings.borderRadius}px
@@ -451,18 +493,20 @@ const FeedSettings = () => {
                 </div>
                 <Switch
                   checked={layoutSettings.showMediaType}
-                  onCheckedChange={(checked) => 
-                    handleSettingChange('showMediaType', checked)
+                  onCheckedChange={(checked) =>
+                    handleSettingChange("showMediaType", checked)
                   }
                 />
               </div>
 
-              <Button 
+              <Button
                 className="w-full bg-blue-600 hover:bg-blue-700 transition-colors"
                 onClick={handleSaveSettings}
-                disabled={!isInstagramConnected || !hasSettingsChanged() || isSaving}
+                disabled={
+                  !isInstagramConnected || !hasSettingsChanged() || isSaving
+                }
               >
-                {!isInstagramConnected 
+                {!isInstagramConnected
                   ? "인스타그램 연동 필요"
                   : isSaving
                   ? "저장 중..."
